@@ -1,0 +1,1308 @@
+\section{The target and the scope of this milestone}
+
+Reisner's criterion converts an algebraic property of a face ring into
+vanishing of the homology of every link. It makes Cohen--Macaulayness
+accessible to combinatorial topology and explains why triangulated spheres
+give such rings. Our target is precisely Panov, Theorem 2.5
+\cite{panov}, over an arbitrary field. The empty face is essential.
+This document gives a complete informal proof route. Only the nodes explicitly
+marked as checked have Lean implementations; all other nodes, including
+foundational comparison theorems, are future formalization work.
+
+The route is through the multigraded extended Cech complex, local cohomology,
+and algebraic depth. Panov's Theorem 2.9 is a formula for Tor using induced
+subcomplexes. It is not the local-cohomology formula using links below.
+We compute the latter directly, including its degree shift and signs.
+The proofs of the project-specific lemmas below are arguments supplied by this
+project; the externally used algebraic foundations are separately identified.
+
+\section{Objects and conventions}
+
+\begin{definition}[Augmented finite complexes]\label{def:complex}
+\lean{Reisner.Complex, Reisner.Complex.face_of_subset, Reisner.Complex.nonface_of_subset}
+\leanok
+Fix a finite type $V$, possibly empty. A complex $K$ on the ambient set $V$
+is a downward closed collection of finite subsets of $V$ containing
+$\varnothing$. The complex $\{\varnothing\}$ is allowed; the void collection
+is excluded. The Lean structure also supports infinite ambient types.
+\end{definition}
+
+\begin{definition}[Vertices, facets, and dimension]\label{def:dimension}
+\uses{def:complex}
+\lean{Reisner.Complex.vertices, Reisner.Complex.maxFaceCard, Reisner.Complex.card_le_maxFaceCard, Reisner.Complex.exists_face_card_eq_maxFaceCard, Reisner.Complex.exists_facet_card_eq_maxFaceCard, Reisner.Complex.dimension, Reisner.Complex.maxFaceCard_eq_zero_iff_no_vertices, Reisner.Complex.dimension_eq_neg_one_iff_no_vertices}
+\leanok
+The actual vertices of $K$ are
+$W=\{v\in V:\{v\}\in K\}$; elements of $V\setminus W$ are ghost vertices.
+A facet is an inclusion-maximal face. Put
+\[
+ d(K)=\max_{F\in K}|F|,\qquad \dim K=d(K)-1\in\mathbb Z.
+\]
+Thus $\dim\{\varnothing\}=-1$, not zero.
+In Lean, $d(K)$ is \texttt{maxFaceCard}, the finite supremum of the
+cardinalities of all faces, and \texttt{dimension} is its integer cast
+minus one. The empty face makes the face type nonempty, so a face attains
+this maximum; extension to a facet shows that a facet also attains it.
+The checked zero-cardinality and dimension-minus-one characterizations
+hold exactly when all ambient vertices are ghosts.
+\end{definition}
+
+The Lean representation is a structure whose faces form a
+\texttt{LowerSet (Finset V)}, with an explicit empty-face field. This reuses
+mathlib's order API. The mathlib types
+\[
+\texttt{PreAbstractSimplicialComplex},\qquad\texttt{AbstractSimplicialComplex}
+\]
+use different conventions: the first excludes the empty face and the second
+also requires every singleton. Removing the empty face
+gives the former representation; adjoining it is the inverse operation.
+No such conversion is needed for this milestone. Finiteness of $V$ is a
+hypothesis of the ultimate target, but is unnecessary for monomial membership
+and the standard monomial basis.
+
+\begin{definition}[Links]\label{def:link}
+\uses{def:complex}
+For $\sigma\in K$ define a complex on the same ambient set by
+\[
+ \operatorname{lk}_K\sigma
+ =\{\tau:\tau\cap\sigma=\varnothing,\ \sigma\cup\tau\in K\}.
+\]
+Its empty face is present. Vertices of $\sigma$ become ghosts.
+In particular $\operatorname{lk}_K\varnothing=K$, and the link of a facet
+is $\{\varnothing\}$.
+\end{definition}
+
+\begin{lemma}[Link calculus]\label{lem:link-calculus}
+\uses{def:link,def:dimension}
+If $\tau\in\operatorname{lk}_K\sigma$, then
+$\operatorname{lk}_{\operatorname{lk}_K\sigma}\tau
+=\operatorname{lk}_K(\sigma\cup\tau)$.
+Facets of $\operatorname{lk}_K\sigma$ correspond to facets of $K$ containing
+$\sigma$ by $G\mapsto G\setminus\sigma$.
+Always $\dim\operatorname{lk}_K\sigma\le d(K)-|\sigma|-1$.
+If every facet of $K$ has cardinality $d$, equality holds with $d(K)=d$.
+\end{lemma}
+\begin{proof}
+Expand the two disjointness conditions in an iterated link: a face $T$ is
+disjoint from both $\sigma$ and $\tau$ and its union with both is in $K$.
+This is exactly membership in the stated link. For the facet correspondence,
+strict enlargement on either side gives a strict enlargement on the other by
+union or difference with $\sigma$. A maximal extension exists because $V$ is
+finite. The disjoint union $\sigma\cup T$ has size $|\sigma|+|T|\le d(K)$.
+For a pure complex, extend $\sigma$ to a facet and apply the correspondence;
+all resulting facets have size $d-|\sigma|$.
+\end{proof}
+
+\begin{definition}[Reduced homology, including degree minus one]\label{def:homology}
+\uses{def:complex}
+Choose a total order on $V$. For a field $k$, the augmented chain complex has
+$\widetilde C_i(K;k)$ freely spanned by increasing faces of size $i+1$ for
+$i\ge0$, $\widetilde C_{-1}=k$ with empty-face basis, and zero terms for
+$i<-1$. The boundary deletes vertices with signs $(-1)^r$; in degree zero
+each vertex maps to $1\in k$. Define $\widetilde H_i$ as kernel modulo image.
+Define reduced cochains by $\widetilde C^i=\operatorname{Hom}_k(\widetilde C_i,k)$
+with the transposed differential, and write $\widetilde H^i$ for cohomology.
+Changing the order gives the usual orientation-sign chain isomorphism.
+In particular $\widetilde H_{-1}(\{\varnothing\};k)=k$, whereas
+$\widetilde H_{-1}(K;k)=0$ if $K$ has any actual vertex. All groups below
+degree $-1$ vanish.
+\end{definition}
+The boundary squares to zero: deleting two different vertices in either
+order gives the same remaining face and opposite signs, and the boundary
+of an edge augments to $1-1=0$. Relabelling the order multiplies an oriented
+face by the sign of its sorting permutation, which commutes with deletion.
+This verifies that the construction and its order independence include the
+augmentation. Building this augmented complex in Lean is still required.
+
+\begin{lemma}[Homology versus cohomology]\label{lem:dual}
+\uses{def:homology}
+For every integer $i$,
+\[
+\widetilde H^i(K;k)\cong\operatorname{Hom}_k(\widetilde H_i(K;k),k).
+\]
+Consequently their vanishing
+conditions agree. Also $\widetilde H_0(K;k)=0$ for a complex with vertices
+if and only if its graph of vertices and edges is connected.
+\end{lemma}
+\begin{proof}
+Choose complements to boundaries inside cycles, and to cycles inside each
+chain space. The complex splits into its homology with zero differential
+and two-term complexes with invertible differential. Dualizing preserves
+this decomposition, proving the isomorphism (the resulting cohomology
+identification with the dual is canonical). A finite dimensional vector space
+has zero dual exactly when it is zero. In degree zero, boundaries identify
+the basis vectors at the endpoints of each edge. Quotienting by these
+relations leaves one basis vector per graph component. The augmentation is
+the sum of their coordinates, whose kernel has dimension one less than the
+number of components.
+\end{proof}
+
+\begin{definition}[Nonface generators and the face ring]\label{def:ring}
+\uses{def:complex}
+\lean{Reisner.squarefreeExponent, Reisner.monomial_squarefreeExponent_eq_prod, Reisner.Complex.nonfaceExponents, Reisner.Complex.stanleyReisnerIdeal, Reisner.Complex.stanleyReisnerIdeal_eq_span, Reisner.Complex.FaceRing}
+\leanok
+Let $S=k[x_v:v\in V]$, represented by \texttt{MvPolynomial V k}.
+Exponents are finitely
+supported maps $\alpha:V\to_0\mathbb N$, with
+$\operatorname{supp}\alpha=\{v:\alpha(v)\ne0\}$ and monic monomial $x^\alpha$.
+For a finite set $F$, let $\mathbf1_F$ be its finitely supported indicator
+and $x_F=x^{\mathbf1_F}=\prod_{v\in F}x_v$ (the empty product is $1$).
+Define
+\[
+ I_K=(x_F:F\notin K),\qquad A=k[K]=S/I_K.
+\]
+The definition is an ideal span of squarefree nonface generators, not a
+membership predicate.
+\end{definition}
+For the future grading development use total degree $1$ for variables, and retain
+the finer $\mathbb N^V$ grading. Panov uses degree $2$ instead; this regrading
+does not change the ungraded ring or Cohen--Macaulayness.
+
+\begin{definition}[Algebraic Cohen--Macaulayness]\label{def:cm}
+For a Noetherian local ring $(B,\mathfrak n)$, a regular sequence is a finite
+sequence in $\mathfrak n$ whose successive multiplications on the successive
+quotients are injective; the final quotient is nonzero. Its depth is the
+supremum of lengths of these sequences. It is Cohen--Macaulay if
+$\operatorname{depth} B=\dim B$, with Krull dimension defined by chains of
+prime ideals. A Noetherian ring $A$ is Cohen--Macaulay if every localization
+$A_{\mathfrak p}$ at a prime is a Cohen--Macaulay local ring. It is equivalent
+to test maximal ideals. These are algebraic definitions, independent of links
+or homology; see Stacks, Sections 10.103--10.104 \cite{stacks-cm}.
+\end{definition}
+
+\section{The implemented algebraic entry point}
+
+\begin{lemma}[Squarefree exponent comparison]\label{lem:indicator}
+\uses{def:ring}
+\lean{Reisner.squarefreeExponent_apply, Reisner.support_squarefreeExponent, Reisner.squarefreeExponent_le_iff}
+\leanok
+For any finite $F$ and $\alpha:V\to_0\mathbb N$,
+\[
+ \mathbf1_F\le\alpha\quad\Longleftrightarrow\quad
+ F\subseteq\operatorname{supp}\alpha.
+\]
+\end{lemma}
+\begin{proof}
+\leanok
+The order is pointwise. At $v\in F$ it requires $1\le\alpha(v)$, equivalent
+over $\mathbb N$ to $\alpha(v)\ne0$. At $v\notin F$ it requires only
+$0\le\alpha(v)$. This also shows $\operatorname{supp}\mathbf1_F=F$.
+\end{proof}
+
+\begin{theorem}[Monomial membership]\label{thm:membership}
+\uses{def:ring,lem:indicator}
+\lean{Reisner.Complex.monomial_mem_stanleyReisnerIdeal_iff}
+\leanok
+For every $\alpha:V\to_0\mathbb N$,
+\[
+ x^\alpha\in I_K\quad\Longleftrightarrow\quad
+ \operatorname{supp}\alpha\notin K.
+\]
+\end{theorem}
+\begin{proof}
+\leanok
+Mathlib's \texttt{MvPolynomial.mem\_ideal\_span\_monomial\_image} says that a
+polynomial is in the ideal spanned by monic monomials with exponent set $E$
+exactly when each exponent in its polynomial support dominates an element
+of $E$. Apply it with $E=\{\mathbf1_F:F\notin K\}$ to $x^\alpha$.
+Its polynomial support is $\{\alpha\}$ because $1\ne0$ in a field.
+Thus membership is equivalent to the existence of $F\notin K$ with
+$\mathbf1_F\le\alpha$. By Lemma~\ref{lem:indicator} this says that a nonface
+is contained in $\operatorname{supp}\alpha$. Downward closure forbids this
+when the latter is a face. Conversely, when it is a nonface, take
+$F=\operatorname{supp}\alpha$ itself. The argument needs only a nontrivial
+commutative semiring, and does not need $V$ finite; the Lean theorem retains
+this greater generality.
+\end{proof}
+
+\begin{proposition}[Standard monomial basis]\label{prop:basis}
+\uses{thm:membership}
+\lean{Reisner.Complex.mem_stanleyReisnerIdeal_iff, Reisner.Complex.faceExponents, Reisner.Complex.stanleyReisnerIdeal_restrictScalars_eq_restrictSupport, Reisner.Complex.isCompl_stanleyReisnerIdeal_faceSupport, Reisner.Complex.faceRingBasis, Reisner.Complex.faceRingBasis_apply, Reisner.Complex.faceRing_nontrivial, Reisner.Complex.faceRing_algebraMap_injective}
+\leanok
+A polynomial $f\in S$ belongs to $I_K$ exactly when every exponent in its
+polynomial support has nonface vertex support. The classes of the monomials
+$x^\alpha$ with $\operatorname{supp}\alpha\in K$ form a $k$-basis of $A$.
+The basis index is the subtype of finitely supported exponents with
+face support, and its vector at $\alpha$ is the quotient class of
+$x^\alpha$. In particular $A\ne0$ and the scalar map $k\longrightarrow A$
+is injective.
+\end{proposition}
+\begin{proof}
+\leanok
+Apply the same mathlib monomial-ideal theorem to each exponent in $f$ and
+use the indicator comparison and downward closure, exactly as above.
+Split the polynomial monomial basis into face-supported and nonface-supported
+parts. The ideal is precisely the span of the latter. Every polynomial is a
+finite sum of these two parts, so face-supported classes span the quotient.
+A linear combination of them in the ideal would have all its nonzero
+coefficients simultaneously face-supported and nonface-supported, an
+impossibility. Hence they are independent. In Lean, identify the coefficient
+submodule of the ideal with \texttt{MvPolynomial.restrictSupport} on the
+nonface exponents. The monomial basis and the complementary exponent sets
+give complementary submodules. Transport the canonical face-supported basis
+using mathlib's \texttt{quotientEquivOfIsCompl} in the inverse direction.
+This inverse takes each polynomial
+to its class in the actual ideal quotient, as checked explicitly for each
+basis vector.
+The zero exponent has empty support, a face, so its class $1$ survives.
+More generally, a nonzero constant has only the zero exponent in its
+polynomial support, so it cannot lie in the ideal. This proves injectivity
+of the scalar map. Polynomial membership needs only a commutative semiring;
+the basis and scalar injectivity hold over any commutative ring, with
+nontriviality of that ring needed for $A\ne0$. The ambient type may be
+infinite throughout.
+\end{proof}
+
+\begin{lemma}[Weighted homogeneity of the nonface ideal]\label{lem:homogeneous}
+\uses{def:ring}
+\lean{Reisner.Complex.stanleyReisnerIdeal_isHomogeneous, Reisner.Complex.weightedHomogeneousComponent_mem_stanleyReisnerIdeal, Reisner.weight_fine_eq, Reisner.weight_one_eq_sum}
+\leanok
+Let $V$ be any type, $K$ an augmented complex on $V$, $R$ a commutative
+semiring, $M$ an additive commutative monoid, and $w:V\to M$ any weight
+function. For an exponent $\alpha:V\to_0\mathbb N$ put
+\[
+ |\alpha|_w=\sum_{v\in\operatorname{supp}\alpha}\alpha(v)\,w(v),
+ \qquad
+ S_d=\left\{p\in R[x_v:v\in V]:
+   \forall\alpha,\ [x^\alpha]p\ne0\Longrightarrow |\alpha|_w=d\right\}.
+\]
+Here $n\,m$ means repeated addition in $M$. These are the weighted
+homogeneous submodules of the polynomial algebra; its degree-$d$
+projection is
+\[
+ \pi_d(p)=\sum_{\substack{\alpha\in\operatorname{supp}p\\|\alpha|_w=d}}
+       [x^\alpha]p\,x^\alpha.
+\]
+The existing ideal $I_K=(x_F:F\notin K)$ is homogeneous for this grading:
+\[
+ p\in I_K\quad\Longrightarrow\quad\pi_d(p)\in I_K
+ \qquad(d\in M).
+\]
+In Lean, \texttt{Ideal.IsHomogeneous} expresses this property for
+mathlib's weighted polynomial grading and its component projections.
+For $M=V\to_0\mathbb N$ and the fine weight $w(v)=e_v$, with $e_v$ the exponent supported at $v$
+and equal to $1$ there, $|\alpha|_w=\alpha$. For the constant weight
+$w(v)=1$ in $\mathbb N$, $|\alpha|_w=\sum_v\alpha(v)$, so the same ideal
+is homogeneous for both the fine grading and the usual total-degree
+grading of the polynomial ring. No finiteness, nonzero-weight, or
+nontrivial-coefficient hypothesis is required.
+\end{lemma}
+\begin{proof}
+\leanok
+We give the generator argument explicitly; its specialization to the
+nonface generating set is a project argument. Every polynomial has only
+finitely many exponents, so grouping its terms by $|\alpha|_w$ gives a
+finite homogeneous decomposition, even if $V$ is infinite or some weights
+are zero. Since $|\alpha+\beta|_w=|\alpha|_w+|\beta|_w$, products of
+homogeneous polynomials of degrees $e$ and $f$ are homogeneous of degree
+$e+f$. These are the decomposition and multiplication properties of the
+weighted polynomial grading.
+
+For each nonface $F$, its generator
+$x_F=x^{\mathbf1_F}$ lies in $S_{|\mathbf1_F|_w}$. More generally, a
+monomial with any coefficient is homogeneous of its exponent's weighted
+degree, including when it is zero. If $q=\sum_e q_e$ is the finite
+homogeneous decomposition of an arbitrary multiplier and
+$\delta=|\mathbf1_F|_w$, then
+\[
+ \pi_d(qx_F)=\sum_{\substack{e\\e+\delta=d}}q_e x_F.
+\]
+Every term on the right is in $I_K$. A polynomial of $I_K$ is a finite
+sum of multiples of its displayed generators, and the projections are
+additive, so all its projections belong to $I_K$. This proves homogeneity
+of the whole generator-defined ideal. Different degrees $e$ may satisfy
+$e+\delta=d$; all of them are retained, so no cancellation or ordering
+property of $M$ is used. Conversely, if every $\pi_d(p)$ belongs to the
+ideal, their finite sum $p$ does also.
+
+In namespace \texttt{Ideal}, the theorem \texttt{homogeneous\_span}
+supplies this argument. In namespace \texttt{MvPolynomial}, monomial
+homogeneity uses \texttt{isWeightedHomogeneous\_monomial}, and the
+polynomial grading is \texttt{weightedGradedAlgebra}. Its decomposition
+projections are the stated weighted components, so the library's
+component-preservation theorem gives the displayed consequence directly.
+Only the set of generators is used: downward closure, the empty-face
+witness, and the presence or absence of ambient singleton faces do not
+enter this argument. The existing complex conventions are preserved.
+
+For fine weights the degree is
+$\sum_v\alpha(v)e_v=\sum_v\alpha(v)\,\mathbf1_{\{v\}}=\alpha$,
+the standard reconstruction of a finitely supported function. For unit
+weights it is $\sum_v\alpha(v)\cdot1=\sum_v\alpha(v)$, the ordinary
+exponent sum. These finite sums also prove the two specializations without
+assuming $V$ finite. This lemma concerns the polynomial ideal; construction
+of the quotient grading is the separate next proposition.
+\end{proof}
+
+\begin{proposition}[Fine grading and degree zero]\label{prop:grading}
+\uses{lem:homogeneous,prop:basis,def:ring}
+\lean{Reisner.Complex.weightedFaceRingComponent, Reisner.Complex.weightedFaceRingComponent_eq_span, Reisner.Complex.monomial_nonface_eq_zero, Reisner.Complex.weightedFaceRingComponent_eq_polynomial_image, Reisner.Complex.weightedFaceRingComponent_mul, Reisner.Complex.weightedFaceRing_isInternal, Reisner.Complex.weightedFaceRingGradedAlgebra, Reisner.Complex.faceRingFineComponent, Reisner.Complex.faceRingTotalComponent, Reisner.Complex.faceRingFineGradedAlgebra, Reisner.Complex.faceRingTotalGradedAlgebra, Reisner.Complex.faceRingFineComponent_eq_span_monomial, Reisner.Complex.faceRingFineComponent_eq_bot_of_nonface, Reisner.Complex.faceRingTotalComponent_eq_span, Reisner.Complex.faceRingTotalComponent_eq_iSup_fine, Reisner.Complex.faceRingFineComponent_zero, Reisner.Complex.faceRingTotalComponent_zero, Reisner.Complex.faceRingDegreeZeroSubalgebra, Reisner.Complex.faceRingDegreeZeroEquiv, Reisner.Complex.faceRingDegreeZeroEquiv_apply}
+\leanok
+Allow any ambient type $V$ and any commutative coefficient ring $R$,
+in particular any field $k$, and write $A=R[K]$ for the actual quotient.
+Let $q:R[x_v:v\in V]\to A$ be its quotient map, let
+$J=\{\alpha:V\to_0\mathbb N:\operatorname{supp}\alpha\in K\}$, and let
+$b_\alpha=q(x^\alpha)$ for $\alpha\in J$ be the checked standard basis.
+For every exponent $\alpha$, the fine component is
+\[
+ A_\alpha=
+ \begin{cases}
+ R\,b_\alpha,&\operatorname{supp}\alpha\in K,\\
+ 0,&\operatorname{supp}\alpha\notin K.
+ \end{cases}
+\]
+These submodules give a genuine internal direct-sum grading of the quotient:
+\[
+ A=\bigoplus_{\alpha:V\to_0\mathbb N}A_\alpha,
+ \qquad 1\in A_0,\qquad A_\alpha A_\beta\subseteq A_{\alpha+\beta}.
+\]
+Thus the fine grading is indexed by finitely supported nonnegative exponent
+vectors; for finite $V$ this is the usual $\mathbb N^V$ grading.
+Put $|\alpha|=\sum_v\alpha(v)$, the additive total-degree map. Its
+coarsening has components
+\[
+ T_n=\operatorname{span}_R\{b_\alpha:\alpha\in J,\ |\alpha|=n\}
+     =\bigoplus_{|\alpha|=n} A_\alpha.
+\]
+\[
+ A=\bigoplus_{n\in\mathbb N}T_n,
+ \qquad T_mT_n\subseteq T_{m+n}.
+\]
+Both decompositions are supplied as graded-algebra structures on $A$,
+with their canonical finite homogeneous decompositions. The fine and total
+degree-zero components coincide and are precisely the scalar image:
+\[
+ A_0=T_0=R\,1=\operatorname{im}(R\longrightarrow A).
+\]
+With multiplication inherited from $A$, this component is a subalgebra,
+and the scalar map induces the canonical algebra equivalence
+$R\simeq_R T_0$. In particular the original identification $A_0=k$ holds
+over every field. No finite-vertex, purity, no-ghost, nonemptiness, or
+nontrivial-coefficient hypothesis is added.
+\end{proposition}
+\begin{proof}
+\leanok
+We give the quotient construction explicitly, using the checked standard
+basis rather than replacing the quotient by another ring. More generally,
+for a weight $w:V\to M$ into any additive commutative monoid, partition the
+basis indices into $J_d=\{\alpha\in J:|\alpha|_w=d\}$ and put
+$B_d=\operatorname{span}_R\{b_\alpha:\alpha\in J_d\}$.
+The basis-coordinate equivalence identifies $B_d$ with the finitely
+supported coefficient functions on $J$ whose support is contained in
+$J_d$. Every basis index lies in exactly one fiber. Hence these submodules
+span $A$, and a sum from distinct fibers can vanish only when each of its
+basis coefficients vanishes. Equivalently, each fiber submodule is disjoint
+from the sum of all the others. Thus their sum is internal. Transporting
+the supported-coordinate decomposition through the basis equivalence gives
+actual direct-sum decomposition data on $A$; each element has only finitely
+many nonzero homogeneous components.
+
+These components also agree with the images of the polynomial weighted
+homogeneous submodules under $q$. Indeed, a polynomial homogeneous of degree
+$d$ is a sum of monomials of weight $d$. Monomials with nonface support
+vanish in the quotient, while the others give exactly the displayed basis
+vectors of $B_d$. Conversely every such basis vector has its homogeneous
+monomial representative. Lemma~\ref{lem:homogeneous} ensures that
+$q(\pi_d(p))$ is independent of the chosen polynomial representative $p$:
+changing the representative changes its weighted component by an element
+of the nonface ideal. These descended projections are exactly the
+coordinate-fiber projections just constructed.
+
+For any exponents $\alpha,\beta$, multiplication of monomials gives
+$q(x^\alpha)q(x^\beta)=q(x^{\alpha+\beta})$. If the sum exponent has face
+support, this is its standard basis vector; otherwise it is zero by ideal
+membership. Since weighted degrees add, the product of a basis vector in
+$B_d$ and one in $B_e$ lies in $B_{d+e}$ in either case. Bilinearity extends
+this to $B_dB_e\subseteq B_{d+e}$. The zero exponent has empty face support,
+and its basis vector is $q(1)=1$, of weight zero. Internal decomposition,
+the unit condition, and this multiplication law supply the graded-algebra
+structure.
+
+For fine weights $w(v)=e_v$, the checked identity
+$|\alpha|_w=\alpha$ makes each fiber either a singleton basis index or
+empty. This gives precisely the stated $A_\alpha$, including zero for a
+nonface exponent. For unit weights, $|\alpha|_w=|\alpha|$ gives $T_n$.
+Its basis-index fiber is the union of the fine fibers with
+$|\alpha|=n$, so its submodule is their supremum, and their sum is internal
+by the same basis independence. Thus the total grading is the asserted
+coarsening of the fine grading, with both its direct sum and multiplication
+law proved.
+
+For nonnegative integer exponents, $|\alpha|=0$ holds exactly when
+$\alpha=0$. Consequently $T_0=A_0=R\,b_0=R\,1$. A scalar multiple of $1$
+is the image of that scalar under the algebra map. Proposition~\ref{prop:basis}
+already proves this scalar map injective, and the displayed span makes it
+surjective onto the degree-zero subalgebra. Restricting the scalar algebra
+homomorphism to that subalgebra therefore gives the stated algebra
+equivalence, with its value at every scalar explicitly the original scalar
+image in $A$.
+
+If $K=\{\varnothing\}$, the only face-supported exponent is zero, so both
+gradings are concentrated in degree zero and $A\simeq_R R$. For a ghost
+vertex $v$, the fine component at $e_v$ is zero, since its support is the
+nonface $\{v\}$; the ambient index set is unchanged. Infinite ambient types
+cause no problem because every exponent and every basis expansion has finite
+support. The component families, internal gradings, coarsening, zero
+components, and scalar algebra equivalence are checked in Lean.
+\end{proof}
+
+\begin{proposition}[Ghost vertices]\label{prop:ghost}
+\uses{prop:basis,def:dimension,def:homology,def:link}
+Passing from the ambient $V$ to $W=\{v:\{v\}\in K\}$ gives an isomorphic
+face ring. Links and augmented homology are unchanged after removing ghosts.
+For $K=\{\varnothing\}$ the face ring is $k$, even when $V$ is nonempty.
+\end{proposition}
+\begin{proof}
+Every ghost variable is a nonface generator and hence zero in $A$. Inclusion
+of the remaining variables and evaluation of ghost variables at zero induce
+inverse maps of the two quotients: their composites agree on coefficients
+and every variable. The face bases in the chain complexes coincide, as no
+face contains a ghost. If there are no actual vertices the only surviving
+monomial is $1$.
+\end{proof}
+
+\begin{proposition}[Finite type and the augmentation ideal]\label{prop:augmentation}
+\uses{def:ring,prop:basis,prop:grading}
+\lean{Reisner.Complex.faceRingAugmentation, Reisner.Complex.faceRingAugmentation_mk, Reisner.Complex.faceRingAugmentation_algebraMap, Reisner.Complex.faceRingAugmentation_surjective, Reisner.Complex.faceRingAugmentationIdeal, Reisner.Complex.faceRingPositiveIdeal, Reisner.Complex.idealOfVars_eq_ker_constantCoeff, Reisner.Complex.faceRingAugmentationIdeal_eq_map_idealOfVars, Reisner.Complex.faceRingAugmentation_ker, Reisner.Complex.faceRingResidueEquiv, Reisner.Complex.faceRingResidueEquiv_mk, Reisner.Complex.faceRing_finiteType, Reisner.Complex.faceRing_isNoetherianRing, Reisner.Complex.faceRingAugmentationIdeal_eq_positive, Reisner.Complex.faceRingAugmentationIdeal_isHomogeneous, Reisner.Complex.faceRingAugmentationIdeal_isMaximal, Reisner.Complex.faceRing_variable_eq_zero_of_ghost, Reisner.Complex.faceRingAugmentationIdeal_eq_span_vertices, Reisner.Complex.faceRingAugmentationIdeal_eq_bot_of_no_vertices, Reisner.Complex.faceRingAugmentationEquivOfNoVertices, Reisner.Complex.faceRingAugmentationEquivOfNoVertices_apply}
+\leanok
+Let $K$ be an augmented complex on any ambient type $V$, let $R$ be a
+commutative ring, and put $A=R[K]$, with quotient map
+$q:R[x_v:v\in V]\to A$ and total-degree components $T_n$ from
+Proposition~\ref{prop:grading}. Evaluation of every variable at zero induces
+an augmentation algebra map
+\[
+ \varepsilon:A\longrightarrow R,\qquad
+ \varepsilon(q(p))=[x^0]p.
+\]
+It satisfies $\varepsilon(r\,1)=r$ and is surjective. Define independently
+the variable ideal and the positive-degree ideal by
+\[
+ \mathfrak m=(q(x_v):v\in V),\qquad
+ A_{>0}=\bigl(\,\bigcup_{n>0}T_n\,\bigr).
+\]
+The parentheses in the second expression mean the ideal generated by the
+displayed homogeneous elements. Then
+\[
+ \ker\varepsilon=\mathfrak m=A_{>0},\qquad
+ A/\mathfrak m\simeq_R R.
+\]
+The residue equivalence sends the class of $a$ to $\varepsilon(a)$.
+The ideal $\mathfrak m$ is homogeneous for the total grading; if $R=k$
+is a field, it is maximal and the residue algebra is exactly $k$.
+If $V$ is finite, $A$ is a finite-type $R$-algebra. If moreover $R$ is
+Noetherian, then $A$ is Noetherian. In particular these conclusions hold
+for a finite ambient type over any field, and $\mathfrak m$ is precisely
+the homogeneous maximal ideal used in Proposition~\ref{prop:dimension}.
+
+For a ghost vertex $v$, $q(x_v)=0$, so $\mathfrak m$ can equivalently be
+generated by the classes indexed only by actual vertices. This omits zero
+generators inside the same quotient ring. If $K=\{\varnothing\}$, then
+$\mathfrak m=0$ and $\varepsilon$ itself is an algebra equivalence
+$A\simeq_R R$. No purity, actual-vertex, nonempty-ambient, or no-ghost
+hypothesis is imposed; finiteness is needed only for the finite-type and
+Noetherian conclusions.
+\end{proposition}
+\begin{proof}
+\leanok
+The constant-coefficient map on the polynomial ring is a ring homomorphism
+and fixes the coefficient ring. For $p\in I_K$, a nonzero coefficient at
+exponent zero would put zero in the polynomial support. The checked
+membership theorem would then say that its empty vertex support is a
+nonface, contradicting the empty-face witness. Thus the constant-coefficient
+map kills $I_K$ and descends through the actual quotient to the stated
+algebra map. Its value on scalar classes is the original scalar, proving
+surjectivity and compatibility with the checked scalar embedding.
+
+In the polynomial ring, put $J=(x_v:v\in V)$. A polynomial is in $J$
+exactly when its constant coefficient is zero: every nonconstant monomial
+has a variable factor, while every multiple of a variable has zero constant
+coefficient. The existing variable-ideal membership theorem gives this
+coefficient characterization directly, without a finite-vertex hypothesis.
+Hence $J$ is the kernel of the polynomial constant-coefficient map.
+Its image under $q$ is the ideal generated by the variable classes, namely
+$\mathfrak m$. Every element of $A$ has a polynomial representative; the
+augmentation of that representative vanishes exactly when the representative
+is in $J$. This proves $\ker\varepsilon=q(J)=\mathfrak m$.
+
+Each variable class belongs to $T_1$, so the variable ideal is contained
+in $A_{>0}$. Conversely, by the polynomial-image comparison in
+Proposition~\ref{prop:grading}, every element of $T_n$ has a polynomial
+representative homogeneous of total degree $n$. For $n>0$ its exponent-zero
+coefficient is zero, so its augmentation is zero. The kernel is an ideal;
+it therefore contains the ideal generated by all these positive components.
+Together with the kernel calculation this proves
+$\mathfrak m=A_{>0}$. These generators are homogeneous, so their ideal is
+homogeneous. Surjectivity and the first isomorphism theorem give the stated
+residue algebra equivalence, with the displayed value formula. When the
+target $R$ of the augmentation is a field, this quotient is a field and
+$\mathfrak m$ is maximal.
+
+For finite $V$, the polynomial algebra is generated by its finitely many
+variables, and its quotient is a finite-type algebra. If $R$ is Noetherian,
+Hilbert's basis theorem and passage to a quotient make $A$ Noetherian.
+These are the standard finite-type and quotient results already available
+in the pinned library; this step makes no Krull-dimension assertion.
+
+A ghost singleton is a nonface, so its variable class vanishes by checked
+monomial membership. Removing these zero elements from the generating set
+does not change its ideal. If the empty face is the only face, every
+singleton is a ghost, whence $\mathfrak m=0$. The augmentation then has
+zero kernel and is both injective and surjective, giving the stated algebra
+equivalence. This argument includes an empty ambient type and arbitrarily
+many ghost vertices; it neither changes the ambient type nor claims a
+ghost-removal comparison for links or homology. The finite-type and
+Noetherian statements, augmentation and ideal identifications, homogeneity,
+maximality, residue equivalence, and these ghost and empty-face-only
+consequences are checked in Lean.
+\end{proof}
+
+\begin{proposition}[Coordinate primes and facet intersection]\label{prop:facet-primes}
+\uses{def:complex,def:ring,prop:basis}
+\lean{Reisner.coordinateIdeal, Reisner.mem_coordinateIdeal_iff, Reisner.coordinateRestriction, Reisner.coordinateRestriction_ker, Reisner.coordinateRestriction_surjective, Reisner.coordinateQuotientEquiv, Reisner.coordinateQuotientEquiv_mk, Reisner.coordinateRestriction_X_inside, Reisner.coordinateRestriction_X_outside, Reisner.coordinateIdeal_isPrime, Reisner.coordinateQuotient_ringKrullDim, Reisner.Complex.facets, Reisner.Complex.facets_finite, Reisner.Complex.exists_facet_superset, Reisner.Complex.facets_nonempty, Reisner.Complex.stanleyReisnerIdeal_eq_iInf_coordinateIdeal, Reisner.Complex.exists_facet_coordinateIdeal_le, Reisner.Complex.ghost_not_mem_facet, Reisner.Complex.facets_eq_singleton_empty_of_no_vertices}
+\leanok
+Let $V$ be a finite ambient type, $k$ a field, $K$ an augmented complex,
+and $S=k[x_v:v\in V]$. Write
+\[
+ \operatorname{Fac}(K)=
+ \{F\in K:\ \forall G\in K,\ F\subseteq G\Longrightarrow G\subseteq F\}.
+\]
+Thus facets are maximal faces, with the empty face allowed. The facet
+type is finite and nonempty, and every face is contained in a facet.
+For any finite set $F\subseteq V$, independently of whether it is a face,
+define the coordinate ideal by its variable generators:
+\[
+ P_F=(x_v:v\notin F)\subseteq S.
+\]
+For every polynomial $p$,
+\[
+ p\in P_F\quad\Longleftrightarrow\quad
+ \forall\alpha\in\operatorname{supp}p,\quad
+       \operatorname{supp}\alpha\not\subseteq F.
+\]
+Equivalently, each nonzero term has a variable outside $F$ in its support.
+Setting those outside variables to zero and retaining the variables of $F$
+induces the explicit algebra equivalence
+\[
+ S/P_F\simeq_k k[x_v:v\in F].
+\]
+The ideal $P_F$ is prime, and $\dim(S/P_F)=|F|$. In Lean the latter is
+an equality for ring Krull dimension with the natural-number cardinality
+cast into its extended dimension type. The actual nonface-generated ideal
+satisfies the equality for arbitrary polynomials
+\[
+ I_K=\bigcap_{F\in\operatorname{Fac}(K)}P_F.
+\]
+Every prime ideal $Q$ of $S$ containing $I_K$ contains $P_F$ for at least
+one facet $F$.
+
+Coordinate membership holds over any commutative semiring. The coordinate
+quotient equivalence holds over any commutative ring, and the coordinate
+ideal is prime over any integral domain. These coordinate statements, and
+the quotient dimension formula over a field, need no finiteness of the
+ambient type because $F$ itself is finite. Finite ambient vertices are
+used for facet extension and the finite intersection and prime-containment
+arguments. No purity or no-ghost hypothesis is imposed.
+\end{proposition}
+\begin{proof}
+\leanok
+The facet predicate is maximality in the inclusion order on finite faces.
+There are finitely many subsets of a finite ambient type, so the facet
+subtype is finite. Every face has a maximal face above it in this finite
+partially ordered set. Applying this to the empty face also shows that
+the facet type is nonempty. This uses the augmented convention, including
+when the empty face is the only face.
+
+The variable-ideal membership theorem says that $p\in P_F$ exactly when
+each exponent in its polynomial support has a nonzero coordinate at some
+$v\notin F$. This is precisely the displayed support condition.
+Define $r_F:S\to k[x_v:v\in F]$ by sending $x_v$ to its corresponding
+variable if $v\in F$, and to zero otherwise, while fixing coefficients.
+The polynomial inclusion from the variable subtype $F$ back to $V$ is a
+right inverse to $r_F$, so $r_F$ is surjective.
+
+Under $r_F$, the terms whose exponent support lies in $F$ retain their
+coefficients, and all other terms vanish. Distinct exponents supported in
+$F$ remain distinct after this restriction, so there is no cancellation
+between different surviving terms. Therefore $r_F(p)=0$ holds exactly when
+every exponent in the support has a vertex outside $F$. The membership
+criterion proves $\ker r_F=P_F$. The first isomorphism theorem gives the
+stated equivalence of the actual ideal quotient, sending a quotient class
+to its specialized polynomial. Its target is a polynomial ring over a
+domain, hence a domain; equivalently, the kernel of $r_F$ is prime. Over
+a field the finite-variable polynomial dimension theorem gives
+$\dim k[x_v:v\in F]=\dim k+|F|=|F|$, and the quotient equivalence transfers
+this dimension to $S/P_F$.
+
+We now compare arbitrary polynomial terms. If $p\in I_K$, every exponent
+in its support has nonface vertex support by Proposition~\ref{prop:basis}.
+Such a support cannot lie in a facet, since downward closure would make
+it a face. The coordinate membership criterion therefore puts $p$ in
+every $P_F$. Conversely, if $p$ lies in every facet coordinate ideal and
+a term of $p$ has face support $T$, extend $T$ to a facet $F$. That term's
+support is contained in $F$, contradicting membership in $P_F$. Thus all
+terms have nonface support and $p\in I_K$. This proves the intersection
+equality for polynomials, including possible cancellation among other terms.
+
+The product of the finitely many ideals $P_F$ is contained in their
+intersection $I_K$. If a prime $Q$ contains $I_K$, it contains this product.
+Primality for a finite ideal product then gives a factor $P_F\subseteq Q$.
+The pinned finite-intersection lemma is exactly this product-and-primality
+argument, so it can be reused directly.
+
+A ghost vertex is in no face, hence in no facet; its variable belongs to
+every $P_F$. If all singleton faces are absent, downward closure forces
+the empty face to be the only face. It is then the unique facet. The
+intersection reduces to $I_K=P_{\varnothing}$, the ideal of all variables;
+the coordinate quotient has no variables and is $k$, of dimension zero.
+These are statements about facets of the given augmented complex, not an
+assumed purity condition or a change of ambient vertices. The coordinate
+ideals and their quotient dimensions, facet extension and intersection,
+prime containment, and these facet conventions are checked in Lean.
+\end{proof}
+
+\begin{proposition}[Dimension]\label{prop:dimension}
+\uses{prop:facet-primes,prop:augmentation,prop:basis,prop:grading,def:dimension}
+\lean{Reisner.X_mem_coordinateIdeal_iff, Reisner.coordinateIdeal_le_iff, Reisner.coordinateIdeal_empty, Reisner.exists_coordinatePrimeChain, Reisner.Complex.stanleyReisnerIdeal_le_coordinateIdeal, Reisner.Complex.faceRing_ringKrullDim_le, Reisner.Complex.exists_faceRingPrimeChain, Reisner.Complex.card_le_faceRingAugmentationIdeal_height, Reisner.Complex.maxFaceCard_le_faceRingAugmentationIdeal_height, Reisner.Complex.faceRingAugmentationIdeal_isPrime, Reisner.Complex.faceRing_ringKrullDim, Reisner.Complex.faceRingAugmentationIdeal_height, Reisner.Complex.faceRing_atAugmentation_ringKrullDim}
+\leanok
+The ring $A$ is a finitely generated Noetherian $k$-algebra and
+$\dim A=\dim A_{\mathfrak m}=d(K)$, where
+$\mathfrak m=(\bar x_v:v\in V)=A_{>0}$ is a maximal ideal and
+$A/\mathfrak m=k$.
+\end{proposition}
+\begin{proof}
+\leanok
+Polynomial rings over a field are Noetherian; a quotient is Noetherian and
+finitely generated. Evaluation at zero gives the stated residue field.
+These assertions, maximality of $\mathfrak m$, and its identification with
+the positive-degree ideal are already checked in
+Proposition~\ref{prop:augmentation}.
+
+For the upper bound, take any finite strict chain of primes containing
+$I_K$. By Proposition~\ref{prop:facet-primes}, its first prime contains a
+facet coordinate ideal $P_F$, hence every prime in the chain contains $P_F$.
+The quotient prime-spectrum order isomorphism views the same chain, with
+the same length, in $\operatorname{Spec}(S/P_F)$. The checked coordinate
+quotient formula bounds that length by $|F|\leq d(K)$. Taking the supremum
+over all chains gives $\dim A\leq d(K)$.
+
+For the lower bound, first observe that $x_v\in P_G$ exactly when
+$v\notin G$. Thus $P_G\subseteq P_H$ exactly when $H\subseteq G$.
+For every finite $F$, removing its vertices one at a time gives a strict
+coordinate-prime chain from $P_F$ to $P_{\varnothing}=(x_v:v\in V)$ of
+length $|F|$. More explicitly, the empty set gives a chain of length zero;
+if $v\notin G$, prepend $P_{G\cup\{v\}}$ to the chain for $G$.
+The new inclusion is strict, witnessed by $x_v$, and increases the length
+by one. If $F$ is a face, termwise membership and downward closure show
+$I_K\subseteq P_F$, so the entire chain descends to $A$ through the
+quotient prime-spectrum order isomorphism without losing strictness.
+Its final prime is $\mathfrak m$, since $P_{\varnothing}$ maps to the
+augmentation ideal. This proves $|F|\leq\operatorname{ht}\mathfrak m$
+for every face, even without finite ambient $V$.
+
+A face, and indeed a facet, attains the finite maximum $d(K)$. Consequently
+\[
+ d(K)\leq\operatorname{ht}\mathfrak m\leq\dim A\leq d(K).
+\]
+The standard localization prime correspondence identifies
+$\dim A_{\mathfrak m}$ with $\operatorname{ht}\mathfrak m$, proving both
+required equalities. Lean uses the actual localization
+\texttt{Localization.AtPrime} and the pinned localization-height theorem;
+the ring dimensions lie in \texttt{WithBot} $\mathbb N\cup\{\infty\}$,
+with $d(K)$ cast from $\mathbb N$. No purity or no-ghost hypothesis occurs.
+For $K=\{\varnothing\}$ the chain has length zero, both ring dimensions
+are zero, and the simplicial dimension remains $-1$.
+The foundational algebra used here is Hilbert's basis theorem,
+quotient/localization prime correspondence, and the dimension of a polynomial
+ring over a field; see Stacks, Sections 10.31, 10.60 and 10.114
+\cite{stacks-dimension}.
+\end{proof}
+
+\section{Visible algebraic foundations still to formalize}
+
+\begin{theorem}[Graded local test: external foundation]\label{found:graded-cm}
+\uses{def:cm}
+For a finitely generated positively graded commutative $k$-algebra $B$ with
+$B_0=k$, put $\mathfrak n=B_{>0}$. Then $B$ is Cohen--Macaulay if and only
+if $B_{\mathfrak n}$ is Cohen--Macaulay.
+\end{theorem}
+This is the graded local test in Bruns--Herzog, item 2.1.27
+\cite{bh}; its scope is also explicitly confirmed in the authors' corrections,
+page 1 \cite{bh-errata}. It requires finite generation and positive grading.
+It is not merely a restatement of the definition for arbitrary rings.
+This comparison is not implemented here.
+
+\begin{definition}[Local cohomology]\label{def:local-cohomology}
+For a Noetherian ring $B$ and ideal $J$, define
+$\Gamma_J(M)=\{m\in M:J^r m=0\text{ for some }r\ge0\}$ and let
+$H^q_J(M)$ be its right derived functors, for $q\ge0$.
+Mathlib's \texttt{localCohomology} is instead constructed as a filtered
+colimit of Ext along powers of $J$. Its identification with this convention
+and with the following Cech model is a required future comparison.
+\end{definition}
+
+\begin{theorem}[Cech comparison: external foundation]\label{found:cech}
+\uses{def:local-cohomology}
+If $J=(f_v:v\in V)$ with $V$ finite, the extended cochain complex
+\[
+ C^q(f;M)=\bigoplus_{|F|=q}M_{f_F},\qquad f_F=\prod_{v\in F}f_v,
+ \quad C^0=M,
+\]
+with alternating localization maps computes $H^q_J(M)$.
+\end{theorem}
+This is Stacks, Lemma 47.9.1, together with the Noetherian comparison in
+Section 47.10 \cite{stacks-cech}. Localizations are flat, so the displayed
+complex for a module represents the derived tensor expression there.
+Inverting zero gives the zero module, which handles ghost variables and
+nonface products. The comparison is a substantial unformalized node.
+
+\begin{theorem}[Depth detection: external foundation]\label{found:depth}
+\uses{def:cm,def:local-cohomology}
+If $B$ is Noetherian, $M$ is a finite $B$-module and $JM\ne M$, then
+$\operatorname{depth}_J M=\min\{q\ge0:H^q_J(M)\ne0\}$, where
+$\operatorname{depth}_J$ is maximal regular-sequence length in $J$.
+For a local ring with $J$ maximal this is ordinary local depth.
+\end{theorem}
+This is Stacks, Lemma 47.11.1, tag 0AVZ \cite{stacks-depth}.
+Mathlib has Ext depth and a regular-sequence comparison, but no use of a
+depth/local-cohomology bridge is assumed to be available in this milestone.
+
+\begin{theorem}[Depth bound: external foundation]\label{found:depth-bound}
+\uses{def:cm}
+For a nonzero finite module $M$ over a Noetherian local ring $B$,
+$\operatorname{depth} M\le\dim\operatorname{Supp} M$.
+In particular $\operatorname{depth} B\le\dim B$.
+\end{theorem}
+This is Stacks, Lemma 10.72.3 \cite{stacks-depth-def}. It is a separate
+algebraic comparison still required for the formal route.
+
+\begin{corollary}[Cohen--Macaulayness detected by local cohomology]\label{cor:cm-lc}
+\uses{prop:dimension,found:graded-cm,found:depth,found:depth-bound,found:cech}
+Writing $d=d(K)$, $A$ is Cohen--Macaulay if and only if
+$H^q_{\mathfrak m}(A)=0$ for all $0\le q<d$.
+\end{corollary}
+\begin{proof}
+The graded local test reduces to depth at $\mathfrak m$.
+Localize the Cech complex to get local cohomology of $A_{\mathfrak m}$;
+flatness of localization lets it commute with kernels, images and cohomology.
+Each cohomology module is $\mathfrak m$-power torsion
+(use the colimit-of-Ext description in Stacks, Lemma 47.8.2),
+and its localization at $\mathfrak m$ detects zero. Indeed, for an element
+annihilated by $\mathfrak m^r$, any $s\notin\mathfrak m$ is a unit modulo
+$\mathfrak m^r$ because that quotient is local. Thus $sz=0$ implies $z=0$.
+Apply depth detection in the local ring and the bound
+$\operatorname{depth} A_{\mathfrak m}\le\dim A_{\mathfrak m}=d$.
+All these comparison steps remain future Lean work; none is an axiom.
+\end{proof}
+
+\section{Computing the Cech pieces}
+
+\begin{lemma}[Localization kernels and transition maps]\label{lem:localization-kernel}
+\uses{prop:basis,thm:membership}
+\lean{Reisner.Complex.faceRingFaceProduct, Reisner.Complex.faceRingFaceProduct_eq_monomial, Reisner.Complex.faceRingFaceProduct_empty, Reisner.Complex.faceRingFaceProduct_dvd, Reisner.Complex.faceRingFaceProduct_sdiff, Reisner.Complex.FaceRingLocalization, Reisner.Complex.faceRingLocalizationFraction, Reisner.Complex.faceRingLocalizationFraction_zero_power, Reisner.Complex.faceRingLocalizationFraction_surjective, Reisner.Complex.monomial_mul_mem_stanleyReisnerIdeal_iff, Reisner.Complex.faceRingFaceProduct_pow_mul_mk, Reisner.Complex.faceRingFaceProduct_mul_mk_eq_zero_iff, Reisner.Complex.faceRingLocalization_algebraMap_mk_eq_zero_iff, Reisner.Complex.faceRingLocalization_algebraMap_eq_zero_iff, Reisner.Complex.faceRingLocalizationFraction_eq_zero_iff, Reisner.Complex.faceRingLocalization_monomialFraction_ne_zero_iff, Reisner.Complex.faceRingLocalization_nontrivial_iff, Reisner.Complex.faceRingLocalization_subsingleton_of_nonface, Reisner.Complex.faceRingLocalization_scalarMap_injective, Reisner.Complex.faceRingLocalizationEmptyEquiv, Reisner.Complex.faceRingLocalizationEmptyEquiv_apply, Reisner.Complex.faceRingLocalizationMap, Reisner.Complex.faceRingLocalizationMap_algebraMap, Reisner.Complex.faceRingLocalizationMap_fraction, Reisner.Complex.faceRingLocalizationMap_self, Reisner.Complex.faceRingLocalizationMap_comp}
+\leanok
+Let $R$ be a commutative ring, $A=R[K]$, and $F$ a finite set of ambient
+vertices. Write $x_F=\prod_{v\in F}\bar x_v$ and let $A_{x_F}$ be the
+actual ring localization at the powers of $x_F$, including localization
+at zero. Every element has a polynomial fraction representation.
+If $p$ is a polynomial and $r\geq0$, then
+\[
+ \frac{\bar p}{x_F^r}=0\text{ in }A_{x_F}
+ \quad\Longleftrightarrow\quad x_F\bar p=0\text{ in }A
+ \quad\Longleftrightarrow\quad
+ \forall\alpha\in\operatorname{supp}p,\quad
+       F\cup\operatorname{supp}\alpha\notin K.
+\]
+Equivalently, the kernel of $A\longrightarrow A_{x_F}$ is the annihilator
+$\operatorname{Ann}_A(x_F)=\{a\in A:x_Fa=0\}$.
+For nontrivial $R$, a monic monomial fraction
+$\bar x^\alpha/x_F^r$ is nonzero exactly when
+$F\cup\operatorname{supp}\alpha\in K$, and $A_{x_F}$ is nontrivial
+exactly when $F\in K$. The localization for $F=\varnothing$ is
+$R$-algebra-equivalent to $A$.
+Whenever $F$ is a face, the scalar map $R\longrightarrow A_{x_F}$ is
+injective, also when $R$ is trivial.
+
+For $F\subseteq G$ there is a canonical $R$-algebra map
+$\rho_{FG}:A_{x_F}\longrightarrow A_{x_G}$ taking the image of every
+$a\in A$ to its image in the target. It takes a fraction to the same
+fraction interpreted in the target, where $x_F$ is a unit. These maps are
+identity maps for $F=G$ and compose as
+$\rho_{GH}\rho_{FG}=\rho_{FH}$ for $F\subseteq G\subseteq H$.
+Explicitly, using $x_G=x_{G\setminus F}x_F$,
+\[
+ \rho_{FG}\left(\frac{\bar p}{x_F^r}\right)
+   =\frac{x_{G\setminus F}^{\,r}\bar p}{x_G^r}.
+\]
+All assertions allow infinite ambient vertex types and ghost vertices.
+\end{lemma}
+\begin{proof}
+\leanok
+Every denominator is a power of $x_F$, and surjectivity of the polynomial
+quotient map supplies a polynomial numerator. Since the denominator is a
+unit in the localization, $\bar p/x_F^r=0$ exactly when $\bar p/1=0$,
+including at $r=0$. The general localization criterion gives
+$\bar p/1=0$ exactly when $x_F^n\bar p=0$ for some $n\geq0$.
+
+To see why one factor suffices here, lift $x_F^n$ to the monic polynomial
+$x^{n\mathbf1_F}$. Multiplication translates each exponent $\alpha$ of $p$
+to $\alpha+n\mathbf1_F$. Translation is injective and preserves the
+coefficient, even over a ring with zero divisors. For every $n\geq1$,
+\[
+  \operatorname{supp}(\alpha+n\mathbf1_F)
+     =\operatorname{supp}\alpha\cup F .
+\]
+Membership in the squarefree nonface ideal depends only on these supports,
+by Proposition~\ref{prop:basis}. Thus $x_F^n\bar p=0$ for any positive
+$n$ exactly when $x_F\bar p=0$, with the stated termwise test.
+A witness $n=0$ means $\bar p=0$ and hence also $x_F\bar p=0$.
+
+For comparison, over a field $k$ take $B=k[x,y]/(x^2y)$. Inverting $x$
+kills $\bar y$ because $x^2\bar y=0$, yet $x\bar y\ne0$ because $xy$ is
+outside the monomial ideal $(x^2y)$. Here membership distinguishes the
+two exponents of $x$ even though the vertex supports agree.
+
+A monic monomial has one nonzero term over a nontrivial coefficient ring,
+which gives the stated nonvanishing criterion. Applying it to the constant
+monomial shows that $1\ne0$ in the localization exactly when $F$ is a face.
+For a nonface, $x_F=0$ already in $A$, and inverting it gives the zero ring.
+The empty product is one, and localization at a unit gives the claimed
+empty-set equivalence.
+For scalar injectivity, a nonzero constant has exponent zero in its
+polynomial support. Its image cannot vanish when $F$ is a face, by the
+kernel criterion.
+
+If $F\subseteq G$, the product $x_F$ divides $x_G$, hence its image is a
+unit in $A_{x_G}$. The universal property of localization gives
+$\rho_{FG}$ with the stated values on $A$. Algebra homomorphisms out of
+a localization are determined by these values, proving the fraction rule,
+identity, and composition assertions. The explicit denominator formula
+follows by applying the map to the defining fraction equation and using
+$x_G^r=x_{G\setminus F}^{\,r}x_F^r$; the target denominator is a unit, so
+this equation determines the fraction uniquely.
+\end{proof}
+
+\begin{lemma}[Localized monomial pieces]\label{lem:localized}
+\uses{prop:basis,prop:grading,lem:localization-kernel}
+\lean{Reisner.Complex.natExponent, Reisner.Complex.natExponent_apply, Reisner.Complex.positiveSupport, Reisner.Complex.LocalizationAdmissible, Reisner.Complex.fractionDegree, Reisner.Complex.fractionDegree_apply, Reisner.Complex.localizationMonomial, Reisner.Complex.localizationMonomial_fraction, Reisner.Complex.localizationMonomial_eq_zero_of_not_admissible, Reisner.Complex.localizationDegrees, Reisner.Complex.localizationMonomialBasis, Reisner.Complex.localizationMonomialBasis_apply, Reisner.Complex.localizationMonomial_ne_zero_iff, Reisner.Complex.localizationMonomial_natExponent, Reisner.Complex.faceRingLocalizationComponent, Reisner.Complex.faceRingLocalizationComponent_eq_bot, Reisner.Complex.faceRingLocalizationComponent_finrank, Reisner.Complex.faceRingLocalization_isInternal, Reisner.Complex.faceRingLocalizationGradedAlgebra, Reisner.Complex.faceRingLocalizationMap_monomial, Reisner.Complex.faceRingLocalizationMap_component, Reisner.Complex.faceRingLocalizationMap_basis, Reisner.Complex.faceRingLocalizationFraction_mem_component, Reisner.Complex.faceRingLocalizationComponentBasis, Reisner.Complex.faceRingLocalizationComponentBasis_apply, Reisner.Complex.faceRingLocalizationMap_basis_eq_zero, Reisner.Complex.faceRingFineComponent_map_localization}
+\leanok
+Let $A=R[K]$ over a commutative ring $R$ and let $F\subseteq V$ be finite.
+Write $\mathbb Z^{(V)}$ for the finitely supported integer exponents. For
+finite $V$ this is $\mathbb Z^V$. For $a\in\mathbb Z^{(V)}$ put
+$N(a)=\{v:a_v<0\}$ and $P(a)=\{v:a_v>0\}$.
+Call $a$ admissible for $F$ when
+\[
+ N(a)\subseteq F\qquad\text{and}\qquad F\cup P(a)\in K.
+\]
+The localization $A_{x_F}$ has an internal $\mathbb Z^{(V)}$ grading in which
+$\bar x^\alpha/x_F^r$ is homogeneous of degree $\alpha-r\mathbf1_F$,
+where $\mathbf1_F$ denotes the indicator of $F$. The degree $a$ piece is
+zero for inadmissible $a$. The localization has an $R$-module basis indexed
+by its admissible degrees, whose vector in degree $a$ is
+\[
+ m_F(a)=\frac{\bar x^{\,a+r\mathbf1_F}}{x_F^r},
+ \qquad r\in\mathbb N,\quad a+r\mathbf1_F\geq0 .
+\]
+This Laurent monomial spans its component. Over a field $k$ the component
+is one dimensional with basis $m_F(a)$ exactly when $a$ is admissible.
+For a nonnegative exponent $\alpha$, the component is the image of the
+degree $\alpha$ component of $A$. For $F\subseteq G$ the map $\rho_{FG}$
+preserves degrees. For each $a$ admissible for $F$, it sends $m_F(a)$ to
+$m_G(a)$ when $a$ is admissible for $G$, and to zero otherwise.
+\end{lemma}
+\begin{proof}
+\leanok
+If $N(a)\subseteq F$, choose $r$ at least as large as the absolute value
+of each negative coordinate. Then $\beta=a+r\mathbf1_F$ is nonnegative
+and agrees with $a$ outside $F$, so
+$F\cup\operatorname{supp}\beta=F\cup P(a)$. Increasing $r$ by $s$
+multiplies numerator and denominator by $x_F^s$. Hence any two choices
+give the same fraction, by comparison at their maximum.
+For nontrivial $R$, Lemma~\ref{lem:localization-kernel} shows that this fraction is nonzero
+exactly when $F\cup P(a)$ is a face.
+
+Write any element as $\bar p/x_F^r$ and expand $p$ in monomials.
+The term of exponent $\alpha$ has degree $a=\alpha-r\mathbf1_F$ and
+$N(a)\subseteq F$. The kernel criterion kills the term when
+$F\cup P(a)$ is a nonface, and every surviving term is its coefficient
+times $m_F(a)$. This proves spanning. For independence, take a finite
+relation among the $m_F(a)$ with distinct admissible indices.
+Choose one $r$ large enough for every index in the relation. Its numerator
+is $\sum_a c_a x^{a+r\mathbf1_F}$. The exponents are distinct, so each
+nonzero $c_a$ is the coefficient of a term whose support together with $F$
+is a face. The polynomial-fraction kernel criterion forces every $c_a$
+to vanish. Thus the spans of the indicated vectors, with zero in the
+other degrees, form an internal direct sum.
+
+Products of monomial fractions add numerator exponents and denominator
+powers. The product therefore lies in the indicated piece of degree
+$a+b$, including when the numerator is killed by the kernel. The unit
+has degree zero, as represented by $1/1$. This proves the algebra grading.
+At $r=0$ the image of $\bar x^\alpha$ generates the degree $\alpha$
+piece, including when this image is zero. Proposition~\ref{prop:grading}
+identifies the fine component of $A$ with the span of $\bar x^\alpha$,
+which proves the image assertion.
+For a nonface $F$ every piece vanishes. For $F=\varnothing$ the admissible
+degrees are precisely the nonnegative exponents with face support.
+Their components agree with the fine components of
+Proposition~\ref{prop:grading} under the empty-product equivalence.
+These admissible components are nonzero when $R$ is nontrivial.
+When $R$ is the zero ring, every component is zero.
+
+Finally the fraction formula of Lemma~\ref{lem:localization-kernel}
+multiplies the numerator by $x_{G\setminus F}^{\,r}$ when replacing
+$x_F^r$ by $x_G^r$.
+The new exponent is $a+r\mathbf1_G$. Its support together with $G$ is
+$G\cup P(a)$, and $N(a)\subseteq F\subseteq G$. The same kernel criterion
+therefore gives precisely the stated images of the basis vectors.
+\end{proof}
+
+\begin{lemma}[The ordered extended Cech complex]\label{lem:cech-complex}
+\uses{lem:localization-kernel,lem:localized}
+Let $V$ be a finite linearly ordered set, let $R$ be a commutative ring,
+and set $A=R[K]$. For $q\geq0$ the extended Cech cochains are
+\[
+ C^q=\prod_{\substack{F\subseteq V\\ |F|=q}} A_{x_F}.
+\]
+This finite product is canonically the direct sum of the displayed
+$R$-modules. The index runs over all subsets of the indicated size.
+A nonface contributes the zero ring, including any subset containing a
+ghost vertex. The unique summand in $C^0$ is $A_{x_\varnothing}\cong A$.
+For $q>|V|$ the product has empty index set and is the zero module.
+
+For a finite set $G$ and $v\in G$, put
+$r_G(v)=|\{u\in G:u<v\}|$. For $z\in C^q$ and $|G|=q+1$ set
+\[
+ (d^q z)_G=\sum_{v\in G}(-1)^{r_G(v)}
+    \rho_{G\setminus\{v\},\,G}\bigl(z_{G\setminus\{v\}}\bigr).
+\]
+These $R$-linear maps satisfy $d^{q+1}d^q=0$. For each finitely supported
+integer degree $a$, the families with $z_F\in(A_{x_F})_a$ in every
+coordinate form a subcomplex $C^\bullet_a$.
+\lean{Reisner.Complex.CechIndex, Reisner.Complex.CechCochain, Reisner.Complex.CechCochainDirectSum, Reisner.Complex.cechCochainDirectSumEquiv, Reisner.Complex.cechDifferentialComponent, Reisner.Complex.cechDifferential, Reisner.Complex.cechDifferential_apply, Reisner.Complex.cechDifferential_comp_eq_zero, Reisner.Complex.cechComplex, Reisner.Complex.cechComplex_X, Reisner.Complex.cechComplex_d, Reisner.Complex.cechDegreeSubmodule, Reisner.Complex.cechDifferential_maps_degree, Reisner.Complex.cechDifferentialDegree}
+\leanok
+\end{lemma}
+\begin{proof}
+The summands, the canonical equivalence for the empty product of variables,
+and the transition maps are supplied by Lemma~\ref{lem:localization-kernel}.
+Each term in the differential is a coordinate projection followed by an
+$R$-linear transition map and multiplication by a sign, so their sum is
+$R$-linear. In particular at a singleton the differential from degree zero
+is the localization map with sign $+1$.
+
+Fix a target $H$ of size $q+2$. In the double sum for $(d^{q+1}d^qz)_H$,
+each ordered pair of distinct vertices $u,v\in H$ starts at the same set
+$H\setminus\{u,v\}$ as its reversed pair. Both compositions are the
+canonical map from that summand to $A_{x_H}$. If $u<v$, erasing $u$
+reduces the rank of $v$ by one, and erasing $v$ leaves the rank of $u$
+unchanged. Thus the two total sign exponents differ by one. Pairing the
+two orders cancels the entire sum, also in characteristic two.
+
+By Lemma~\ref{lem:localized}, each transition preserves degree $a$.
+The target component is an $R$-submodule, so it contains the signed sum.
+The restricted differentials inherit the square-zero identity.
+\end{proof}
+
+\begin{lemma}[Cech differential on monomial cochains]\label{lem:cech-basis-action}
+\uses{lem:cech-complex,lem:localized}
+Let $V$ be finite and linearly ordered, let $R$ be a commutative ring,
+and set $A=R[K]$. Fix a finitely supported integer degree
+$a\in\mathbb Z^{(V)}$. For every $F\subseteq V$, define
+$e_F(a)\in C^{|F|}$ to be the cochain supported at the $F$ coordinate,
+with value $m_F(a)$ when $a$ is admissible in $A_{x_F}$ and value zero
+otherwise. Thus inadmissible monomial coordinates, including nonface and
+ghost-containing subsets, are zero. If $a$ is admissible at $F$, then
+\[
+ d^{|F|}e_F(a)=\sum_{v\in V\setminus F}
+ (-1)^{|\{u\in F:u<v\}|}e_{F\cup\{v\}}(a).
+\]
+On the right, an inadmissible target contributes the zero cochain.
+\lean{Reisner.Complex.cechInsertIndex, Reisner.Complex.cechMonomialCochain, Reisner.Complex.cechMonomialCochain_apply_self, Reisner.Complex.cechMonomialCochain_apply_of_ne, Reisner.Complex.cechDifferential_monomialCochain}
+\leanok
+\end{lemma}
+\begin{proof}
+Evaluate both sides at any coordinate $H$ with $|H|=|F|+1$. In the
+coordinate formula for the differential, a term can be nonzero only when
+$H\setminus\{v\}=F$, which determines $v$ uniquely and is equivalent to
+$H=F\cup\{v\}$ with $v\notin F$. The differential sign at this coordinate
+is $(-1)^{|\{u\in H:u<v\}|}=(-1)^{|\{u\in F:u<v\}|}$. By
+Lemma~\ref{lem:localized}, the transition map sends $m_F(a)$ to $m_H(a)$ if
+$a$ is admissible at $H$, and to zero otherwise. This proves the formula in
+every coordinate, including inadmissible targets.
+\end{proof}
+
+\begin{lemma}[The termwise fine-degree decomposition of the Cech cochains]\label{lem:cech-termwise-decomposition}
+\uses{lem:cech-complex,lem:localized}
+Let $V$ be finite, let $R$ be a commutative ring, and let $K$ be a complex
+containing the empty face, with ghost vertices allowed. For each $q\geq0$
+and $a\in\mathbb Z^{(V)}$, let $C^q_a$ be the submodule of the extended
+Cech cochains whose coordinate at every $F\subseteq V$ with $|F|=q$ lies
+in the degree-$a$ component of $A_{x_F}$. Then the family of these
+submodules is an internal direct sum:
+\[
+  \bigoplus_{a\in\mathbb Z^{(V)}} C^q_a\ \xrightarrow{\ \sim\ }\ C^q,
+\]
+where the map is the sum of the coordinatewise inclusions. Equivalently,
+\[
+  \operatorname{DirectSum.IsInternal}\bigl(a\mapsto C^q_a\bigr).
+\]
+The indexing retains every subset coordinate, including the empty subset,
+nonfaces, and subsets containing ghost vertices. The statement holds over
+every commutative ring, including the zero ring.
+\lean{Reisner.Complex.cechCochainMonomialBasis, Reisner.Complex.cechDegreeSubmodule, Reisner.Complex.cechDegreeSubmodule_isInternal}
+\leanok
+\end{lemma}
+\begin{proof}
+For each localization coordinate, Lemma~\ref{lem:localized} provides the
+basis of admissible Laurent monomials. The finite product of these bases
+gives a basis of $C^q$ indexed by pairs $(F,a)$, where $|F|=q$ and $a$ is
+admissible at $F$. In the Lean model this is
+`Pi.basis (fun F => localizationMonomialBasis R F.1)`, indexed by
+`Sigma F : CechIndex V q, localizationDegrees F.1`.
+
+For fixed $a$, the submodule $C^q_a$ is the image under the inverse basis
+coordinate map of the finitely supported coefficient functions supported
+on the fiber of indices $(F,b)$ with $b=a$. Distinct degree fibers are
+disjoint, so their submodules are independent. The union of all fibers is
+the entire basis index type; hence the submodules span $C^q$. The standard
+internal-direct-sum criterion (independence and spanning) gives the result.
+The construction applies to the actual localization at every subset; when
+the subset is inadmissible its localization and all its degree components
+are zero.
+\end{proof}
+
+\begin{lemma}[Cech differential and decomposition]\label{lem:cech-grading}
+\uses{lem:cech-complex,lem:localized,lem:cech-basis-action,lem:cech-termwise-decomposition}
+Fix an order on $V$. For each $F$ admissible in degree $a$, let $e_F$ be
+the cochain of degree $|F|$ with value $m_F(a)$ in coordinate $F$ and
+zero elsewhere. In the Cech complex of the images of all variables, the
+differential on this degree $a$ basis is
+\[
+ d e_F=\sum_{v\notin F}(-1)^{|\{u\in F:u<v\}|}e_{F\cup\{v\}},
+\]
+where inadmissible terms mean zero. The differential squares to zero,
+preserves $a$, and cohomology decomposes as the direct sum of its degree
+$a$ cohomologies. Explicitly, inclusions of the subcomplexes induce
+\[
+ \bigoplus_{a\in\mathbb Z^{(V)}} H^q(C^\bullet_a)
+       \ \xrightarrow{\ \sim\ }\ H^q(C^\bullet).
+\]
+\end{lemma}
+\begin{proof}
+At a target $G$ of size $|F|+1$, only a term with $G\setminus\{v\}=F$ can
+contribute to $d e_F$. Such a vertex is unique, and $r_G(v)$ counts the
+elements of $F$ below $v$. Lemma~\ref{lem:localized} sends $m_F(a)$ to
+$m_G(a)$ for an admissible target and to zero otherwise. This gives the
+displayed basis formula from the differential of Lemma~\ref{lem:cech-complex}.
+
+In each cochain $z$, every coordinate has a finite homogeneous
+decomposition. There are finitely many coordinates, so the union of their
+degree supports is finite. Collecting equal degrees gives a unique finite
+sum $z=\sum_a z_a$. If $dz=0$, degree preservation and uniqueness give
+$dz_a=0$ for each $a$. Thus the map on cohomology is surjective.
+For injectivity, suppose a finite sum of homogeneous cocycles satisfies
+$\sum_a z_a=dy$. Decomposing $y=\sum_a y_a$ gives $z_a=dy_a$ by uniqueness,
+so every class in that sum already vanishes in its own subcomplex. In
+degree zero the incoming boundary group is zero, and the same argument
+uses uniqueness alone.
+\end{proof}
+
+\begin{lemma}[Positive-coordinate contraction]\label{lem:contraction}
+\uses{lem:cech-grading}
+If $P(a)\ne\varnothing$, the degree $a$ Cech complex is contractible.
+\end{lemma}
+\begin{proof}
+Choose $p\in P(a)$. Admissibility is invariant under inserting or removing
+$p$: it does not affect $N(a)\subseteq F$, and $p$ is already in $P(a)$.
+Define a degree $-1$ map on basis vectors by $h(e_F)=0$ for $p\notin F$,
+and
+\[
+ h(e_F)=(-1)^{|\{u\in F:u<p\}|}e_{F\setminus\{p\}}
+ \quad(p\in F).
+\]
+For $p\notin F$, the term inserting $p$ in $h d(e_F)$ is $e_F$;
+all other terms vanish. For $p\in F$, the term reinserting $p$ in
+$d h(e_F)$ is $e_F$. For any other inserted vertex $v$, its contributions
+to $dh$ and $hd$ have opposite signs: if $v<p$ its insertion changes
+the removal sign once; if $p<v$ removing $p$ changes the insertion sign
+once. The admissible terms match in pairs, including when they are zero.
+Thus $dh+hd=1$ in every degree, including the endpoints.
+\end{proof}
+
+\begin{theorem}[Local-cohomology link formula]\label{thm:lc-link}
+\uses{def:homology,found:cech,lem:cech-grading,lem:contraction}
+For $q\ge0$ and $a\in\mathbb Z^V$,
+\[
+ H^q_{\mathfrak m}(A)_a\cong
+ \begin{cases}
+ \widetilde H^{q-|N(a)|-1}(\operatorname{lk}_K N(a);k),
+   & a\le0\text{ and }N(a)\in K,\\
+ 0,&\text{otherwise}.
+ \end{cases}
+\]
+This is a vector-space isomorphism, not an assertion about the full module
+structure. It is the multigraded local-cohomology formula; see the
+Hilbert-series version in Welker, Theorem 5.1 \cite{welker}.
+\end{theorem}
+\begin{proof}
+Positive coordinates give zero by the contraction. Now suppose $a\le0$.
+If $N=N(a)$ is a nonface, no face $F$ can contain $N$ and every term is
+zero. If $N$ is a face, admissible sets have the unique form
+$F=N\sqcup T$ for $T\in\operatorname{lk}_K N$.
+The Cech degree is $q=|N|+|T|$, whereas $T$ has augmented cochain degree
+$|T|-1$. For an explicit cochain identification multiply the basis
+cochain of $T$ by
+\[
+ (-1)^{\sum_{t\in T}|\{n\in N:n<t\}|}.
+\]
+Inserting $v$ changes this exponent by $|\{n\in N:n<v\}|$.
+That is precisely the difference between the Cech insertion sign in $F$
+and the simplicial insertion sign in $T$. Thus the map commutes with the
+differentials and identifies complexes with degrees shifted by $|N|+1$.
+This includes $T=\varnothing$, the cochain of degree $-1$; omitting it
+would give the wrong formula even for a simplex. Take cohomology and
+apply the Cech comparison.
+\end{proof}
+
+\begin{corollary}[Uniform vanishing bound]\label{cor:uniform}
+\uses{thm:lc-link,lem:dual}
+For $d=d(K)$, the following are equivalent:
+\[
+ \begin{split}
+ &H^q_{\mathfrak m}(A)=0\quad(0\le q<d);\\
+ &\widetilde H_i(\operatorname{lk}_K F;k)=0
+   \quad(F\in K,\ i<d-|F|-1).
+ \end{split}
+\]
+\end{corollary}
+\begin{proof}
+For each face $F$ choose $a=-\mathbf1_F$, so $N(a)=F$. For
+$-1\le i<d-|F|-1$, put $q=i+|F|+1$, which satisfies $0\le q<d$.
+The formula and duality give the second assertion from the first. Degrees
+$i<-1$ vanish by convention. Conversely, for every $0\le q<d$ and
+every $a$, positive coordinates or a nonface $N(a)$ give a zero piece.
+Otherwise $i=q-|N(a)|-1<d-|N(a)|-1$ and the assumed bound gives zero.
+The direct-sum decomposition then makes the entire module zero.
+For $d=0$ both assertions are vacuous after the below-minus-one convention.
+\end{proof}
+
+\section{Purity and the complete criterion}
+
+\begin{lemma}[Linkwise vanishing forces purity]\label{lem:purity}
+\uses{lem:link-calculus,lem:dual}
+If $\widetilde H_i(\operatorname{lk}_K F;k)=0$ for every face $F$ and
+every integer $i<\dim\operatorname{lk}_K F$, then $K$ is pure: all facets
+have the same cardinality.
+\end{lemma}
+\begin{proof}
+Induct on $\dim K\ge-1$. Dimension $-1$ has only the empty facet, and
+dimension zero has only singleton facets. For dimension at least one,
+the hypothesis for the empty face gives $\widetilde H_0(K;k)=0$, so the
+vertex-edge graph is connected. For an actual vertex $v$, its link has
+smaller dimension and satisfies the same hypothesis: every link inside it
+is the link of a face containing $v$, by link calculus. The induction
+hypothesis makes this vertex link pure. Its facets correspond to facets
+of $K$ containing $v$, so all those facets have a common size $r(v)$.
+Every vertex belongs to a facet by finiteness. If $\{v,w\}$ is an edge,
+extend it to a facet; that facet shows $r(v)=r(w)$. Connectedness now
+makes $r(v)$ independent of $v$. Every facet is nonempty in these
+dimensions and contains a vertex, so all facets have that size. This
+derives purity and does not add it as an extra assumption.
+\end{proof}
+
+\begin{theorem}[Reisner's criterion]\label{thm:reisner}
+\uses{cor:cm-lc,cor:uniform,lem:purity,lem:link-calculus}
+Let $k$ be any field and $K$ a complex on a finite ambient set containing
+the empty face. Its Stanley--Reisner ring is Cohen--Macaulay, in the
+algebraic sense of Definition~\ref{def:cm}, if and only if
+\[
+ \widetilde H_i(\operatorname{lk}_K\sigma;k)=0
+ \quad\text{for every }\sigma\in K\text{ and every }
+ i\in\mathbb Z\text{ with }i<\dim\operatorname{lk}_K\sigma.
+\]
+\end{theorem}
+\begin{proof}
+Write $d=d(K)$. If the ring is Cohen--Macaulay, Corollaries
+\ref{cor:cm-lc} and \ref{cor:uniform} give vanishing for
+$i<d-|\sigma|-1$. Link calculus gives
+$\dim\operatorname{lk}_K\sigma\le d-|\sigma|-1$, so this includes the
+required range. Conversely the displayed condition makes $K$ pure by
+Lemma~\ref{lem:purity}. Link calculus then gives equality
+$\dim\operatorname{lk}_K\sigma=d-|\sigma|-1$ for every face.
+The condition is therefore the uniform bound; the two corollaries imply
+Cohen--Macaulayness. If $K=\{\varnothing\}$, its ring is $k$ and $d=0$;
+its only link has dimension $-1$ and every required group is below $-1$.
+Thus this edge case is included without changing the statement.
+\end{proof}
+
+\section{Formalization boundary and next steps}
+The implemented entry points are Theorem~\ref{thm:membership},
+Proposition~\ref{prop:basis}, Lemma~\ref{lem:homogeneous}, and
+Propositions~\ref{prop:grading}, \ref{prop:augmentation}, and
+\ref{prop:facet-primes}, together with Proposition~\ref{prop:dimension}
+and Lemmas~\ref{lem:localization-kernel} and~\ref{lem:localized}, with the
+augmented complex, squarefree exponent, ideal, quotient, and indicator
+comparison that they need. Polynomial membership, the genuine quotient
+basis and its monomial identification, nontriviality, scalar injectivity,
+and weighted homogeneity of the polynomial ideal are checked. The latter
+includes preservation of weighted homogeneous components and the fine
+and total weight identities. The actual quotient now carries checked
+weighted graded-algebra structures, including its fine and total gradings,
+their coarsening relation, and the scalar algebra equivalence in degree
+zero. Its augmentation, positive-degree and variable-ideal identifications,
+homogeneous maximal ideal over a field, and residue algebra are checked.
+Finite type for finite ambient vertices and Noetherianity over a Noetherian
+coefficient ring are also checked. The coordinate quotients now have checked
+algebra equivalences and Krull dimensions $|F|$, and the finite facet
+intersection and prime-containment arguments are checked. Maximum face
+cardinality, simplicial dimension, and the global and augmentation-local
+face-ring dimension equalities are also checked. The actual variable-product
+localizations, polynomial fraction kernels, monomial nonvanishing criteria,
+scalar injectivity, empty-set equivalence, and coherent transition maps are
+checked. Lemma~\ref{lem:localized} supplies the integer grading and Laurent
+basis of each localization. Over a field each component has dimension zero
+or one, and the transition maps carry each basis vector to the corresponding
+target vector or to zero according to target admissibility.
+
+Proposition~\ref{prop:dimension} now proves
+$\dim A=\dim A_{\mathfrak m}=d(K)$ using both prime-chain bounds and
+the augmentation-ideal height computation. Lemma~\ref{lem:cech-complex}
+assembles the localization maps into the ordered extended Cech complex
+and restricts its differential to each integer degree.
+Lemma~\ref{lem:cech-grading} then identifies the basis formula and the
+direct-sum decomposition on cohomology. Lemma~\ref{lem:cech-complex} is
+checked in Lean. Lemma~\ref{lem:cech-grading}, including the cohomology
+decomposition, the augmented chains and link calculus, the depth and
+local-cohomology comparisons, and Reisner's criterion remain future Lean
+work.
+
+\begin{thebibliography}{99}
+\bibitem{panov} T. Panov, \emph{Cohomology of face rings, and torus actions},
+arXiv:math/0506526v3 (2007), Theorems 2.5 and 2.9;
+LMS Lecture Note Series 347 (2008), 165--201.
+\url{https://arxiv.org/html/math/0506526v3}.
+\bibitem{bh} W. Bruns and J. Herzog, \emph{Cohen--Macaulay Rings},
+revised edition, Cambridge Studies in Advanced Mathematics 39,
+Cambridge University Press, 1998, item 2.1.27 (graded local test).
+\bibitem{bh-errata} W. Bruns and J. Herzog, corrections to the revised
+edition, 20 May 2024, p. 1, note to 2.1.29 confirming 2.1.27.
+\url{https://www.home.uni-osnabrueck.de/wbruns/brunsw/cmcorr.pdf}.
+\bibitem{welker} V. Welker, \emph{Which properties of Stanley--Reisner
+rings and simplicial complexes are topological?}, Section 5, Theorems
+5.1--5.2. Used to check the local-cohomology shift, not as a substitute
+for the Cech calculation given above.
+\url{https://www.mathematik.uni-marburg.de/~welker/preprints/top_survey.pdf}.
+\bibitem{stacks-cm} The Stacks Project, Sections 10.103--10.104,
+algebraic Cohen--Macaulay modules and rings.
+\url{https://stacks.math.columbia.edu/tag/00N7}.
+\bibitem{stacks-dimension} The Stacks Project, Sections 10.31, 10.60,
+10.114, Noetherian rings and dimension of finite type algebras over fields.
+\url{https://stacks.math.columbia.edu/tag/00OO}.
+\bibitem{stacks-cech} The Stacks Project, Lemma 47.9.1 and Section 47.10,
+extended Cech model and Noetherian comparison.
+\url{https://stacks.math.columbia.edu/tag/0952}.
+\bibitem{stacks-depth} The Stacks Project, Lemma 47.11.1, depth and
+first nonzero local cohomology.
+\url{https://stacks.math.columbia.edu/tag/0AVZ}.
+\bibitem{stacks-depth-def} The Stacks Project, Section 10.72,
+regular sequences, depth, and the dimension bound.
+\url{https://stacks.math.columbia.edu/tag/00LE}.
+\end{thebibliography}

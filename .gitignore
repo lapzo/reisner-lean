@@ -1,0 +1,26 @@
+.lake/
+.venv/
+__pycache__/
+
+# Generated blueprint outputs
+blueprint/web/
+blueprint/print/print.pdf
+blueprint/dep_graph.dot
+blueprint/dep_graph.pdf
+blueprint/dep_graph.svg
+blueprint/lean_decls
+
+# Generated combined site and personal reports
+site/dist/
+reports/
+
+blueprint/print/*.aux
+blueprint/print/*.log
+blueprint/print/*.out
+blueprint/print/*.toc
+blueprint/print/*.bbl
+blueprint/print/*.blg
+blueprint/print/*.fls
+blueprint/print/*.fdb_latexmk
+blueprint/print/*.synctex.gz
+blueprint/src/*.paux

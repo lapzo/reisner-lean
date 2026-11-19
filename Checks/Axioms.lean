@@ -1,0 +1,307 @@
+import Reisner
+
+#check Reisner.Complex.monomial_mem_stanleyReisnerIdeal_iff
+#check Reisner.Complex.mem_stanleyReisnerIdeal_iff
+#check Reisner.Complex.faceRingBasis
+#check Reisner.Complex.faceRingBasis_apply
+#check Reisner.Complex.faceRing_algebraMap_injective
+#check Reisner.Complex.faceRing_nontrivial
+#check Reisner.Complex.stanleyReisnerIdeal_isHomogeneous
+#check Reisner.Complex.weightedHomogeneousComponent_mem_stanleyReisnerIdeal
+#check Reisner.weight_fine_eq
+#check Reisner.weight_one_eq_sum
+#check Reisner.Complex.weightedFaceRingComponent
+#check Reisner.Complex.weightedFaceRingComponent_eq_span
+#check Reisner.Complex.weightedFaceRingComponent_eq_polynomial_image
+#check Reisner.Complex.weightedFaceRingComponent_mul
+#check Reisner.Complex.weightedFaceRing_isInternal
+#check Reisner.Complex.weightedFaceRingGradedAlgebra
+#check Reisner.Complex.faceRingFineComponent
+#check Reisner.Complex.faceRingTotalComponent
+#check Reisner.Complex.faceRingFineGradedAlgebra
+#check Reisner.Complex.faceRingTotalGradedAlgebra
+#check Reisner.Complex.faceRingFineComponent_eq_span_monomial
+#check Reisner.Complex.faceRingFineComponent_eq_bot_of_nonface
+#check Reisner.Complex.faceRingTotalComponent_eq_span
+#check Reisner.Complex.faceRingTotalComponent_eq_iSup_fine
+#check Reisner.Complex.faceRingFineComponent_zero
+#check Reisner.Complex.faceRingTotalComponent_zero
+#check Reisner.Complex.faceRingDegreeZeroSubalgebra
+#check Reisner.Complex.faceRingDegreeZeroEquiv
+#check Reisner.Complex.faceRingDegreeZeroEquiv_apply
+#check Reisner.Complex.faceRingAugmentation
+#check Reisner.Complex.faceRingAugmentation_mk
+#check Reisner.Complex.faceRingAugmentation_algebraMap
+#check Reisner.Complex.faceRingAugmentation_surjective
+#check Reisner.Complex.faceRingAugmentationIdeal
+#check Reisner.Complex.faceRingPositiveIdeal
+#check Reisner.Complex.idealOfVars_eq_ker_constantCoeff
+#check Reisner.Complex.faceRingAugmentationIdeal_eq_map_idealOfVars
+#check Reisner.Complex.faceRingAugmentation_ker
+#check Reisner.Complex.faceRingResidueEquiv
+#check Reisner.Complex.faceRingResidueEquiv_mk
+#check Reisner.Complex.faceRing_finiteType
+#check Reisner.Complex.faceRing_isNoetherianRing
+#check Reisner.Complex.faceRingAugmentationIdeal_eq_positive
+#check Reisner.Complex.faceRingAugmentationIdeal_isHomogeneous
+#check Reisner.Complex.faceRingAugmentationIdeal_isMaximal
+#check Reisner.Complex.faceRing_variable_eq_zero_of_ghost
+#check Reisner.Complex.faceRingAugmentationIdeal_eq_span_vertices
+#check Reisner.Complex.faceRingAugmentationIdeal_eq_bot_of_no_vertices
+#check Reisner.Complex.faceRingAugmentationEquivOfNoVertices
+#check Reisner.Complex.faceRingAugmentationEquivOfNoVertices_apply
+#check Reisner.coordinateIdeal
+#check Reisner.mem_coordinateIdeal_iff
+#check Reisner.coordinateRestriction
+#check Reisner.coordinateRestriction_ker
+#check Reisner.coordinateRestriction_surjective
+#check Reisner.coordinateQuotientEquiv
+#check Reisner.coordinateQuotientEquiv_mk
+#check Reisner.coordinateRestriction_X_inside
+#check Reisner.coordinateRestriction_X_outside
+#check Reisner.coordinateIdeal_isPrime
+#check Reisner.coordinateQuotient_ringKrullDim
+#check Reisner.Complex.facets
+#check Reisner.Complex.facets_finite
+#check Reisner.Complex.exists_facet_superset
+#check Reisner.Complex.facets_nonempty
+#check Reisner.Complex.stanleyReisnerIdeal_eq_iInf_coordinateIdeal
+#check Reisner.Complex.exists_facet_coordinateIdeal_le
+#check Reisner.Complex.ghost_not_mem_facet
+#check Reisner.Complex.facets_eq_singleton_empty_of_no_vertices
+#print axioms Reisner.Complex.face_of_subset
+#print axioms Reisner.Complex.nonface_of_subset
+#print axioms Reisner.squarefreeExponent
+#print axioms Reisner.squarefreeExponent_apply
+#print axioms Reisner.support_squarefreeExponent
+#print axioms Reisner.squarefreeExponent_le_iff
+#print axioms Reisner.monomial_squarefreeExponent_eq_prod
+#print axioms Reisner.Complex.nonfaceExponents
+#print axioms Reisner.Complex.stanleyReisnerIdeal
+#print axioms Reisner.Complex.stanleyReisnerIdeal_eq_span
+#print axioms Reisner.Complex.FaceRing
+#print axioms Reisner.Complex.monomial_mem_stanleyReisnerIdeal_iff
+#print axioms Reisner.Complex.mem_stanleyReisnerIdeal_iff
+#print axioms Reisner.Complex.faceExponents
+#print axioms Reisner.Complex.stanleyReisnerIdeal_restrictScalars_eq_restrictSupport
+#print axioms Reisner.Complex.isCompl_stanleyReisnerIdeal_faceSupport
+#print axioms Reisner.Complex.faceRingBasis
+#print axioms Reisner.Complex.faceRingBasis_apply
+#print axioms Reisner.Complex.faceRing_algebraMap_injective
+#print axioms Reisner.Complex.faceRing_nontrivial
+#print axioms Reisner.Complex.stanleyReisnerIdeal_isHomogeneous
+#print axioms Reisner.Complex.weightedHomogeneousComponent_mem_stanleyReisnerIdeal
+#print axioms Reisner.weight_fine_eq
+#print axioms Reisner.weight_one_eq_sum
+#print axioms Reisner.Complex.weightedFaceRingComponent_eq_span
+#print axioms Reisner.Complex.weightedFaceRingComponent_eq_polynomial_image
+#print axioms Reisner.Complex.weightedFaceRingComponent_mul
+#print axioms Reisner.Complex.weightedFaceRing_isInternal
+#print axioms Reisner.Complex.weightedFaceRingGradedAlgebra
+#print axioms Reisner.Complex.faceRingFineComponent_eq_span_monomial
+#print axioms Reisner.Complex.faceRingFineComponent_eq_bot_of_nonface
+#print axioms Reisner.Complex.faceRingTotalComponent_eq_span
+#print axioms Reisner.Complex.faceRingFineGradedAlgebra
+#print axioms Reisner.Complex.faceRingTotalGradedAlgebra
+#print axioms Reisner.Complex.faceRingTotalComponent_eq_iSup_fine
+#print axioms Reisner.Complex.faceRingFineComponent_zero
+#print axioms Reisner.Complex.faceRingTotalComponent_zero
+#print axioms Reisner.Complex.faceRingDegreeZeroEquiv
+#print axioms Reisner.Complex.faceRingDegreeZeroEquiv_apply
+#print axioms Reisner.Complex.faceRingAugmentation
+#print axioms Reisner.Complex.faceRingAugmentation_mk
+#print axioms Reisner.Complex.faceRingAugmentation_surjective
+#print axioms Reisner.Complex.faceRingAugmentation_ker
+#print axioms Reisner.Complex.faceRingResidueEquiv
+#print axioms Reisner.Complex.faceRingResidueEquiv_mk
+#print axioms Reisner.Complex.faceRing_finiteType
+#print axioms Reisner.Complex.faceRing_isNoetherianRing
+#print axioms Reisner.Complex.faceRingAugmentationIdeal_eq_positive
+#print axioms Reisner.Complex.faceRingAugmentationIdeal_isHomogeneous
+#print axioms Reisner.Complex.faceRingAugmentationIdeal_isMaximal
+#print axioms Reisner.Complex.faceRing_variable_eq_zero_of_ghost
+#print axioms Reisner.Complex.faceRingAugmentationIdeal_eq_span_vertices
+#print axioms Reisner.Complex.faceRingAugmentationIdeal_eq_bot_of_no_vertices
+#print axioms Reisner.Complex.faceRingAugmentationEquivOfNoVertices
+#print axioms Reisner.Complex.faceRingAugmentationEquivOfNoVertices_apply
+#print axioms Reisner.mem_coordinateIdeal_iff
+#print axioms Reisner.coordinateRestriction_ker
+#print axioms Reisner.coordinateQuotientEquiv
+#print axioms Reisner.coordinateIdeal_isPrime
+#print axioms Reisner.coordinateQuotient_ringKrullDim
+#print axioms Reisner.Complex.exists_facet_superset
+#print axioms Reisner.Complex.cechDifferential_monomialCochain
+#print axioms Reisner.Complex.cechDegreeSubmodule_isInternal
+#print axioms Reisner.Complex.stanleyReisnerIdeal_eq_iInf_coordinateIdeal
+#print axioms Reisner.Complex.exists_facet_coordinateIdeal_le
+#print axioms Reisner.Complex.ghost_not_mem_facet
+#print axioms Reisner.Complex.facets_eq_singleton_empty_of_no_vertices
+
+#check Reisner.X_mem_coordinateIdeal_iff
+#check Reisner.coordinateIdeal_le_iff
+#check Reisner.coordinateIdeal_empty
+#check Reisner.exists_coordinatePrimeChain
+#check Reisner.Complex.vertices
+#check Reisner.Complex.maxFaceCard
+#check Reisner.Complex.card_le_maxFaceCard
+#check Reisner.Complex.exists_face_card_eq_maxFaceCard
+#check Reisner.Complex.exists_facet_card_eq_maxFaceCard
+#check Reisner.Complex.dimension
+#check Reisner.Complex.maxFaceCard_eq_zero_iff_no_vertices
+#check Reisner.Complex.dimension_eq_neg_one_iff_no_vertices
+#check Reisner.Complex.stanleyReisnerIdeal_le_coordinateIdeal
+#check Reisner.Complex.faceRing_ringKrullDim_le
+#check Reisner.Complex.exists_faceRingPrimeChain
+#check Reisner.Complex.card_le_faceRingAugmentationIdeal_height
+#check Reisner.Complex.maxFaceCard_le_faceRingAugmentationIdeal_height
+#check Reisner.Complex.faceRingAugmentationIdeal_isPrime
+#check Reisner.Complex.faceRing_ringKrullDim
+#check Reisner.Complex.faceRingAugmentationIdeal_height
+#check Reisner.Complex.faceRing_atAugmentation_ringKrullDim
+#print axioms Reisner.X_mem_coordinateIdeal_iff
+#print axioms Reisner.coordinateIdeal_le_iff
+#print axioms Reisner.coordinateIdeal_empty
+#print axioms Reisner.exists_coordinatePrimeChain
+#print axioms Reisner.Complex.vertices
+#print axioms Reisner.Complex.maxFaceCard
+#print axioms Reisner.Complex.card_le_maxFaceCard
+#print axioms Reisner.Complex.exists_face_card_eq_maxFaceCard
+#print axioms Reisner.Complex.exists_facet_card_eq_maxFaceCard
+#print axioms Reisner.Complex.dimension
+#print axioms Reisner.Complex.maxFaceCard_eq_zero_iff_no_vertices
+#print axioms Reisner.Complex.dimension_eq_neg_one_iff_no_vertices
+#print axioms Reisner.Complex.stanleyReisnerIdeal_le_coordinateIdeal
+#print axioms Reisner.Complex.faceRing_ringKrullDim_le
+#print axioms Reisner.Complex.exists_faceRingPrimeChain
+#print axioms Reisner.Complex.card_le_faceRingAugmentationIdeal_height
+#print axioms Reisner.Complex.maxFaceCard_le_faceRingAugmentationIdeal_height
+#print axioms Reisner.Complex.faceRingAugmentationIdeal_isPrime
+#print axioms Reisner.Complex.faceRing_ringKrullDim
+#print axioms Reisner.Complex.faceRingAugmentationIdeal_height
+#print axioms Reisner.Complex.faceRing_atAugmentation_ringKrullDim
+
+#check Reisner.Complex.faceRingFaceProduct
+#check Reisner.Complex.faceRingFaceProduct_eq_monomial
+#check Reisner.Complex.faceRingFaceProduct_empty
+#check Reisner.Complex.faceRingFaceProduct_dvd
+#check Reisner.Complex.faceRingFaceProduct_sdiff
+#check Reisner.Complex.FaceRingLocalization
+#check Reisner.Complex.faceRingLocalizationFraction
+#check Reisner.Complex.faceRingLocalizationFraction_zero_power
+#check Reisner.Complex.faceRingLocalizationFraction_surjective
+#check Reisner.Complex.monomial_mul_mem_stanleyReisnerIdeal_iff
+#check Reisner.Complex.faceRingFaceProduct_pow_mul_mk
+#check Reisner.Complex.faceRingFaceProduct_mul_mk_eq_zero_iff
+#check Reisner.Complex.faceRingLocalization_algebraMap_mk_eq_zero_iff
+#check Reisner.Complex.faceRingLocalization_algebraMap_eq_zero_iff
+#check Reisner.Complex.faceRingLocalizationFraction_eq_zero_iff
+#check Reisner.Complex.faceRingLocalization_monomialFraction_ne_zero_iff
+#check Reisner.Complex.faceRingLocalization_nontrivial_iff
+#check Reisner.Complex.faceRingLocalization_subsingleton_of_nonface
+#check Reisner.Complex.faceRingLocalization_scalarMap_injective
+#check Reisner.Complex.faceRingLocalizationEmptyEquiv
+#check Reisner.Complex.faceRingLocalizationEmptyEquiv_apply
+#check Reisner.Complex.faceRingLocalizationMap
+#check Reisner.Complex.faceRingLocalizationMap_algebraMap
+#check Reisner.Complex.faceRingLocalizationMap_fraction
+#check Reisner.Complex.faceRingLocalizationMap_self
+#check Reisner.Complex.faceRingLocalizationMap_comp
+#print axioms Reisner.Complex.faceRingFaceProduct
+#print axioms Reisner.Complex.faceRingFaceProduct_eq_monomial
+#print axioms Reisner.Complex.faceRingFaceProduct_empty
+#print axioms Reisner.Complex.faceRingFaceProduct_dvd
+#print axioms Reisner.Complex.faceRingFaceProduct_sdiff
+#print axioms Reisner.Complex.FaceRingLocalization
+#print axioms Reisner.Complex.faceRingLocalizationFraction
+#print axioms Reisner.Complex.faceRingLocalizationFraction_zero_power
+#print axioms Reisner.Complex.faceRingLocalizationFraction_surjective
+#print axioms Reisner.Complex.monomial_mul_mem_stanleyReisnerIdeal_iff
+#print axioms Reisner.Complex.faceRingFaceProduct_pow_mul_mk
+#print axioms Reisner.Complex.faceRingFaceProduct_mul_mk_eq_zero_iff
+#print axioms Reisner.Complex.faceRingLocalization_algebraMap_mk_eq_zero_iff
+#print axioms Reisner.Complex.faceRingLocalization_algebraMap_eq_zero_iff
+#print axioms Reisner.Complex.faceRingLocalizationFraction_eq_zero_iff
+#print axioms Reisner.Complex.faceRingLocalization_monomialFraction_ne_zero_iff
+#print axioms Reisner.Complex.faceRingLocalization_nontrivial_iff
+#print axioms Reisner.Complex.faceRingLocalization_subsingleton_of_nonface
+#print axioms Reisner.Complex.faceRingLocalization_scalarMap_injective
+#print axioms Reisner.Complex.faceRingLocalizationEmptyEquiv
+#print axioms Reisner.Complex.faceRingLocalizationEmptyEquiv_apply
+#print axioms Reisner.Complex.faceRingLocalizationMap
+#print axioms Reisner.Complex.faceRingLocalizationMap_algebraMap
+#print axioms Reisner.Complex.faceRingLocalizationMap_fraction
+#print axioms Reisner.Complex.faceRingLocalizationMap_self
+#print axioms Reisner.Complex.faceRingLocalizationMap_comp
+
+#check Reisner.Complex.natExponent
+#check Reisner.Complex.natExponent_apply
+#check Reisner.Complex.positiveSupport
+#check Reisner.Complex.LocalizationAdmissible
+#check Reisner.Complex.fractionDegree
+#check Reisner.Complex.fractionDegree_apply
+#check Reisner.Complex.localizationMonomial
+#check Reisner.Complex.localizationMonomial_fraction
+#check Reisner.Complex.localizationMonomial_eq_zero_of_not_admissible
+#check Reisner.Complex.localizationDegrees
+#check Reisner.Complex.localizationMonomialBasis
+#check Reisner.Complex.localizationMonomialBasis_apply
+#check Reisner.Complex.localizationMonomial_ne_zero_iff
+#check Reisner.Complex.localizationMonomial_natExponent
+#check Reisner.Complex.faceRingLocalizationComponent
+#check Reisner.Complex.faceRingLocalizationComponent_eq_bot
+#check Reisner.Complex.faceRingLocalizationComponent_finrank
+#check Reisner.Complex.faceRingLocalization_isInternal
+#check Reisner.Complex.faceRingLocalizationGradedAlgebra
+#check Reisner.Complex.faceRingLocalizationMap_monomial
+#check Reisner.Complex.faceRingLocalizationMap_component
+#check Reisner.Complex.faceRingLocalizationMap_basis
+#check Reisner.Complex.faceRingLocalizationFraction_mem_component
+#check Reisner.Complex.faceRingLocalizationComponentBasis
+#check Reisner.Complex.faceRingLocalizationComponentBasis_apply
+#check Reisner.Complex.faceRingLocalizationMap_basis_eq_zero
+#check Reisner.Complex.faceRingFineComponent_map_localization
+#print axioms Reisner.Complex.natExponent
+#print axioms Reisner.Complex.natExponent_apply
+#print axioms Reisner.Complex.positiveSupport
+#print axioms Reisner.Complex.LocalizationAdmissible
+#print axioms Reisner.Complex.fractionDegree
+#print axioms Reisner.Complex.fractionDegree_apply
+#print axioms Reisner.Complex.localizationMonomial
+#print axioms Reisner.Complex.localizationMonomial_fraction
+#print axioms Reisner.Complex.localizationMonomial_eq_zero_of_not_admissible
+#print axioms Reisner.Complex.localizationDegrees
+#print axioms Reisner.Complex.localizationMonomialBasis
+#print axioms Reisner.Complex.localizationMonomialBasis_apply
+#print axioms Reisner.Complex.localizationMonomial_ne_zero_iff
+#print axioms Reisner.Complex.localizationMonomial_natExponent
+#print axioms Reisner.Complex.faceRingLocalizationComponent
+#print axioms Reisner.Complex.faceRingLocalizationComponent_eq_bot
+#print axioms Reisner.Complex.faceRingLocalizationComponent_finrank
+#print axioms Reisner.Complex.faceRingLocalization_isInternal
+#print axioms Reisner.Complex.faceRingLocalizationGradedAlgebra
+#print axioms Reisner.Complex.faceRingLocalizationMap_monomial
+#print axioms Reisner.Complex.faceRingLocalizationMap_component
+#print axioms Reisner.Complex.faceRingLocalizationMap_basis
+#print axioms Reisner.Complex.faceRingLocalizationFraction_mem_component
+#print axioms Reisner.Complex.faceRingLocalizationComponentBasis
+#print axioms Reisner.Complex.faceRingLocalizationComponentBasis_apply
+#print axioms Reisner.Complex.faceRingLocalizationMap_basis_eq_zero
+#print axioms Reisner.Complex.faceRingFineComponent_map_localization
+
+#check Reisner.Complex.CechCochainDirectSum
+#check Reisner.Complex.cechCochainDirectSumEquiv
+#check Reisner.Complex.cechCochainMonomialBasis
+#check Reisner.Complex.cechDegreeSubmodule_isInternal
+#check Reisner.Complex.cechMonomialCochain
+#check Reisner.Complex.cechDifferential_monomialCochain
+#check Reisner.Complex.cechDifferential
+#check Reisner.Complex.cechDifferential_comp_eq_zero
+#check Reisner.Complex.cechComplex
+#check Reisner.Complex.cechDegreeSubmodule
+#check Reisner.Complex.cechDifferential_maps_degree
+#check Reisner.Complex.cechDifferentialDegree
+#print axioms Reisner.Complex.cechComplex
+#print axioms Reisner.Complex.cechDifferential
+#print axioms Reisner.Complex.cechDifferential_comp_eq_zero
+#print axioms Reisner.Complex.cechDifferential_maps_degree
+#print axioms Reisner.Complex.cechDifferentialDegree
