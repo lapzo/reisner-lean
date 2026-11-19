@@ -3,6 +3,8 @@
 Lean 4 project formalizing dependencies for Reisner's Cohen–Macaulay
 criterion for Stanley–Reisner rings.
 
+[Project website](https://lapzo.github.io/reisner-lean/)
+
 ## Status
 
 The face-ring, dimension, localization, and finite Čech foundations are
