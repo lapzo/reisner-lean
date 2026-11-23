@@ -33,13 +33,20 @@ class Declaration:
 
 SOURCE_FILES = (
     SourceFile("stanley", "Reisner/StanleyReisner.lean", "lean-L"),
-    SourceFile("cech", "Reisner/Cech.lean", "lean-Cech-L"),
+    SourceFile("cech-core", "Reisner/Cech/Core.lean", "lean-Cech-core-L"),
+    SourceFile("cech-grading", "Reisner/Cech/Grading.lean", "lean-Cech-grading-L"),
+    SourceFile("cech-contraction", "Reisner/Cech/Contraction.lean", "lean-Cech-contraction-L"),
+    SourceFile("cech-indices", "Reisner/Cech/Indices.lean", "lean-Cech-indices-L"),
+    SourceFile("cech-link", "Reisner/Cech/LinkComparison.lean", "lean-Cech-link-L"),
+    SourceFile("cech-shifted", "Reisner/Cech/ShiftedLink.lean", "lean-Cech-shifted-L"),
+    SourceFile("simplicial", "Reisner/SimplicialCochain.lean", "lean-Simplicial-L"),
 )
 
 DECLARATION = re.compile(
     r"^(?:(?:noncomputable|protected|private|unsafe|partial)\s+)*"
     r"(?:structure|theorem|lemma|def|abbrev|instance)\s+"
-    r"([A-Za-z_][A-Za-z0-9_']*)\b"
+    # Include the Greek pi used in the mathlib homologyπ compatibility API.
+    r"([A-Za-z_][A-Za-z0-9_']*π?)\b"
 )
 NAMESPACE = re.compile(r"^namespace\s+([A-Za-z_][A-Za-z0-9_.']*)\s*$")
 END = re.compile(r"^end(?:\s+([A-Za-z_][A-Za-z0-9_.']*))?\s*(?:--.*)?$")

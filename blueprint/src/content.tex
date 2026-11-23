@@ -60,15 +60,18 @@ hypothesis of the ultimate target, but is unnecessary for monomial membership
 and the standard monomial basis.
 
 \begin{definition}[Links]\label{def:link}
-\uses{def:complex}
-For $\sigma\in K$ define a complex on the same ambient set by
+\uses{def:complex,def:dimension}
+\lean{Reisner.Complex.link, Reisner.Complex.mem_link_iff, Reisner.Complex.link_empty, Reisner.Complex.notMem_link_singleton_of_mem, Reisner.Complex.mem_link_facet_iff}
+\leanok
+For a face $\sigma\in K$ define a complex on the same ambient set by
 \[
  \operatorname{lk}_K\sigma
  =\{\tau:\tau\cap\sigma=\varnothing,\ \sigma\cup\tau\in K\}.
 \]
 Its empty face is present. Vertices of $\sigma$ become ghosts.
 In particular $\operatorname{lk}_K\varnothing=K$, and the link of a facet
-is $\{\varnothing\}$.
+is $\{\varnothing\}$. These statements hold for an arbitrary ambient set
+$V$, with all faces finite.
 \end{definition}
 
 \begin{lemma}[Link calculus]\label{lem:link-calculus}
@@ -111,7 +114,229 @@ order gives the same remaining face and opposite signs, and the boundary
 of an edge augments to $1-1=0$. Relabelling the order multiplies an oriented
 face by the sign of its sorting permutation, which commutes with deletion.
 This verifies that the construction and its order independence include the
-augmentation. Building this augmented complex in Lean is still required.
+augmentation. The augmented chain construction, its order-comparison
+isomorphisms, and the homology assertions remain Lean work. The separate
+cochain construction below has a smaller checked scope.
+
+\begin{lemma}[The augmented face-cardinality cochain complex]\label{lem:augmented-cochain-complex}
+\uses{def:complex}
+\lean{Reisner.Complex.SimplicialFaceIndex, Reisner.Complex.SimplicialCochain, Reisner.Complex.SimplicialCochainDirectSum, Reisner.Complex.simplicialCochainDirectSumEquiv, Reisner.Complex.simplicialCochainBasis, Reisner.Complex.simplicialCochainBasis_apply, Reisner.Complex.simplicialFaceEraseIndex, Reisner.Complex.simplicialRankBelow, Reisner.Complex.simplicialDifferential, Reisner.Complex.simplicialDifferential_apply, Reisner.Complex.simplicialDifferential_comp_eq_zero, Reisner.Complex.simplicialFaceIndexZeroUnique, Reisner.Complex.simplicialCochainZeroEquiv, Reisner.Complex.simplicialCochainZeroEquiv_apply, Reisner.Complex.simplicialDifferential_zero_apply, Reisner.Complex.simplicialDifferential_zero_of_no_vertices, Reisner.Complex.simplicialDifferential_basis_apply, Reisner.Complex.simplicialCochain_subsingleton_of_card_lt, Reisner.Complex.simplicialCochain_isZero_of_card_lt, Reisner.Complex.simplicialCochainComplex, Reisner.Complex.simplicialCochainComplex_X, Reisner.Complex.simplicialCochainComplex_d}
+\leanok
+Let $V$ be a finite linearly ordered type, $K$ an augmented complex on
+$V$, and $R$ any commutative ring. For $n\in\mathbb N$, set
+\[
+ \mathcal F_n(K)=\{F\in K:|F|=n\},\qquad
+ E^n(K;R)=\prod_{F\in\mathcal F_n(K)}R.
+\]
+The product is finite and has the coordinate basis $e_F$, whose value is
+$1$ at $F$ and $0$ at all other faces. It is canonically the corresponding
+finite direct sum. If $G\in\mathcal F_{n+1}(K)$ and $v\in G$, its deletion
+$G\setminus\{v\}$ belongs to $\mathcal F_n(K)$. Write
+$r_G(v)=|\{u\in G:u<v\}|$. The linear maps
+\[
+ (\delta^n f)(G)=\sum_{v\in G}(-1)^{r_G(v)}
+                         f(G\setminus\{v\})
+\]
+satisfy $\delta^{n+1}\delta^n=0$ for every $n\geq0$ and give an actual
+cochain complex $E^\bullet(K;R)$ in the category of $R$-modules. Its term
+at $n$ and its differential from $n$ to $n+1$ are exactly the module and
+map displayed above. On the coordinate basis the following coordinate
+formula holds:
+\[
+ (\delta^n e_F)(G)=\sum_{v\in G}(-1)^{r_G(v)}
+       \begin{cases}
+        1,&G\setminus\{v\}=F,\\
+        0,&G\setminus\{v\}\ne F.
+       \end{cases}
+\]
+The face-cardinality index $n$ represents reduced cochain degree
+$(n:\mathbb Z)-1$; in particular $n=0$ represents degree $-1$.
+There is no incoming differential at cardinality index zero. Evaluation at the
+unique empty face gives a canonical linear equivalence $E^0(K;R)\simeq_R R$.
+Under this equivalence, $\delta^0$ sends a scalar $r$ to the constant
+cochain with value $r$ on the actual singleton faces. Ghost singletons
+are absent from this index set. If every singleton is a nonface, the linear
+map $\delta^0$ is zero. For $n>|V|$, the actual module $E^n(K;R)$ is a
+zero object in the category of $R$-modules. These assertions include empty
+$V$, ghost vertices, characteristic two, and the zero coefficient ring.
+\end{lemma}
+\begin{proof}
+\leanok
+Faces of a fixed cardinality form a finite subtype of the finite subsets
+of $V$, so the coordinate product and its standard basis are defined.
+Downward closure puts every deletion back in $K$, and deletion of a vertex
+of an $(n+1)$-element set leaves exactly $n$ vertices. Coordinate evaluation,
+scalar multiplication by a sign, and finite summation are linear, proving
+linearity of $\delta^n$.
+
+Expand $\delta^{n+1}\delta^n f$ at a face $H$ of size $n+2$.
+Its terms are indexed by ordered pairs of distinct vertices $v,w\in H$,
+with coefficient
+\[
+ (-1)^{r_H(v)+r_{H\setminus\{v\}}(w)}
+                      f(H\setminus\{v,w\}).
+\]
+Swapping $v$ and $w$ is a fixed-point-free involution on these indices.
+The two deletions give the same remaining face. If $v<w$, deleting $v$
+lowers the rank of $w$ by one, whereas deleting $w$ leaves the rank of
+$v$ unchanged; the case $w<v$ is symmetric. The two sign products are
+therefore additive inverses, and every pair cancels. This proves the
+square-zero identity also for $n=0$, where the two terms at an edge are
+the values at its two singleton faces with opposite signs. Cancellation
+uses additive inverses, with no division by two and no restriction on the
+characteristic. The square-zero maps construct the genuine module-valued
+cochain complex.
+
+Substituting the coordinate value of $e_F$ into the deletion formula gives
+the stated basis-action formula. The cardinality-zero face is uniquely
+$\varnothing$ by the augmented convention, so evaluation there gives the
+scalar equivalence. Every singleton has deletion $\varnothing$ and deletion
+rank zero, giving the constant value in the dual augmentation. If there
+are no actual vertices, there are no singleton indices, and the outgoing
+linear map is zero. No ghost contributes an index. Finally, if $n>|V|$,
+there is no $n$-element subset of $V$, so the index type is empty and its
+function module is a zero object. All constructions and cancellations work
+unchanged for the zero ring.
+\end{proof}
+
+\begin{lemma}[Coordinate formula for basis insertion]\label{lem:augmented-basis-insertion}
+\uses{lem:augmented-cochain-complex}
+For an $n$-face $F$ and an $(n+1)$-face $G$, the coordinate of the
+differential of $e_F$ is
+\[
+ (\delta^n e_F)(G)=
+ \sum_{v\in G}
+   \begin{cases}
+    (-1)^{r_F(v)},&v\notin F\text{ and }F\cup\{v\}=G,\\
+    0,&\text{otherwise}.
+   \end{cases}
+\]
+Thus the coefficient is nonzero only when $G$ is obtained by inserting one
+vertex into $F$, and the sign is the number of vertices of $F$ below it.
+\lean{Reisner.Complex.simplicialDifferential_basis_insertion_apply}
+\leanok
+\end{lemma}
+\begin{proof}
+In the deletion-coordinate formula, the basis cochain $e_F$ contributes at
+the deletion of $v$ precisely when $G\setminus\{v\}=F$. This is equivalent
+to $v\notin F$ and $F\cup\{v\}=G$. Under this condition the vertices below
+$v$ are unchanged by deleting $v$, so $r_G(v)=r_F(v)$. The Lean theorem proves
+this coordinate formula directly.
+\end{proof}
+
+\begin{lemma}[Degree-minus-one cohomology endpoints]\label{lem:augmented-cohomology-minus-one}
+\uses{lem:augmented-cochain-complex}
+The actual homology object at cardinality index zero of the constructed
+cochain complex is canonically isomorphic to $\ker\delta^0$. If $K$ has no
+actual vertices, equivalently $K=\{\varnothing\}$, it is canonically
+linearly equivalent to $R$. If $K$ has an actual vertex, it is zero.
+These assertions include empty $V$, ghost vertices, characteristic two,
+and the zero coefficient ring.
+\lean{Reisner.Complex.simplicialCochainHomologyZeroIsoKer, Reisner.Complex.simplicialCochainHomologyZeroEquivOfNoVertices, Reisner.Complex.simplicialCochainHomologyZero_isZero_of_vertex}
+\leanok
+\end{lemma}
+\begin{proof}
+Mathlib identifies degree-zero homology of a cochain complex indexed by
+$\mathbb N$ with its cycles object, since there is no incoming boundary.
+The cycles object is the categorical kernel of $\delta^0$, and in
+$\mathrm{ModuleCat}(R)$ this is the usual linear-map kernel. If there are
+no actual vertices, $\delta^0=0$ and its kernel is the full empty-face term
+$R$. If $\{v\}$ is an actual face, evaluation at that singleton recovers
+the empty-face scalar, so $\delta^0$ is injective and the kernel is zero.
+The Lean declarations construct the actual homology-to-kernel isomorphism
+and prove both endpoint cases.
+\end{proof}
+
+\begin{lemma}[Integer-indexed augmented cochains and grading endpoints]\label{lem:augmented-cochains}
+\uses{lem:augmented-cochain-complex,lem:augmented-cohomology-minus-one}
+\lean{Reisner.Complex.simplicialCochainDegreeEmbedding, Reisner.Complex.simplicialCochainComplexInt, Reisner.Complex.simplicialCochainComplexIntXIso, Reisner.Complex.simplicialCochainComplexIntRestrictionIso, Reisner.Complex.simplicialCochainComplexIntHomologyIso, Reisner.Complex.simplicialCochainComplexInt_d, Reisner.Complex.simplicialCochainComplexInt_isZero_of_lt_minus_one, Reisner.Complex.simplicialCochainComplexInt_d_eq_zero_of_lt_minus_one, Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_lt_minus_one, Reisner.Complex.simplicialCochainComplex_homology_isZero_of_card_lt, Reisner.Complex.simplicialCochainInt_natDegree, Reisner.Complex.simplicialCochainInt_natBound, Reisner.Complex.simplicialCochainComplexInt_isZero_of_card_lt, Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_card_lt, Reisner.Complex.simplicialCochainComplexIntHomologyMinusOneEquivOfNoVertices, Reisner.Complex.simplicialCochainComplexIntHomologyMinusOne_isZero_of_vertex}
+\leanok
+Let $V$, $K$, and $R$ be as in
+Lemma~\ref{lem:augmented-cochain-complex}, and write $E^\bullet$ for its
+checked cochain complex indexed by natural face cardinalities. Set
+\[
+ e(n)=(n:\mathbb Z)-1,\qquad n\in\mathbb N.
+\]
+There is a genuine cochain complex $C^\bullet(K;R)$ indexed by
+$\mathbb Z$, obtained by extending $E^\bullet$ by zero along $e$.
+For $i\geq-1$, put $n_i=(i+1).\mathrm{toNat}$, where conversion to a
+natural number is used only after verifying $i+1\geq0$. Thus
+$(n_i:\mathbb Z)=i+1$ and $e(n_i)=i$. Its terms have canonical
+identifications
+\[
+ C^i(K;R)\cong
+ \begin{cases}
+  E^{n_i}(K;R),&i\geq-1,\\
+  0,&i<-1.
+ \end{cases}
+\]
+Write $\phi_n:C^{e(n)}\simeq_R E^n$ for the term identifications.
+Since $e(n+1)=e(n)+1$, the differential satisfies
+\[
+ \phi_{n+1}\circ d_C^{e(n)}\circ\phi_n^{-1}=\delta^n.
+\]
+Every differential with source below degree $-1$ is zero. In particular
+the map from degree $-1$ to degree $0$ is the checked dual augmentation,
+and the incoming map from degree $-2$ to degree $-1$ is zero.
+Restriction of $C^\bullet$ along $e$ is isomorphic to $E^\bullet$ as an
+actual cochain complex; the isomorphism and its inverse have components
+$\phi_n$ and $\phi_n^{-1}$. There are canonical isomorphisms of actual
+cohomology objects
+\[
+ H^{e(n)}(C^\bullet)\cong H^n(E^\bullet),\qquad n\in\mathbb N.
+\]
+
+For every $i<-1$, both the module $C^i$ and its actual cohomology object
+$H^i(C^\bullet)$ are zero. For every
+$i>(|V|:\mathbb Z)-1$, they are again both zero; this upper inequality
+is equivalent to $|V|<n_i$ when $i\geq-1$. In particular the actual
+homology object $H^n(E^\bullet)$ is zero for every natural $n>|V|$.
+At degree $-1$ the displayed cohomology isomorphism identifies
+$H^{-1}(C^\bullet)$ with the checked cardinality-zero cohomology:
+it is canonically linearly equivalent to $R$ if $K$ has no actual
+vertices, equivalently $K=\{\varnothing\}$, and is zero if an actual
+vertex exists. All statements include empty $V$, ghosts, characteristic
+two, and the zero coefficient ring. No comparison with the Cech complex
+or local cohomology is asserted here.
+\end{lemma}
+\begin{proof}
+\leanok
+The map $e$ is injective, preserves successive degrees, and has image
+exactly the integers at least $-1$. Extend the checked complex along this
+embedding of cochain shapes. On its image the extension has the same
+objects and maps up to the canonical transport isomorphisms; outside its
+image it has zero objects and zero maps. Its square-zero law is inherited
+from $E^\bullet$ when both successive maps are in the image, and otherwise
+one of the maps is zero. This includes the incoming map at degree $-1$.
+The term transports commute with every differential, so they and their
+inverses define the claimed restriction isomorphism.
+
+For $i\geq-1$, nonnegativity of $i+1$ gives
+$((i+1).\mathrm{toNat}:\mathbb Z)=i+1$, hence $e(n_i)=i$.
+Moreover $i>(|V|:\mathbb Z)-1$ is equivalent to $|V|<n_i$:
+add one in $\mathbb Z$ and use the same cast identity. These identities
+justify the natural indices without truncated subtraction. The extension
+identifies the kernels and images determining cohomology at every image
+degree with those of $E^\bullet$. At $e(0)=-1$, the incoming term of the
+extension is zero, matching the absence of an incoming differential at
+natural index zero, so this comparison includes that endpoint.
+
+Below degree $-1$, the term itself is zero. Above the stated upper bound,
+the corresponding natural index exceeds $|V|$, and
+Lemma~\ref{lem:augmented-cochain-complex} makes that term zero as well.
+A complex is exact at a zero term, so its actual cohomology object is
+zero there. The same argument proves high-cardinality vanishing directly
+for $E^\bullet$. Finally transport the scalar equivalence and the
+actual-vertex vanishing from
+Lemma~\ref{lem:augmented-cohomology-minus-one} through the cohomology
+isomorphism at $n=0$. No coefficient is divided out, so the argument
+includes the zero ring and characteristic two.
+
+The extension and its term, restriction, and homology isomorphisms are
+implemented using mathlib's embedding API. The chain model,
+order-independence comparison, and the full reduced homology and duality assertions of
+Definition~\ref{def:homology} remain separate formalization work.
+\end{proof}
 
 \begin{lemma}[Homology versus cohomology]\label{lem:dual}
 \uses{def:homology}
@@ -1064,13 +1289,94 @@ on the fiber of indices $(F,b)$ with $b=a$. Distinct degree fibers are
 disjoint, so their submodules are independent. The union of all fibers is
 the entire basis index type; hence the submodules span $C^q$. The standard
 internal-direct-sum criterion (independence and spanning) gives the result.
-The construction applies to the actual localization at every subset; when
-the subset is inadmissible its localization and all its degree components
-are zero.
+The construction uses the actual localization at every subset. A nonface
+has zero localization. At a face, a degree which is inadmissible
+contributes the zero component in that degree.
+\end{proof}
+
+\begin{lemma}[Fine-degree components of Cech cocycles and boundaries]\label{lem:cech-cycle-boundary-components}
+\uses{lem:cech-complex,lem:cech-termwise-decomposition}
+Let $V$ be finite and linearly ordered, $R$ a commutative ring, and $K$
+a complex on $V$ containing the empty face. For $q\geq 0$ and
+$a\in\mathbb Z^{(V)}$, write $\pi_a^q:C^q\to C^q_a$ for the projection
+from the internal direct sum of Lemma~\ref{lem:cech-termwise-decomposition},
+and $d_a^q:C^q_a\to C^{q+1}_a$ for the restricted differential.
+The projection recovers a cochain in $C^q_a$ and vanishes on $C^q_b$ for
+$b\ne a$. Every cochain $z$ is the sum of its projections over the finite
+set of degrees in its support. The projections satisfy
+\[
+  \pi_a^{q+1}(d^qz)=d_a^q(\pi_a^q z)
+  \qquad(z\in C^q).
+\]
+In particular $d^qz=0$ if and only if $d_a^q(\pi_a^qz)=0$ for every $a$.
+For $w\in C^{q+1}_a$, its image in $C^{q+1}$ lies in
+$\operatorname{im}d^q$ if and only if $w\in\operatorname{im}d_a^q$.
+This last assertion describes incoming boundaries in positive cochain
+degrees. In cochain degree zero the incoming boundary module is zero.
+\lean{Reisner.Complex.cechDecomposition, Reisner.Complex.cechDecomposeLinearEquiv, Reisner.Complex.cechHomogeneousComponent, Reisner.Complex.cechHomogeneousComponent_eq_self, Reisner.Complex.cechHomogeneousComponent_eq_zero_of_ne, Reisner.Complex.cechHomogeneousComponent_sum_support, Reisner.Complex.cechHomogeneousComponent_eq_zero_iff, Reisner.Complex.cechHomogeneousComponent_differential, Reisner.Complex.cechDifferential_eq_zero_iff_components, Reisner.Complex.cechBoundary_homogeneous_primitive}
+\leanok
+\end{lemma}
+\begin{proof}
+\leanok
+Write $z=\sum_b z_b$ as its unique finite sum of homogeneous components.
+Degree preservation gives $d^qz_b\in C^{q+1}_b$, so $d^qz=\sum_b d^qz_b$
+is already the homogeneous decomposition of $d^qz$. Taking its component
+of degree $a$ proves the displayed identity. An element of the direct sum
+vanishes exactly when every component vanishes, which gives the cocycle
+criterion. If $d^qy=w$ with $w$ homogeneous of degree $a$, projecting
+gives $d_a^q(\pi_a^q y)=w$. Conversely a primitive in $C^q_a$ is also a
+primitive after inclusion in $C^q$.
+\end{proof}
+
+\begin{lemma}[Cohomology of the fine-degree Cech subcomplexes]\label{lem:cech-cohomology-decomposition}
+\uses{lem:cech-complex,lem:cech-termwise-decomposition,lem:cech-cycle-boundary-components}
+Let $K$ be a complex on a finite linearly ordered set $V$ and let $R$
+be a commutative ring. Write $C^\bullet$ for its extended Cech complex
+and $C^\bullet_a$ for the complex of its degree-$a$ submodules with the
+restricted differentials. Write $i_a:C^\bullet_a\to C^\bullet$ and
+$p_a:C^\bullet\to C^\bullet_a$ for the inclusion and projection.
+For every $q\geq 0$ these cochain maps induce an $R$-linear isomorphism
+\[
+ T:\bigoplus_{a\in\mathbb Z^{(V)}} H^q(C^\bullet_a)
+    \xrightarrow{\ \sim\ } H^q(C^\bullet),\qquad
+ T(\iota_a x)=H^q(i_a)(x),
+\]
+where $\iota_a$ inserts a class in the $a$ summand. The $a$ component of
+$T^{-1}(h)$ is $H^q(p_a)(h)$. If $z$ is a cocycle representing $h$, the
+nonzero components of $T^{-1}(h)$ occur only in the finite degree support
+of $z$.
+\lean{Reisner.Complex.cechComplexDegree, Reisner.Complex.cechComplexDegree_d, Reisner.Complex.cechDegreeInclusion, Reisner.Complex.cechDegreeProjection, Reisner.Complex.cechDegreeInclusion_projection, Reisner.Complex.cechDegreeInclusion_projection_of_ne, Reisner.Complex.cechCohomologyDegree, Reisner.Complex.cechCohomologyAssembly, Reisner.Complex.cechCohomologyAssembly_lof, Reisner.Complex.cechCohomologyProjection_assembly, Reisner.Complex.cechCohomologyAssembly_injective, Reisner.Complex.cechCohomologyAssembly_surjective, Reisner.Complex.cechCohomologyAssembly_bijective, Reisner.Complex.cechCohomologyDecomposition, Reisner.Complex.cechCohomologyDecomposition_lof, Reisner.Complex.cechCohomologyDecomposition_symm_apply, Reisner.Complex.cechCohomologyDecomposition_support_subset, Reisner.Complex.cechCohomologyQuotientEquiv, Reisner.Complex.cechCohomologyDegreeQuotientEquiv, Reisner.Complex.cechCohomology_outgoing, Reisner.Complex.cechCohomology_incoming, Reisner.Complex.cechCohomologyDegree_outgoing, Reisner.Complex.cechCohomologyDegree_incoming, Reisner.Complex.cechCohomologyQuotientEquiv_homologyπ, Reisner.Complex.cechCohomologyDegreeQuotientEquiv_homologyπ, Reisner.Complex.cechCohomology_boundaries_zero, Reisner.Complex.cechCohomologyDegree_boundaries_zero}
+\leanok
+\end{lemma}
+\begin{proof}
+\leanok
+For either complex $D^\bullet$, let $Z^q=\ker d^q$. The identity $d^2=0$
+puts the image of the preceding differential inside $Z^q$. Its image
+there is $B^q$, with $B^0=0$ since the complex starts in degree zero.
+The module-category homology of $D^\bullet$ identifies canonically with
+$Z^q/B^q$. In mathlib's short-complex API, the comparison at $q$ is
+\texttt{moduleCatHomologyIso}. Under this
+identification the canonical map from cocycles sends $z$ to its class.
+
+By Lemma~\ref{lem:cech-cycle-boundary-components}, $p_a$ commutes with the
+differential. The inclusions commute by definition of the restricted
+differential. Thus both maps take cycles to cycles and boundaries to
+boundaries, so both act on cohomology. In particular $H^q(i_a)$ takes a
+homogeneous cocycle class to the class of the same cocycle in $C^\bullet$.
+The composition $p_ai_b$ is the identity for $a=b$ and zero otherwise.
+The induced maps on cohomology satisfy these same identities. Applying
+$H^q(p_a)$ to the image under $T$ of a finite family therefore recovers
+its $a$ component.
+
+Conversely, let $z$ represent $h\in H^q(C^\bullet)$. By
+Lemma~\ref{lem:cech-termwise-decomposition}, $z$ is the finite sum of the
+$i_a p_a z$ over its degree support. Every $p_a z$ is a cocycle.
+Taking classes proves that $T$ sends the finite family
+$(H^q(p_a)(h))_a$ to $h$. Both identities hold in degree zero as well.
 \end{proof}
 
 \begin{lemma}[Cech differential and decomposition]\label{lem:cech-grading}
-\uses{lem:cech-complex,lem:localized,lem:cech-basis-action,lem:cech-termwise-decomposition}
+\uses{lem:cech-complex,lem:localized,lem:cech-basis-action,lem:cech-termwise-decomposition,lem:cech-cycle-boundary-components,lem:cech-cohomology-decomposition}
 Fix an order on $V$. For each $F$ admissible in degree $a$, let $e_F$ be
 the cochain of degree $|F|$ with value $m_F(a)$ in coordinate $F$ and
 zero elsewhere. In the Cech complex of the images of all variables, the
@@ -1085,8 +1391,11 @@ $a$ cohomologies. Explicitly, inclusions of the subcomplexes induce
  \bigoplus_{a\in\mathbb Z^{(V)}} H^q(C^\bullet_a)
        \ \xrightarrow{\ \sim\ }\ H^q(C^\bullet).
 \]
+\lean{Reisner.Complex.cechMonomialCochain, Reisner.Complex.cechDifferential_monomialCochain, Reisner.Complex.cechDifferential_comp_eq_zero, Reisner.Complex.cechDifferential_maps_degree, Reisner.Complex.cechCohomologyDecomposition, Reisner.Complex.cechCohomologyDecomposition_lof}
+\leanok
 \end{lemma}
 \begin{proof}
+\leanok
 At a target $G$ of size $|F|+1$, only a term with $G\setminus\{v\}=F$ can
 contribute to $d e_F$. Such a vertex is unique, and $r_G(v)$ counts the
 elements of $F$ below $v$. Lemma~\ref{lem:localized} sends $m_F(a)$ to
@@ -1107,13 +1416,27 @@ uses uniqueness alone.
 
 \begin{lemma}[Positive-coordinate contraction]\label{lem:contraction}
 \uses{lem:cech-grading}
-If $P(a)\ne\varnothing$, the degree $a$ Cech complex is contractible.
+Let $V$ be finite and linearly ordered, $R$ a commutative ring, and
+$a\in\mathbb Z^{(V)}$. If $P(a)\ne\varnothing$, the degree $a$ Cech complex
+is contractible. More precisely, each $p\in P(a)$ gives a homotopy from
+the identity of $C^\bullet_a$ to zero. Its maps
+$h^{q+1}:C^{q+1}_a\to C^q_a$ satisfy $h^1d^0=1$ and
+$d^{q-1}h^q+h^{q+1}d^q=1$ for $q>0$. Consequently
+$H^q(C^\bullet_a)=0$ for all $q\geq0$.
+\lean{Reisner.Complex.cechMonomialCochainDegree, Reisner.Complex.cechCochainMonomialBasis_apply, Reisner.Complex.cechMonomialCochainDegree_eq_zero, Reisner.Complex.cechDegree_linearMap_ext, Reisner.Complex.cechDifferentialDegree_monomial, Reisner.Complex.cechPositiveContraction, Reisner.Complex.localizationAdmissible_insert_positive, Reisner.Complex.localizationAdmissible_erase_positive, Reisner.Complex.cechContraction_sign_cancel, Reisner.Complex.cechPositiveContraction_monomial, Reisner.Complex.cechContractionMap_eq_id, Reisner.Complex.cechPositiveContractingHomotopy, Reisner.Complex.cechPositiveContractingHomotopy_hom, Reisner.Complex.cechPositiveContraction_smul_monomial, Reisner.Complex.cechPositiveContraction_zero, Reisner.Complex.cechPositiveContraction_succ, Reisner.Complex.cechPositiveSupport_contractible, Reisner.Complex.cechPositiveCohomology_isZero, Reisner.Complex.cechPositiveCohomology_subsingleton}
+\leanok
 \end{lemma}
 \begin{proof}
+\leanok
 Choose $p\in P(a)$. Admissibility is invariant under inserting or removing
 $p$: it does not affect $N(a)\subseteq F$, and $p$ is already in $P(a)$.
-Define a degree $-1$ map on basis vectors by $h(e_F)=0$ for $p\notin F$,
-and
+At an admissible coordinate the Laurent monomial spans the component
+freely over $R$ by Lemma~\ref{lem:localized}. When $p\notin F$,
+the transition from $F$ to $F\cup\{p\}$ sends this generator to the
+corresponding generator. At an inadmissible coordinate both degree
+components are zero. Thus the transition is invertible on these
+components over any commutative ring. Define an $R$-linear map on
+monomial cochains by $h(e_F)=0$ for $p\notin F$, and
 \[
  h(e_F)=(-1)^{|\{u\in F:u<p\}|}e_{F\setminus\{p\}}
  \quad(p\in F).
@@ -1124,11 +1447,264 @@ $d h(e_F)$ is $e_F$. For any other inserted vertex $v$, its contributions
 to $dh$ and $hd$ have opposite signs: if $v<p$ its insertion changes
 the removal sign once; if $p<v$ removing $p$ changes the insertion sign
 once. The admissible terms match in pairs, including when they are zero.
-Thus $dh+hd=1$ in every degree, including the endpoints.
+In Lean the same cancellation follows from $d^2=0$ as follows.
+The cochain map $\Delta=dh+hd-1$ vanishes on the monomials missing $p$.
+For an admissible $F$ containing $p$, put $E=F\setminus\{p\}$.
+Then $\Delta d(e_E)=d\Delta(e_E)=0$. Every insertion into $E$ other
+than $p$ still misses $p$. Thus only the signed term $\pm\Delta(e_F)$
+can survive, which forces $\Delta(e_F)=0$. Linearity on the admissible
+monomials gives $dh+hd=1$ in every positive cochain degree. At $q=0$ the
+only possible coordinate is the empty set and only $h^1d^0$ contributes.
+At the top degree the outgoing term is zero. Above it the cochain
+module is zero. Taking cohomology, the identity induces the zero map
+because the two cochain maps are homotopic.
+\end{proof}
+
+\begin{lemma}[Nonpositive Cech degrees and link faces]\label{lem:cech-nonpositive-indices}
+\uses{def:link,lem:localized,lem:cech-complex,lem:cech-cohomology-decomposition}
+\lean{Reisner.Complex.negativeSupport, Reisner.Complex.mem_negativeSupport, Reisner.Complex.negativeSupport_finite, Reisner.Complex.negativeSupport_subset_iff, Reisner.Complex.positiveSupport_eq_empty_of_nonpos, Reisner.Complex.localizationAdmissible_iff_of_nonpos, Reisner.Complex.nonpositiveLocalizationIndexEquivLink, Reisner.Complex.nonpositiveLocalizationIndexEquivLink_apply, Reisner.Complex.nonpositiveLocalizationIndexEquivLink_symm_apply, Reisner.Complex.nonpositiveLocalizationIndex_card, Reisner.Complex.nonpositiveCechIndexEquivLink, Reisner.Complex.nonpositiveCechIndexEquivLink_apply, Reisner.Complex.nonpositiveCechIndexEquivLink_symm_apply, Reisner.Complex.not_localizationAdmissible_of_card_lt_negativeSupport, Reisner.Complex.not_localizationAdmissible_of_negativeSupport_nonface, Reisner.Complex.cechDegreeSubmodule_eq_bot_of_no_admissible, Reisner.Complex.cechDegreeSubmodule_eq_bot_of_card_lt_negativeSupport, Reisner.Complex.cechDegreeSubmodule_eq_bot_of_nonpos_negativeSupport_nonface, Reisner.Complex.cechComplexDegree_isZero_of_nonpos_negativeSupport_nonface, Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_negativeSupport_nonface}
+\leanok
+For $a\in\mathbb Z^{(V)}$, its negative support $N=\{v:a_v<0\}$ is
+finite. Suppose $a\leq0$ pointwise. Then $P(a)=\varnothing$, and a
+finite set $F$ is admissible in degree $a$ if and only if
+$N\subseteq F$ and $F\in K$.
+
+If $N\in K$, the maps $F\mapsto F\setminus N$ and $T\mapsto N\cup T$
+give inverse bijections between admissible sets and faces of
+$\operatorname{lk}_K N$. For corresponding $F$ and $T$ we have
+$F=N\sqcup T$ and $|F|=|N|+|T|$. Thus for each $q\geq0$ the same maps
+give a bijection
+\[
+ \{F: |F|=q,\ F\text{ admissible in degree }a\}
+ \;\longleftrightarrow\;
+ \{T\in\operatorname{lk}_K N: |N|+|T|=q\}.
+\]
+The empty face of the link corresponds to $F=N$ in degree $q=|N|$.
+There are no admissible indices of size $q<|N|$. If $N\notin K$, there
+are no admissible indices of any size.
+
+For finite $V$ and any commutative ring $R$, the degree submodule
+$C^q_a$ is zero whenever there is no admissible index of size $q$.
+In particular it vanishes for $q<|N|$. If $N\notin K$, every
+term of the ordered degree complex $C^\bullet_a$ and each of its
+cohomology modules $H^q(C^\bullet_a)$ are zero.
+\end{lemma}
+\begin{proof}
+\leanok
+The negative coordinates form a subset of the finite support of $a$.
+Their inclusion in $F$ says exactly that $a_v\geq0$ for each $v\notin F$.
+When $a\leq0$ there are no positive coordinates, so the other
+admissibility condition $F\cup P(a)\in K$ reduces to $F\in K$.
+For a face $F$ containing $N$, the difference $T=F\setminus N$ is
+disjoint from $N$ and satisfies $N\cup T=F$, hence is in the link.
+Conversely, for a link face $T$, the face $N\cup T$ contains $N$ and
+removing $N$ recovers $T$. Counting the disjoint union gives the
+cardinality formula. If $N$ is a nonface, downward closure prevents
+any face from containing it.
+
+Each coordinate of a homogeneous cochain at an inadmissible $F$ belongs
+to the zero localization component by Lemma~\ref{lem:localized}.
+When all coordinates in a given degree vanish, the cochain itself is zero.
+A complex is exact at any zero term, so its cohomology there is zero,
+including in cochain degree zero.
+\end{proof}
+
+\begin{lemma}[Signed coordinate comparison with link cochains]\label{lem:cech-link-coordinate-comparison}
+\uses{lem:cech-complex,lem:cech-basis-action,lem:cech-termwise-decomposition,lem:cech-nonpositive-indices,lem:augmented-cochain-complex,lem:augmented-basis-insertion}
+\lean{Reisner.Complex.cechLinkSign, Reisner.Complex.cechLinkSign_empty, Reisner.Complex.cechLinkSign_mul_self, Reisner.Complex.cechLinkSign_insert, Reisner.Complex.cechRankBelow_union, Reisner.Complex.cechLinkSign_insertion_compat, Reisner.Complex.nonpositiveCechLinkIndexEquiv, Reisner.Complex.nonpositiveCechLinkIndexEquiv_val, Reisner.Complex.nonpositiveCechLinkIndexEquiv_symm_val, Reisner.Complex.cechNonpositiveLinkEquiv, Reisner.Complex.cechNonpositiveLinkEquiv_apply, Reisner.Complex.cechNonpositiveLinkEquiv_monomial, Reisner.Complex.cechNonpositiveLinkEquiv_symm_basis, Reisner.Complex.cechNonpositiveLinkEquiv_symm_apply, Reisner.Complex.cechNonpositiveLinkEquiv_differential, Reisner.Complex.cechNonpositiveLinkMap_monomial_apply, Reisner.Complex.cechLinkInsert_iff, Reisner.Complex.insert_link_admissible_iff}
+\leanok
+Let $V$ be finite and linearly ordered, $R$ a commutative ring, and
+$a\in\mathbb Z^{(V)}$ pointwise nonpositive. Suppose its negative support
+$N=N(a)$ is a face of $K$, and put $L=\operatorname{lk}_K N$.
+For $r\in\mathbb N$, set $q=|N|+r$. An admissible Cech index of size
+$q$ has the unique form $F_T=N\sqcup T$, where $T\in L$ and $|T|=r$.
+Write $c_{F_T}(a)\in C^q_a$ for its Laurent monomial cochain, and
+$e_T\in E^r(L;R)$ for the link's coordinate basis cochain. Define
+\[
+ s_N(T)=\sum_{t\in T}|\{n\in N:n<t\}|,\qquad
+ \sigma_N(T)=(-1)^{s_N(T)}\in R.
+\]
+There is an $R$-linear equivalence
+\[
+ \Phi_r:C^{|N|+r}_a\xrightarrow{\ \sim\ }E^r(L;R),
+ \qquad
+ \Phi_r(c_{F_T}(a))=\sigma_N(T)e_T.
+\]
+More explicitly, write $z=\sum_{T\in\mathcal F_r(L)}
+b_Tc_{F_T}(a)$ using the actual degree-fiber Laurent basis. Then
+\[
+ (\Phi_r z)(T)=\sigma_N(T)b_T,\qquad
+ \Phi_r^{-1}(f)=
+ \sum_{T\in\mathcal F_r(L)}\sigma_N(T)f(T)c_{F_T}(a).
+\]
+These equivalences commute with the existing adjacent differentials:
+\[
+ \Phi_{r+1}\circ d_a^{|N|+r}
+   =\delta_L^r\circ\Phi_r,\qquad r\in\mathbb N.
+\]
+The relation between cardinalities is $|N|+|T|=q$, with no truncated
+subtraction. At $r=0$, the empty link face corresponds to $F=N$,
+$\sigma_N(\varnothing)=1$, and the commuting equality includes the
+dual augmentation. Inadmissible Cech coordinates, including ghost and
+nonface coordinates, remain in the actual Cech product and vanish in
+this homogeneous degree. All assertions include $N=\varnothing$,
+the only-empty-face link, characteristic two, and the zero coefficient
+ring. This is a termwise comparison with differential compatibility.
+The shifted-complex and induced cohomology statements are formulated
+separately in Lemma~\ref{lem:cech-link-cohomology-comparison}; comparison
+with local cohomology remains a further claim.
+\end{lemma}
+\begin{proof}
+\leanok
+The actual product Laurent basis of the Cech cochain module is indexed
+by pairs consisting of a subset coordinate $F$ and an admissible Laurent
+degree at $F$. Restricting its coordinate representation to the degree
+fiber $a$ gives a basis of the actual submodule $C^q_a$, indexed by the
+admissible subsets of cardinality $q$. Apply the checked bijection of
+Lemma~\ref{lem:cech-nonpositive-indices}, and cancel $|N|$ from
+$|N|+|T|=|N|+r$, to reindex this basis by $\mathcal F_r(L)$.
+The coefficient representation gives an unsigned linear equivalence
+with $E^r(L;R)$. Multiply its $T$ coordinate by $\sigma_N(T)$.
+Since $\sigma_N(T)^2=1$, this multiplication is its own inverse,
+giving the displayed equivalence and inverse without any assumption
+that $R$ is nontrivial.
+
+It suffices to check the differential equality on an admissible
+monomial cochain $c_{N\cup T}(a)$. The checked Cech insertion formula
+sums over vertices $v\notin N\cup T$. For such a vertex,
+$\operatorname{insert}(v,N\cup T)$ is admissible in degree $a$ exactly
+when $\operatorname{insert}(v,T)$ is a face of $L$: disjointness from
+$N$ is retained, and the remaining condition is membership of their
+union in $K$. An invalid target monomial vanishes in its actual
+localization, so it contributes zero. For valid targets, disjointness
+of $N$ and $T$ gives
+\[
+ r_{N\cup T}(v)=r_N(v)+r_T(v),\qquad
+ \sigma_N(T\cup\{v\})=\sigma_N(T)(-1)^{r_N(v)}.
+\]
+The first identity counts the two disjoint parts below $v$; the second
+adds the new summand in the exponent. Consequently
+\[
+ (-1)^{r_{N\cup T}(v)}\sigma_N(T\cup\{v\})
+       =\sigma_N(T)(-1)^{r_T(v)},
+\]
+because the two factors $(-1)^{r_N(v)}$ multiply to one. This is exactly
+the coefficient in the link's checked insertion formula. Checking
+target coordinates therefore proves the commuting equality, including
+$T=\varnothing$. For $N=\varnothing$ the sign is identically one.
+No division or cancellation by a nonzero scalar is used, so the argument
+also applies in characteristic two and to the zero ring.
+The Lean equivalence extracts the full Laurent-basis coefficients and
+constructs the inverse by linear extension on the link basis. The checked
+monomial-generation principle then verifies the inverse law and the
+coordinatewise differential equality.
+\end{proof}
+
+\begin{lemma}[Shifted link complex and Cech cohomology comparison]\label{lem:cech-link-cohomology-comparison}
+\uses{lem:cech-link-coordinate-comparison,lem:cech-nonpositive-indices,lem:augmented-cochain-complex,lem:augmented-cochains}
+\lean{Reisner.Complex.cechLinkDegreeEmbedding, Reisner.Complex.cechLinkShiftedComplex, Reisner.Complex.cechLinkShiftedComplexXIso, Reisner.Complex.cechLinkShiftedComplex_d, Reisner.Complex.cechLinkShiftedComplex_isZero_of_lt, Reisner.Complex.cechNonpositiveLinkComplexComponentIso, Reisner.Complex.cechNonpositiveLinkComplexComponentIso_add, Reisner.Complex.cechNonpositiveLinkComplexIso, Reisner.Complex.cechNonpositiveLinkHomologyIso, Reisner.Complex.cechNonpositiveLinkNaturalHomologyIso, Reisner.Complex.cechNonpositiveLinkCohomologyIso, Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_card_lt_negativeSupport}
+\leanok
+Let $V$ be finite and linearly ordered, $R$ a commutative ring, and
+$a\in\mathbb Z^{(V)}$ pointwise nonpositive. Suppose $N=N(a)$ is a
+face, and set $L=\operatorname{lk}_K N$ and $m=|N|$.
+Write $E_L^\bullet$ for the checked natural face-cardinality cochain
+complex of $L$, and $\mathcal E_L^\bullet$ for its checked
+integer-indexed extension, whose degree $i$ represents reduced cochain
+degree $i$. The map
+\[
+ j_m:\mathbb N\longrightarrow\mathbb N,\qquad j_m(r)=m+r
+\]
+is an injective embedding of cochain shapes: it preserves the relation
+from a degree to its successor. Extend $E_L^\bullet$ by zero along
+$j_m$ to obtain an actual cochain complex $D^\bullet$ of $R$-modules.
+It has canonical term identifications
+\[
+ D^q\cong0\quad(q<m),\qquad
+ \rho_r:D^{m+r}\xrightarrow{\ \sim\ }E_L^r
+       \quad(r\in\mathbb N).
+\]
+Under these identifications the differential from $m+r$ to $m+(r+1)$
+is the existing $\delta_L^r$, with its existing orientation signs:
+\[
+ \rho_{r+1}\circ d_D^{m+r}=\delta_L^r\circ\rho_r.
+\]
+Every differential whose source is below $m$ is zero, including the
+incoming map to $D^m$ when $m>0$.
+
+There is an isomorphism of actual natural-indexed cochain complexes
+\[
+ \Psi:C^\bullet_a\xrightarrow{\ \sim\ }D^\bullet.
+\]
+At degree $m+r$, its component is $\rho_r^{-1}\Phi_r$, where
+$\Phi_r$ is the signed coordinate equivalence of
+Lemma~\ref{lem:cech-link-coordinate-comparison}; its inverse component
+is $\Phi_r^{-1}\rho_r$. Below $m$ its components are the unique maps
+between the corresponding zero objects.
+Consequently the induced maps identify the actual homology objects
+in every natural degree $q$, with inverse induced by $\Psi^{-1}$:
+\[
+ H^q(C^\bullet_a)\cong H^q(D^\bullet).
+\]
+For $q<m$ both objects are zero. For every $r\in\mathbb N$, there are
+canonical identifications
+\[
+ H^{m+r}(C^\bullet_a)
+   \cong H^r(E_L^\bullet)
+   \cong H^{(r:\mathbb Z)-1}(\mathcal E_L^\bullet).
+\]
+In particular $r=0$ reaches integer degree $-1$ and retains the empty
+link face and its checked cohomology endpoints. If $q\geq m$, the
+unique natural $r$ with $q=m+r$ satisfies
+$(q:\mathbb Z)-(m:\mathbb Z)-1=(r:\mathbb Z)-1$; the case $q<m$ is
+handled separately by its zero object, without truncated subtraction.
+These assertions include $N=\varnothing$, empty ambient types, the
+only-empty-face link, ghost vertices, characteristic two, and the zero
+coefficient ring. They concern the actual Cech and simplicial cochain
+complexes; the comparison with local cohomology remains separate.
+\end{lemma}
+\begin{proof}
+\leanok
+Injectivity of $j_m$ is cancellation of $m$, and
+$j_m(r+1)=j_m(r)+1$ proves preservation of the cochain relation.
+Its image consists exactly of the natural degrees at least $m$.
+Extension along this embedding supplies the stated terms, transported
+differentials, and square-zero law, including the zero incoming map at
+the cutoff.
+
+For $q<m$, Lemma~\ref{lem:cech-nonpositive-indices} makes the actual
+Cech degree module zero as well. Use the unique isomorphism between
+these zero objects for the component of $\Psi$. Otherwise write
+$q=m+r$, using $r=q-m$ only after proving $m\leq q$.
+Transport the source and target objects along this cardinality equality,
+and use the checked $\Phi_r$ followed by the inverse term identification
+of the extension. On adjacent degrees at least $m$, the component
+commuting square is exactly the already checked signed
+differential-compatibility theorem. At a source degree below $m$,
+both sides of the square are maps from a zero object and hence agree.
+This includes the square crossing from $m-1$ to $m$ when $m>0$.
+The inverse term maps give the inverse cochain map.
+
+Apply the homology isomorphism induced by $\Psi$ in every degree.
+Extension along $j_m$ identifies its homology at $m+r$ with the
+homology of $E_L^\bullet$ at $r$, including $r=0$: both have zero
+incoming boundary at the cutoff. Compose with the inverse of the
+checked integer-extension homology isomorphism of
+Lemma~\ref{lem:augmented-cochains} to obtain the displayed integer
+degree. At $q<m$, the term of $D^\bullet$ is zero; exactness at a zero
+term gives zero actual homology, and $\Psi$ transports this to the
+Cech complex. The additive cardinality relation gives the stated
+integer degree equality.
+
+The complex isomorphism and its homology comparisons use the checked
+component maps, the embedding extension, and mathlib homology transport.
+The positive-coordinate and nonface-negative-support zero cases remain
+the separate checked results. The local-cohomology
+comparison, full reduced chain model and duality, and full link formula
+remain future work.
 \end{proof}
 
 \begin{theorem}[Local-cohomology link formula]\label{thm:lc-link}
-\uses{def:homology,found:cech,lem:cech-grading,lem:contraction}
+\uses{def:homology,lem:augmented-cochains,found:cech,lem:cech-grading,lem:contraction,lem:cech-nonpositive-indices,lem:cech-link-coordinate-comparison,lem:cech-link-cohomology-comparison}
 For $q\ge0$ and $a\in\mathbb Z^V$,
 \[
  H^q_{\mathfrak m}(A)_a\cong
@@ -1238,7 +1814,8 @@ The implemented entry points are Theorem~\ref{thm:membership},
 Proposition~\ref{prop:basis}, Lemma~\ref{lem:homogeneous}, and
 Propositions~\ref{prop:grading}, \ref{prop:augmentation}, and
 \ref{prop:facet-primes}, together with Proposition~\ref{prop:dimension}
-and Lemmas~\ref{lem:localization-kernel} and~\ref{lem:localized}, with the
+and Lemmas~\ref{lem:localization-kernel}, \ref{lem:localized},
+\ref{lem:cech-complex}, and \ref{lem:cech-grading}, with the
 augmented complex, squarefree exponent, ideal, quotient, and indicator
 comparison that they need. Polynomial membership, the genuine quotient
 basis and its monomial identification, nontriviality, scalar injectivity,
@@ -1267,12 +1844,40 @@ $\dim A=\dim A_{\mathfrak m}=d(K)$ using both prime-chain bounds and
 the augmentation-ideal height computation. Lemma~\ref{lem:cech-complex}
 assembles the localization maps into the ordered extended Cech complex
 and restricts its differential to each integer degree.
-Lemma~\ref{lem:cech-grading} then identifies the basis formula and the
-direct-sum decomposition on cohomology. Lemma~\ref{lem:cech-complex} is
-checked in Lean. Lemma~\ref{lem:cech-grading}, including the cohomology
-decomposition, the augmented chains and link calculus, the depth and
-local-cohomology comparisons, and Reisner's criterion remain future Lean
-work.
+Lemma~\ref{lem:cech-complex} and Lemma~\ref{lem:cech-grading} are checked in
+Lean, including the signed monomial differential formula, its square-zero
+law and degree preservation, and the inclusion-induced direct-sum
+decomposition of actual Čech cohomology. Lemma~\ref{lem:contraction} now
+contracts each degree complex with a positive coordinate and proves
+vanishing of its Cech cohomology. Definition~\ref{def:link} and
+Lemma~\ref{lem:cech-nonpositive-indices} identify the admissible indices
+in each nonpositive degree with the link faces of the required cardinality
+when $N(a)$ is a face. For a nonface $N(a)$ the degree complex has zero
+cohomology. Lemma~\ref{lem:augmented-cochain-complex} now constructs the
+actual augmented face-cardinality cochain complex, its coordinate basis
+and deletion formula, and its square-zero differential. The empty-face
+scalar equivalence, constant augmentation on actual singleton faces,
+zero outgoing map when all vertices are ghosts, and zero modules above
+$|V|$ are checked. Lemmas~\ref{lem:augmented-basis-insertion} and
+\ref{lem:augmented-cohomology-minus-one} give the coordinate insertion
+formula and cardinality-zero cohomology endpoints.
+Lemma~\ref{lem:augmented-cochains} now gives the actual integer-indexed
+extension, its restriction and cohomology comparisons, zero terms and
+cohomology below degree $-1$ and above degree $|V|-1$, and the transported
+degree-minus-one endpoints. Lemma~\ref{lem:cech-link-coordinate-comparison}
+now identifies each nonpositive Cech degree term with the corresponding
+link cochains by an explicit sign twist and proves compatibility with
+adjacent differentials over any commutative ring.
+Lemma~\ref{lem:cech-link-cohomology-comparison} now packages these maps as
+an actual isomorphism to the link complex extended by zero below $|N|$.
+It identifies actual Cech cohomology in degree $|N|+r$ with the link's
+integer-indexed cohomology in degree $(r:\mathbb Z)-1$, including $r=0$,
+and proves vanishing below $|N|$. The augmented chain model,
+order independence,
+homology--cohomology duality, the remaining link calculus, and comparison
+with local cohomology in
+Theorem~\ref{thm:lc-link}, depth comparison, and Reisner's criterion remain
+future Lean work.
 
 \begin{thebibliography}{99}
 \bibitem{panov} T. Panov, \emph{Cohomology of face rings, and torus actions},

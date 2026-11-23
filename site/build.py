@@ -253,6 +253,73 @@ EXCERPTS = {
     "cech-termwise-decomposition": ["cechCochainMonomialBasis",
                                      "cechDegreeSubmodule",
                                      "cechDegreeSubmodule_isInternal"],
+    "cech-cycle-boundary-components": ["cechDecomposeLinearEquiv",
+        "cechHomogeneousComponent", "cechHomogeneousComponent_sum_support",
+        "cechHomogeneousComponent_differential", "cechDifferential_eq_zero_iff_components",
+        "cechBoundary_homogeneous_primitive"],
+    "cech-cohomology-decomposition": ["cechComplexDegree", "cechDegreeInclusion",
+        "cechDegreeProjection", "cechCohomologyDecomposition",
+        "cechCohomologyDecomposition_lof", "cechCohomologyDecomposition_symm_apply",
+        "cechCohomologyDecomposition_support_subset", "cechCohomologyQuotientEquiv",
+        "cechCohomologyDegreeQuotientEquiv", "cechCohomology_boundaries_zero",
+        "cechCohomologyDegree_boundaries_zero"],
+    "cech-positive-contraction": ["cechPositiveContraction", "cechPositiveContraction_monomial",
+        "cechPositiveContractingHomotopy", "cechPositiveContraction_zero",
+        "cechPositiveContraction_succ", "cechPositiveSupport_contractible",
+        "cechPositiveCohomology_isZero", "cechPositiveCohomology_subsingleton"],
+    "link-definition": ["link", "mem_link_iff", "link_empty",
+        "notMem_link_singleton_of_mem", "mem_link_facet_iff"],
+    "cech-nonpositive-indices": ["negativeSupport", "mem_negativeSupport",
+        "localizationAdmissible_iff_of_nonpos", "nonpositiveLocalizationIndexEquivLink",
+        "nonpositiveLocalizationIndex_card", "nonpositiveCechIndexEquivLink",
+        "cechDegreeSubmodule_eq_bot_of_card_lt_negativeSupport",
+        "cechCohomologyDegree_isZero_of_nonpos_negativeSupport_nonface"],
+    "simplicial-cochain-modules": ["SimplicialFaceIndex", "SimplicialCochain",
+        "SimplicialCochainDirectSum", "simplicialCochainDirectSumEquiv",
+        "simplicialCochainBasis", "simplicialCochainBasis_apply"],
+    "simplicial-differential": ["simplicialFaceEraseIndex", "simplicialRankBelow",
+        "simplicialDifferential", "simplicialDifferential_apply",
+        "simplicialDifferential_comp_eq_zero", "simplicialCochainComplex",
+        "simplicialCochainComplex_d"],
+    "simplicial-boundaries": ["simplicialFaceIndexZeroUnique", "simplicialCochainZeroEquiv",
+        "simplicialCochainZeroEquiv_apply", "simplicialDifferential_zero_apply",
+        "simplicialDifferential_zero_of_no_vertices", "simplicialDifferential_basis_apply",
+        "simplicialCochain_isZero_of_card_lt"],
+    "simplicial-basis-insertion": ["simplicialDifferential_basis_insertion_apply"],
+    "simplicial-homology-endpoints": ["simplicialCochainHomologyZeroIsoKer",
+        "simplicialCochainHomologyZeroEquivOfNoVertices",
+        "simplicialCochainHomologyZero_isZero_of_vertex"],
+    "simplicial-integer-reindexing": ["simplicialCochainDegreeEmbedding",
+        "simplicialCochainComplexInt", "simplicialCochainComplexIntXIso",
+        "simplicialCochainComplexIntRestrictionIso",
+        "simplicialCochainComplexIntHomologyIso", "simplicialCochainComplexInt_d"],
+    "simplicial-integer-cutoffs": ["simplicialCochainComplexInt_isZero_of_lt_minus_one",
+        "simplicialCochainComplexInt_d_eq_zero_of_lt_minus_one",
+        "simplicialCochainComplexInt_homology_isZero_of_lt_minus_one",
+        "simplicialCochainComplex_homology_isZero_of_card_lt",
+        "simplicialCochainInt_natDegree", "simplicialCochainInt_natBound",
+        "simplicialCochainComplexInt_isZero_of_card_lt",
+        "simplicialCochainComplexInt_homology_isZero_of_card_lt"],
+    "cech-link-signs": ["cechLinkSign", "cechLinkSign_empty", "cechLinkSign_mul_self",
+        "cechLinkSign_insert", "cechRankBelow_union", "cechLinkSign_insertion_compat"],
+    "cech-link-equivalence": ["cechNonpositiveLinkEquiv", "cechNonpositiveLinkEquiv_apply",
+        "cechNonpositiveLinkEquiv_monomial", "cechNonpositiveLinkEquiv_symm_basis",
+        "cechNonpositiveLinkEquiv_symm_apply"],
+    "cech-link-compatibility": ["cechNonpositiveLinkEquiv_differential",
+        "insert_link_admissible_iff"],
+    "cech-link-compatibility-proof": ["cechNonpositiveLinkMap_differential"],
+    "cech-link-shifted-complex": ["cechLinkDegreeEmbedding",
+        "cechLinkShiftedComplex", "cechLinkShiftedComplexXIso",
+        "cechLinkShiftedComplex_d", "cechLinkShiftedComplex_isZero_of_lt"],
+    "cech-link-complex-iso": ["cechNonpositiveLinkComplexComponentIso",
+        "cechNonpositiveLinkComplexComponentIso_add",
+        "cechNonpositiveLinkComplexIso"],
+    "cech-link-homology": ["cechNonpositiveLinkHomologyIso",
+        "cechNonpositiveLinkNaturalHomologyIso",
+        "cechNonpositiveLinkCohomologyIso",
+        "cechCohomologyDegree_isZero_of_nonpos_card_lt_negativeSupport"],
+    "simplicial-integer-endpoints": ["simplicialCochainComplexIntHomologyMinusOneEquivOfNoVertices",
+        "simplicialCochainComplexIntHomologyMinusOne_isZero_of_vertex"],
 }
 
 
@@ -275,8 +342,15 @@ def code_for(key):
     if key == "full-source":
         return code_block(1, len(SOURCE.read_text().splitlines()), anchors=True)
     if key == "full-cech-source":
-        lines = SOURCE_PATHS["cech"].read_text().splitlines()
-        return code_block(1, len(lines), anchors=True, source_key="cech")
+        return "".join(
+            code_block(1, len(SOURCE_PATHS[source_key].read_text().splitlines()),
+                       anchors=True, source_key=source_key)
+            for source_key in ("cech-core", "cech-grading", "cech-contraction",
+                               "cech-indices", "cech-link", "cech-shifted")
+        )
+    if key == "full-simplicial-source":
+        lines = SOURCE_PATHS["simplicial"].read_text().splitlines()
+        return code_block(1, len(lines), anchors=True, source_key="simplicial")
     ranges = []
     for name in EXCERPTS[key]:
         declaration = resolve_declaration(name, ROOT)
@@ -314,7 +388,24 @@ def status_panel(nodes, linked):
             'localization differential, square-zero law, and fine-degree restrictions are '
             'also checked, together with its signed action on localization monomial cochains '
             'and the internal direct-sum decomposition of each cochain module by fine degree. '
-            'The cohomology decomposition remains future work. The count includes definitions; '
+            'Homogeneous projections commute with the differential, detect cocycles, and '
+            'give homogeneous primitives for homogeneous boundaries. '
+            'The induced direct-sum decomposition of actual Čech cohomology and '
+            'the contracting homotopy in positive fine degree are checked. '
+            'For nonpositive degrees, admissible localization indices correspond '
+            'to faces of the link of the negative support. The actual-face '
+            'augmented simplicial cochain complex, signed deletion differential, '
+            'square-zero law, empty-face scalar term, basis-coordinate formula, '
+            'no-vertex differential case, and zero modules above the ambient '
+            'cardinality are checked, as are the coordinate insertion criterion, '
+            'degree-minus-one cohomology endpoints, integer reindexing by n ↦ n − 1, '
+            'and low/high term and cohomology cutoffs. Higher-degree cohomology '
+            'vanishing and chain/duality comparisons remain future work. '
+            'The signed termwise equivalence from nonpositive Čech degrees to augmented link '
+            'cochains, its inverse/component formulas and differential compatibility are checked. '
+            'The shifted-complex isomorphism and induced actual cohomology identifications are '
+            'also checked, including the below-cutoff zero case and integer reduced degree. '
+            'The comparison with local cohomology remains future work. The count includes definitions; '
             'implemented proof blocks carry proof markers.</p>')
 
 
@@ -332,6 +423,16 @@ def route(nodes):
         ("lem:cech-complex", "Localized terms → a finite Čech complex", "Assemble every subset localization into a signed cochain complex, prove the differential squares to zero, and restrict it to each fine degree."),
         ("lem:cech-basis-action", "Monomial cochains → signed insertion formula", "Evaluate at each target coordinate and identify the unique inserted vertex; inadmissible target monomials vanish."),
         ("lem:cech-termwise-decomposition", "Fine degrees → a termwise cochain decomposition", "Use the product of localization monomial bases and disjoint degree fibers to identify each cochain module with the direct sum of its degree submodules."),
+        ("lem:cech-cycle-boundary-components", "Homogeneous components → cycles and boundaries", "Project the differential degreewise to detect cocycles and find homogeneous primitives of homogeneous boundaries."),
+        ("lem:cech-cohomology-decomposition", "Degree subcomplexes → Čech cohomology", "The inclusion-induced map is a direct-sum isomorphism, with inverse given by homogeneous projections."),
+        ("lem:contraction", "Positive degree → contractible subcomplex", "A signed removal map contracts each degree subcomplex with a positive coordinate."),
+        ("lem:cech-nonpositive-indices", "Nonpositive degree → link faces", "The admissible subset indices correspond to faces of the link of the negative support, with a cardinality shift."),
+        ("lem:augmented-cochain-complex", "Actual faces → augmented simplicial cochains", "Use face-cardinality products, the signed deletion differential, and pairwise sign cancellation to construct a genuine cochain complex."),
+        ("lem:augmented-basis-insertion", "Deletion coordinates → insertion signs", "Characterize the support of each basis differential by inserting an actual vertex and compute its order sign."),
+        ("lem:augmented-cohomology-minus-one", "Empty face → degree-minus-one cohomology", "Identify actual cochain-complex homology with the outgoing-map kernel, then prove the empty complex and actual-vertex cases."),
+        ("lem:augmented-cochains", "Face cardinality → integer reduced degree", "Extend the natural complex by zero below degree −1, identify its restriction and homology, and transport the endpoint and cutoff results."),
+        ("lem:cech-link-coordinate-comparison", "Nonpositive degree → signed link coordinates", "Extract actual Laurent coefficients, correct orientations, and compare adjacent differentials, including the empty link face and zero targets."),
+        ("lem:cech-link-cohomology-comparison", "Signed link coordinates → shifted cohomology", "Extend the link cochain complex by zero below the support cardinality, package the term maps as a complex isomorphism, and transport homology to integer reduced degree."),
         ("cor:cm-lc", "Algebraic depth → local cohomology", "Use the graded local test and depth detection to translate Cohen–Macaulayness into vanishing below the dimension."),
         ("thm:lc-link", "Graded Čech pieces → link cohomology", "Compute localized monomials, contract positive degrees, and identify the remaining complexes with augmented link cochains."),
         ("thm:reisner", "Purity and vanishing → the criterion", "Prove purity from linkwise vanishing, match the dimension bounds, and deduce both implications."),
@@ -418,6 +519,22 @@ NODE_CODE = {
     "lem:cech-complex": ["cech-complex"],
     "lem:cech-basis-action": ["cech-basis-action"],
     "lem:cech-termwise-decomposition": ["cech-termwise-decomposition"],
+    "lem:cech-cycle-boundary-components": ["cech-cycle-boundary-components"],
+    "lem:cech-cohomology-decomposition": ["cech-cohomology-decomposition"],
+    "lem:cech-grading": ["cech-cohomology-decomposition"],
+    "lem:contraction": ["cech-positive-contraction"],
+    "def:link": ["link-definition"],
+    "lem:cech-nonpositive-indices": ["cech-nonpositive-indices"],
+    "lem:augmented-cochain-complex": ["simplicial-cochain-modules",
+        "simplicial-differential", "simplicial-boundaries"],
+    "lem:augmented-basis-insertion": ["simplicial-basis-insertion"],
+    "lem:augmented-cohomology-minus-one": ["simplicial-homology-endpoints"],
+    "lem:augmented-cochains": ["simplicial-integer-reindexing",
+        "simplicial-integer-cutoffs", "simplicial-integer-endpoints"],
+    "lem:cech-link-coordinate-comparison": ["cech-link-signs", "cech-link-equivalence",
+        "cech-link-compatibility", "cech-link-compatibility-proof"],
+    "lem:cech-link-cohomology-comparison": ["cech-link-shifted-complex",
+        "cech-link-complex-iso", "cech-link-homology"],
     "lem:localization-kernel": ["localization-objects", "localization-kernel",
                                 "localization-nonzero", "localization-maps"],
 }
@@ -528,7 +645,8 @@ def main():
     validation = (run(['lake', 'build'])
                   + run(['lake', 'env', 'lean', 'Checks/Axioms.lean'])
                   + run(['lake', 'env', 'lean', 'Checks/LocalizationKernelAudit.lean'])
-                  + run(['lake', 'env', 'lean', 'Checks/Cech.lean']))
+                  + run(['lake', 'env', 'lean', 'Checks/Cech.lean'])
+                  + run(['lake', 'env', 'lean', 'Checks/SimplicialCochain.lean']))
     if 'sorryAx' in validation:
         raise RuntimeError('Axiom inspection contains a proof placeholder')
     allowed_axioms = {'propext', 'Classical.choice', 'Quot.sound'}
@@ -536,7 +654,7 @@ def main():
         dependencies = set(re.sub(r'\s+', '', group).split(','))
         if not dependencies <= allowed_axioms:
             raise RuntimeError('Unexpected axiom dependencies: ' + group)
-    print('Lean build, axiom inspection, localization regressions, and Cech checks passed.')
+    print('Lean build, axiom inspection, localization regressions, Cech, and simplicial cochain checks passed.')
     for args in [['pdf'], ['web'], ['checkdecls']]:
         run([sys.executable, 'scripts/blueprint.py', *args])
     run([sys.executable, 'scripts/lean_source.py'])
@@ -549,20 +667,23 @@ def main():
         raise RuntimeError('Blueprint declaration lists disagree')
     markdown = (SITE / 'content/index.md').read_text().replace('@@TOTAL@@', str(len(nodes))).replace('@@CHECKED@@', str(sum(n['status'] == 'checked' for n in nodes.values())))
     markdown = re.sub(r'@@LINE:([A-Za-z_][A-Za-z0-9_]*)@@', lambda match: str(source_line(match[1])), markdown)
-    markdown = re.sub(r'@@ANCHOR:([A-Za-z_][A-Za-z0-9_.]*)@@', lambda match: source_anchor(match[1]), markdown)
+    markdown = re.sub(r'@@ANCHOR:([A-Za-z_][A-Za-z0-9_.]*π?)@@', lambda match: source_anchor(match[1]), markdown)
     paper = math_html(markdown, 'markdown+tex_math_dollars+raw_html')
     paper = re.sub(r'<!-- LEAN:([a-z-]+) -->', lambda match: code_for(match[1]), paper)
     paper = paper.replace('<!-- ROUTE -->', route(nodes)).replace('<!-- STATUS -->', status_panel(nodes, len(linked)))
     if '<!-- LEAN:' in paper or '@@' in paper:
         raise RuntimeError('Unexpanded content placeholder')
-    toc = [('target', 'The target'), ('membership', 'Monomial membership'), ('basis', 'The quotient basis'), ('homogeneity', 'Weighted homogeneity'), ('grading', 'The quotient grading'), ('augmentation', 'Augmentation and residue'), ('facet-primes', 'Coordinate primes and facets'), ('dimension', 'Global and localized dimension'), ('localizations', 'Localization kernels and maps'), ('localized-grading', 'Integer grading of localizations'), ('cech-complex', 'The finite Čech complex'), ('cech-basis-action', 'Monomial cochain action'), ('cech-termwise-decomposition', 'Termwise fine-degree decomposition'), ('objects', 'Objects in Lean'), ('proof', 'The proof, in both languages'), ('route', 'The complete proof route'), ('checked', 'What is checked'), ('reproduce', 'Build and sources')]
+    toc = [('target', 'The target'), ('membership', 'Monomial membership'), ('basis', 'The quotient basis'), ('homogeneity', 'Weighted homogeneity'), ('grading', 'The quotient grading'), ('augmentation', 'Augmentation and residue'), ('facet-primes', 'Coordinate primes and facets'), ('dimension', 'Global and localized dimension'), ('localizations', 'Localization kernels and maps'), ('localized-grading', 'Integer grading of localizations'), ('cech-complex', 'The finite Čech complex'), ('cech-basis-action', 'Monomial cochain action'), ('cech-termwise-decomposition', 'Termwise fine-degree decomposition'), ('cech-cycle-boundary-components', 'Cycles and boundaries by degree'), ('augmented-cochains', 'Augmented simplicial cochains'), ('integer-reindex', 'Integer cochain reindexing'), ('cech-link-comparison', 'Signed link coordinates'), ('objects', 'Objects in Lean'), ('proof', 'The proof, in both languages'), ('route', 'The complete proof route'), ('checked', 'What is checked'), ('reproduce', 'Build and sources')]
     (OUT / 'index.html').write_text(page('Reisner’s criterion', paper, toc, 'paper'))
     content, blueprint_toc = blueprint_content(nodes, len(linked))
     (OUT / 'blueprint.html').write_text(page('The blueprint', content, blueprint_toc, 'blueprint'))
     (OUT / 'validation.txt').write_text(validation)
     (OUT / 'source').mkdir(exist_ok=True)
-    for source in [*(ROOT / item.relative_path for item in SOURCE_FILES), ROOT / 'Checks/Axioms.lean', ROOT / 'Checks/LocalizationKernelAudit.lean', ROOT / 'Checks/Cech.lean', ROOT / 'AUDIT.md', ROOT / 'STATUS.md', ROOT / 'lake-manifest.json', ROOT / 'lakefile.lean', ROOT / 'lean-toolchain']:
-        destination_name = 'Checks-Cech.lean' if source == ROOT / 'Checks/Cech.lean' else source.name
+    for source in [*(ROOT / item.relative_path for item in SOURCE_FILES), ROOT / 'Checks/Axioms.lean', ROOT / 'Checks/LocalizationKernelAudit.lean', ROOT / 'Checks/Cech.lean', ROOT / 'Checks/SimplicialCochain.lean', ROOT / 'AUDIT.md', ROOT / 'STATUS.md', ROOT / 'lake-manifest.json', ROOT / 'lakefile.lean', ROOT / 'lean-toolchain']:
+        destination_name = {
+            ROOT / 'Checks/Cech.lean': 'Checks-Cech.lean',
+            ROOT / 'Checks/SimplicialCochain.lean': 'Checks-SimplicialCochain.lean',
+        }.get(source, source.name)
         shutil.copyfile(source, OUT / 'source' / destination_name)
     shutil.copyfile(ROOT / 'blueprint/print/print.pdf', OUT / 'blueprint.pdf')
     shutil.copyfile(ROOT / 'blueprint/dep_graph.svg', OUT / 'dependency-graph.svg')

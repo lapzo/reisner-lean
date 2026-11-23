@@ -2,7 +2,7 @@
 
 The main page combines the mathematical argument, checked Lean excerpts,
 and the route to the complete criterion. The separate blueprint page
-contains all 34 nodes, their full statements and informal proofs, an
+contains the blueprint nodes, their full statements and informal proofs, an
 interactive dependency graph, and status/search filters.
 
 Build from the project root:
@@ -26,15 +26,17 @@ equations to native MathML at build time. A modern Firefox, Safari, or
 Chromium browser renders MathML without a library download.
 
 The build reruns `lake build`, `Checks/Axioms.lean`, the standalone
-`Checks/LocalizationKernelAudit.lean` regression file, and
-`Checks/Cech.lean`. It then generates the
+`Checks/LocalizationKernelAudit.lean` regression file, `Checks/Cech.lean`, and
+`Checks/SimplicialCochain.lean`. It then generates the
 blueprint PDF/HTML, runs `checkdecls`, and exports the dependency graph. Axiom
 validation accepts subsets of `{propext, Classical.choice, Quot.sound}` and
 rejects every other reported dependency. It extracts code by declaration name from
-`Reisner/StanleyReisner.lean`, verifies linked declarations, and reads checked
-markers and dependency labels from `blueprint/src/content.tex`. Node counts
-include definitions. New Lean declarations need matching named excerpts;
-their line numbers are derived from source at build time.
+`Reisner/StanleyReisner.lean`, the six modules under `Reisner/Cech/`, and
+`Reisner/SimplicialCochain.lean`, verifies linked declarations, and reads
+checked markers and dependency labels from `blueprint/src/content.tex`. Each
+file keeps its own line numbering and anchor prefix. Node counts include
+definitions. New Lean declarations need matching named excerpts; their source
+file and line numbers are derived at build time.
 
 Editable presentation files:
 
@@ -52,19 +54,37 @@ reference, <https://roed314.github.io/gq2/>. This project does not copy that
 site's mathematical claims, implementation status, or assumed interfaces.
 Nothing is registered, pushed, or published by this build.
 
-The current generated site contains 34 blueprint nodes and sixteen checked
-nodes. It presents the actual finite extended Čech complex, the signed
+The generated site presents the actual finite extended Čech complex, the signed
 localization differential and square-zero proof, fine-degree restrictions,
-the signed insertion formula on monomial cochains, and the internal direct-sum
-decomposition of each cochain module by fine degree. The cohomology
-decomposition in `lem:cech-grading` remains future work. The site
+the signed insertion formula on monomial cochains, the internal direct-sum
+decomposition of each cochain module by fine degree, and the homogeneous
+projection, cocycle, and boundary criteria. The inclusion-induced fine-degree
+decomposition of actual Čech cohomology in `lem:cech-grading` is checked,
+as is the positive-coordinate contraction in `lem:contraction`;
+the link definition and nonpositive admissible-index correspondence are also
+checked. The signed termwise identification with augmented link cochains and adjacent
+differential compatibility are checked over arbitrary commutative rings.
+The shifted-complex packaging and induced actual homology identification in
+integer reduced degree are checked, including the below-cutoff zero case. The
+comparison with local cohomology remains future work. The site
 includes downloadable Cech regressions and source snapshots. Each displayed
-Lean excerpt is extracted by declaration name. The site contains 181 linked
-Lean declarations; the static checker resolves 473 local links and validates
-5,345 displayed source rows against the 1,953-line face-ring source and
-526-line Čech source. It also checks unique IDs, source/artifact snapshots,
+Lean excerpt is extracted by declaration name. The static checker validates
+local links and displayed source rows. It also checks unique IDs, source/artifact snapshots,
 acyclic blueprint dependencies, and absence of remote assets. Browser QA has
 not been run against this regenerated milestone.
+
+The separate face-cardinality cochain complex uses only actual faces, including
+the empty face at index zero and excluding ghost singletons. Its signed deletion
+differential, square-zero law, coordinate-basis insertion criterion,
+degree-minus-one cohomology endpoints, and zero modules above the ambient
+cardinality are checked. The complex is reindexed to integer reduced degrees
+by $i=n-1$, with restriction and homology isomorphisms and zero-term and
+zero-cohomology cutoffs below $-1$ and above $|V|-1$. Higher-degree cohomology
+vanishing, the full augmented chain model and duality, and local cohomology
+remain future work. Shifted Čech/link complex and cohomology identifications
+are checked.
+The complete source and focused checks are available as
+`source/SimplicialCochain.lean` and `source/Checks-SimplicialCochain.lean`.
 
 The reading page distinguishes generic localization vanishing (some denominator
 power kills a numerator) from the special first-power criterion. It explains
@@ -84,7 +104,5 @@ monomial nonvanishing, scalar injectivity, empty-product equivalence, and
 coherent transition maps with an explicit fraction formula. The localized
 grading section gives the Laurent monomial basis, the zero-or-one dimension
 formula, and the transition rule for the basis vectors. The full degreewise
-cohomology decomposition, depth and local-cohomology comparisons, and the
-full criterion remain future work. In particular, `lem:cech-grading` remains
-complete and unmarked even though its monomial differential formula now has a
-separate checked prerequisite.
+depth and local-cohomology comparisons, and the full criterion remain future
+work. The full `lem:cech-grading` node is checked.

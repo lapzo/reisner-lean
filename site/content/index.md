@@ -10,6 +10,10 @@ the mathematics.
 [Read the dimension theorem](#dimension) ·
 [Read the localized grading](#localized-grading) ·
 [Read the finite Čech complex](#cech-complex) ·
+[Read augmented simplicial cochains](#augmented-cochains) ·
+[Read integer cochain reindexing](#integer-reindex) ·
+[Read signed link coordinates](#cech-link-comparison) ·
+[Read shifted link cohomology](#cech-link-cohomology) ·
 [Read the Čech degree decomposition](#cech-termwise-decomposition) ·
 [Explore the blueprint](blueprint.html) ·
 [Browse the Lean source](#full-source)
@@ -24,6 +28,24 @@ to their counterparts. The finite extended Čech cochains form a genuine
 cochain complex, and its differential has the checked signed insertion
 formula on monomial coordinate cochains. Each cochain module is the internal
 direct sum of its fine-degree submodules.
+The homogeneous projections commute with the differential, detect cocycles,
+and give homogeneous primitives for homogeneous boundaries.
+The fine-degree subcomplex is contractible whenever one coordinate of its
+degree is positive, so its Čech cohomology vanishes.
+In nonpositive degree, the admissible localization indices are matched with
+faces of the link of the negative support. The actual-face augmented cochain
+complex is also checked: its signed deletion differential squares to zero,
+its empty-face term is canonically the coefficient ring, and its modules
+above the ambient cardinality vanish. The coordinate formula for signed basis
+insertion and the degree-minus-one cohomology endpoints are checked. The
+integer reindexing $i=(n:\mathbb Z)-1$, its restriction and homology
+isomorphisms, and the low/high term and cohomology cutoffs are also checked.
+The signed termwise comparison with augmented link cochains, its extension to
+a shifted cochain-complex isomorphism, and the induced actual cohomology
+identification are checked. Below the shift, both cohomology objects vanish;
+at and above it, the result identifies Čech cohomology with link reduced
+cohomology in integer degree $r-1$. Higher-degree vanishing and the comparison
+with local cohomology remain future work.
 :::
 
 ## The target {#target}
@@ -654,10 +676,9 @@ the empty-face and ghost-vertex conventions.
 
 </details>
 
-The complete degreewise cohomology decomposition, positive-coordinate
-contracting homotopy, and comparison to local cohomology are not part of this
-checked prerequisite. In particular, the full statement of
-`lem:cech-grading` remains future work.
+The degreewise Čech cohomology decomposition and its positive-coordinate
+contracting homotopy are checked below. The comparison to local cohomology
+remains future work.
 
 ### Signed action on monomial cochains {#cech-basis-action}
 
@@ -713,9 +734,363 @@ classically for any finite ambient type.
 
 </details>
 
-This is a decomposition of cochain modules. The cohomology decomposition
-asserted in the full `lem:cech-grading`, positive-coordinate contraction,
-link formula, and local-cohomology comparison remain future work.
+### Cycles and boundaries by fine degree {#cech-cycle-boundary-components}
+
+The finite decomposition gives a projection $\pi_a^q:C^q\to C_a^q$.
+Because the differential preserves degree, projecting before or after applying
+it gives the same result. Therefore a cochain is a cocycle exactly when each
+of its homogeneous components is a cocycle. If a homogeneous cochain in
+degree $q+1$ is a boundary, projecting any primitive gives a primitive of
+the same fine degree. In cochain degree zero there is no incoming boundary.
+
+::: {.theorem-box}
+**Checked prerequisite `lem:cech-cycle-boundary-components`.** The
+projections and criteria hold for arbitrary commutative rings, including the
+zero ring, and retain all subset coordinates.
+
+[Differential compatibility](#@@ANCHOR:Reisner.Complex.cechHomogeneousComponent_differential@@) ·
+[Cycle criterion](#@@ANCHOR:Reisner.Complex.cechDifferential_eq_zero_iff_components@@) ·
+[Homogeneous primitive](#@@ANCHOR:Reisner.Complex.cechBoundary_homogeneous_primitive@@) ·
+[Blueprint node](blueprint.html#lem:cech-cycle-boundary-components)
+:::
+
+<details><summary>Checked projections and cycle and boundary criteria</summary>
+
+<!-- LEAN:cech-cycle-boundary-components -->
+
+</details>
+
+### Čech cohomology decomposes by degree {#cech-cohomology-decomposition}
+
+The degree submodules and restricted differentials form actual subcomplexes
+$C_a^\bullet$. Their inclusions induce the canonical isomorphism
+$$\bigoplus_a H^q(C_a^\bullet)\cong H^q(C^\bullet).$$
+The inverse is induced by the homogeneous projections. A representative
+cochain has finite degree support, so the inverse really lands in the direct
+sum even though the degree index set can be infinite. The checked quotient
+equivalences identify these actual module-category homology objects with
+cycles modulo boundaries; the incoming boundaries in degree zero vanish.
+This holds over any commutative ring, including the zero ring.
+
+::: {.theorem-box}
+**Checked `lem:cech-cohomology-decomposition` and `lem:cech-grading`.**
+[Cohomology isomorphism](#@@ANCHOR:Reisner.Complex.cechCohomologyDecomposition@@) ·
+[Action on summands](#@@ANCHOR:Reisner.Complex.cechCohomologyDecomposition_lof@@) ·
+[Inverse components](#@@ANCHOR:Reisner.Complex.cechCohomologyDecomposition_symm_apply@@) ·
+[Blueprint node](blueprint.html#lem:cech-cohomology-decomposition)
+:::
+
+<details><summary>Checked Čech cohomology decomposition</summary>
+
+<!-- LEAN:cech-cohomology-decomposition -->
+
+</details>
+
+### Positive-coordinate contraction {#cech-positive-contraction}
+
+If a fine degree $a$ has a positive coordinate $a_p>0$, the degree-$a$
+Čech subcomplex is contractible. On monomial cochains the contracting map
+removes $p$ with the usual alternating sign when $p$ is present, and gives
+zero otherwise. The checked homotopy proves $dh+hd=1$, including the endpoint
+in cochain degree zero. Hence all cohomology of this subcomplex vanishes.
+The result works over every commutative ring, including the zero ring.
+
+::: {.theorem-box}
+**Checked `lem:contraction`.**
+[Contracting homotopy](#@@ANCHOR:Reisner.Complex.cechPositiveContractingHomotopy@@) ·
+[Cohomology vanishing](#@@ANCHOR:Reisner.Complex.cechPositiveCohomology_isZero@@) ·
+[Blueprint node](blueprint.html#lem:contraction)
+:::
+
+<details><summary>Checked positive-coordinate contraction</summary>
+
+<!-- LEAN:cech-positive-contraction -->
+
+</details>
+
+### Nonpositive degrees and link faces {#cech-nonpositive-indices}
+
+For a face $N$ of $K$, its link consists of faces $T$ disjoint from $N$
+such that $N\cup T$ is a face of $K$. The empty face is included; the link
+of a facet is the complex containing just the empty face.
+
+Let $a\leq 0$ and let $N=\{v:a_v<0\}$. If $N$ is a face, an admissible
+Čech index $F$ corresponds to the link face $F\setminus N$, with inverse
+$T\mapsto N\cup T$ and cardinality $|F|=|N|+|T|$. The empty link face is
+therefore retained. There are no admissible indices when $q<|N|$. If $N$ is
+not a face, every term of the degree-$a$ complex and its cohomology vanish.
+These statements hold for arbitrary commutative coefficient rings.
+
+::: {.theorem-box}
+**Checked `def:link` and `lem:cech-nonpositive-indices`.**
+[Link definition](#@@ANCHOR:Reisner.Complex.link@@) ·
+[Index correspondence](#@@ANCHOR:Reisner.Complex.nonpositiveCechIndexEquivLink@@) ·
+[Nonface cohomology vanishing](#@@ANCHOR:Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_negativeSupport_nonface@@) ·
+[Blueprint node](blueprint.html#lem:cech-nonpositive-indices)
+:::
+
+<details><summary>Checked nonpositive Čech indices and link faces</summary>
+
+<!-- LEAN:link-definition -->
+<!-- LEAN:cech-nonpositive-indices -->
+
+</details>
+
+This establishes the index correspondence. The actual signed cochain
+comparison and its differential compatibility are described in the next
+section; the comparison with local cohomology and the full link formula remain
+future work.
+
+## Augmented simplicial cochains by face cardinality {#augmented-cochains}
+
+The project now has a second cochain complex built from the **actual faces**
+of $K$. For finite linearly ordered $V$, its cardinality-$n$ term is
+$$ C^n(K;R)=\prod_{\substack{F\in K.\mathrm{faces}\\|F|=n}}R. $$
+It is the finite product, equivalently a finite direct sum, of one copy of
+$R$ for every $n$-element face. Nonfaces and ghost singletons are not
+coordinates. At $n=0$, the only coordinate is $\varnothing$, so this is the
+augmented reduced cochain term of degree $-1$.
+
+For each $(n+1)$-element face $G$, the checked differential deletes one
+vertex at a time:
+$$ (\delta^n f)(G)=\sum_{v\in G}(-1)^{|\{u\in G:u<v\}|}
+                f(G\setminus\{v\}). $$
+Every deletion is a face by downward closure. In the composite of two
+differentials, an ordered pair of distinct deleted vertices is paired with
+the reverse order. Both terms evaluate $f$ on the same twice-deleted face,
+and their orientation signs are additive inverses. This proves
+$\delta^{n+1}\circ\delta^n=0$ over any commutative ring, including
+characteristic two and the zero ring, and packages the terms and maps as an
+actual `CochainComplex (ModuleCat R)`.
+
+::: {.theorem-box}
+**Checked `lem:augmented-cochain-complex`.** The finite product/direct-sum
+equivalence, coordinate basis, signed deletion formula, square-zero law,
+empty-face scalar term, and high-cardinality zero modules compile in Lean.
+
+[Face index and cochains](#@@ANCHOR:Reisner.Complex.SimplicialFaceIndex@@) ·
+[Differential formula](#@@ANCHOR:Reisner.Complex.simplicialDifferential_apply@@) ·
+[Square-zero theorem](#@@ANCHOR:Reisner.Complex.simplicialDifferential_comp_eq_zero@@) ·
+[Cochain complex](#@@ANCHOR:Reisner.Complex.simplicialCochainComplex@@) ·
+[Checked blueprint node](blueprint.html#lem:augmented-cochain-complex)
+:::
+
+Evaluation at the unique empty face gives a checked equivalence
+$C^0(K;R)\simeq_R R$. The differential sends a scalar to the constant
+cochain on the **actual** singleton faces; if no actual singleton exists,
+the outgoing map is zero. The checked basis-coordinate formula evaluates
+the differential on $e_F$ by summing over deletions and testing whether
+$G\setminus\{v\}=F$.
+
+The separate checked node `lem:augmented-basis-insertion` proves the
+coordinate formula: a target coordinate receives a signed contribution
+exactly when it is obtained by inserting a vertex into $F$. The checked
+node `lem:augmented-cohomology-minus-one` identifies the actual homology
+object at index zero with $\ker\delta^0$ and proves it is $R$ for
+$K=\{\varnothing\}$ or zero when an actual vertex exists. Higher-degree
+cohomology vanishing is not part of these endpoint results.
+
+<details><summary>Checked face-cardinality terms and coordinate basis</summary>
+
+<!-- LEAN:simplicial-cochain-modules -->
+
+</details>
+
+<details><summary>Checked signed deletion and square-zero complex</summary>
+
+<!-- LEAN:simplicial-differential -->
+
+</details>
+
+<details><summary>Checked empty-face, no-vertex, and cardinality cases</summary>
+
+<!-- LEAN:simplicial-boundaries -->
+
+</details>
+
+### Integer reduced-degree reindexing and cutoffs {#integer-reindex}
+
+The face-cardinality index $n\in\mathbb N$ represents reduced degree
+$i=(n:\mathbb Z)-1$. Lean extends the natural-indexed complex to
+$\mathbb Z$ along the embedding $e(n)=n-1$, putting zero objects below
+$-1$. For $i\geq-1$, the corresponding natural index is
+$n_i=(i+1).\mathrm{toNat}$; the proof first establishes nonnegativity and
+then proves $(n_i:\mathbb Z)-1=i$, avoiding truncated natural subtraction.
+The integer complex restricts back to the natural complex along this
+embedding, and its cohomology objects at $e(n)$ are canonically isomorphic
+to the natural-indexed ones.
+
+The actual integer cochain terms and cohomology objects vanish for $i<-1$.
+They also vanish for $i>(|V|:\mathbb Z)-1$, equivalent to
+$|V|<n_i$ in the nonzero range. The natural complex has zero homology for
+$n>|V|$. At degree $-1$, the previous endpoint results transport: the
+cohomology is $R$ for $K=\{\varnothing\}$ and zero when an actual vertex
+exists, including over the zero ring.
+
+::: {.theorem-box}
+**Checked `lem:augmented-cochains`.** The integer extension, component and
+restriction isomorphisms, homology comparison, and both cutoff theorems are
+compiled. The degree-minus-one endpoint cases are transported to the
+integer-indexed complex.
+
+[Integer cochain complex](#@@ANCHOR:Reisner.Complex.simplicialCochainComplexInt@@) ·
+[Restriction isomorphism](#@@ANCHOR:Reisner.Complex.simplicialCochainComplexIntRestrictionIso@@) ·
+[Homology isomorphism](#@@ANCHOR:Reisner.Complex.simplicialCochainComplexIntHomologyIso@@) ·
+[Low cutoff](#@@ANCHOR:Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_lt_minus_one@@) ·
+[High cutoff](#@@ANCHOR:Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_card_lt@@) ·
+[Blueprint node](blueprint.html#lem:augmented-cochains)
+:::
+
+<details><summary>Checked extension, restriction, and homology comparison</summary>
+
+<!-- LEAN:simplicial-integer-reindexing -->
+
+</details>
+
+<details><summary>Checked low and high cochain and cohomology cutoffs</summary>
+
+<!-- LEAN:simplicial-integer-cutoffs -->
+
+</details>
+
+<details><summary>Checked transported degree-minus-one endpoints</summary>
+
+<!-- LEAN:simplicial-integer-endpoints -->
+
+</details>
+
+This reindexing does not prove vanishing in higher degrees below the
+simplicial dimension. The augmented chain model and order-independence,
+cohomology duality, shifted Čech/link complex and cohomology identifications,
+local-cohomology comparison,
+and the full Reisner criterion remain future work.
+
+<details id="full-simplicial-source"><summary>Complete augmented cochain Lean source</summary>
+
+<!-- LEAN:full-simplicial-source -->
+
+</details>
+
+## Signed coordinates identify nonpositive degrees with link cochains {#cech-link-comparison}
+
+Let $a\leq0$ have negative support $N$, suppose $N$ is a face, and put
+$L=\operatorname{lk}_K N$. An admissible Čech index is uniquely
+$F=N\sqcup T$ with $T\in L$. Its cardinality is $|N|+|T|$, including
+$T=\varnothing$. The checked comparison is an equivalence between the
+actual modules over any commutative ring $R$:
+
+::: {.theorem-box}
+$$
+\Phi_r:C^{|N|+r}_a \simeq_R E^r(L;R),\qquad
+\Phi_r(c_{N\cup T}(a))=\sigma_N(T)e_T,
+$$
+$$
+\sigma_N(T)=(-1)^{\sum_{t\in T}|\{n\in N:n<t\}|},
+\qquad
+\Phi_{r+1}d_a=\delta_L\Phi_r.
+$$
+
+<span class="checked-badge">Checked in Lean</span>
+[Actual linear equivalence](#@@ANCHOR:Reisner.Complex.cechNonpositiveLinkEquiv@@) ·
+[Explicit inverse](#@@ANCHOR:Reisner.Complex.cechNonpositiveLinkEquiv_symm_apply@@) ·
+[Differential compatibility](#@@ANCHOR:Reisner.Complex.cechNonpositiveLinkEquiv_differential@@) ·
+[Blueprint node](blueprint.html#lem:cech-link-coordinate-comparison)
+:::
+
+The forward map extracts the full Laurent-basis coefficient at $N\cup T$
+and multiplies it by $\sigma_N(T)$. The inverse is the finite sum
+$\sum_T\sigma_N(T)f(T)c_{N\cup T}(a)$. It is an inverse because each sign
+squares to one. No nontriviality assumption or division is needed.
+
+For insertion of $v$, disjointness gives
+$r_{N\cup T}(v)=r_N(v)+r_T(v)$, while
+$\sigma_N(T\cup\{v\})=\sigma_N(T)(-1)^{r_N(v)}$.
+The two copies of the negative-support sign cancel. Invalid insertion
+targets vanish in the actual localization; valid targets are exactly the
+actual link faces. At $r=0$, the empty link face has sign one, so the
+commuting equality includes the dual augmentation. Ghosts, characteristic
+two, and the zero ring are included.
+
+<details><summary>Checked equivalence, components, and inverse</summary>
+
+<!-- LEAN:cech-link-equivalence -->
+
+</details>
+
+<details><summary>Orientation identities and valid insertion criterion</summary>
+
+<!-- LEAN:cech-link-signs -->
+<!-- LEAN:cech-link-compatibility -->
+
+</details>
+
+<details><summary>Full checked differential-compatibility proof</summary>
+
+<!-- LEAN:cech-link-compatibility-proof -->
+
+</details>
+
+This result compares terms and adjacent differentials. The next section
+packages the maps as an actual shifted complex isomorphism and transports its
+homology. The comparison with local cohomology and the full link formula
+remain future work.
+
+## Shifted link complex and Čech cohomology {#cech-link-cohomology}
+
+Let $a\leq0$, let $N$ be its negative support, assume $N$ is a face, and
+write $m=|N|$ and $L=\operatorname{lk}_K N$. Extend the actual
+face-cardinality cochain complex of $L$ by zero along $r\mapsto m+r$.
+This gives a genuine cochain complex $D$: its terms below $m$ are zero, and
+its term in degree $m+r$ is the link cochain term in cardinality $r$. Under
+these term identifications, its differential is exactly the existing signed
+link differential, including the zero incoming map at the cutoff.
+
+The signed coordinate equivalence from the previous section supplies the
+components of an isomorphism from the degree-$a$ Čech complex to $D$. Below
+$m$, the source term is also zero by the nonpositive-index cutoff theorem.
+At $m+r$, the comparison square is precisely the checked adjacent-
+differential compatibility. The family therefore gives an isomorphism of
+actual cochain complexes, and hence an isomorphism of actual homology objects
+in every natural degree.
+
+For $q<m$, both cohomology objects are zero. For $q=m+r$, the extended
+complex identifies its homology with the link's natural face-cardinality
+cohomology in degree $r$. The checked integer reindexing then identifies
+this with reduced cohomology in integer degree $(r:\mathbb Z)-1$. This
+includes $r=0$, retaining the empty link face and degree $-1$. The hypotheses
+allow arbitrary commutative coefficient rings, including the zero ring, and
+retain empty ambient types, ghost vertices, characteristic two, and the
+case $N=\varnothing$.
+
+::: {.theorem-box}
+**Checked `lem:cech-link-cohomology-comparison`.** The zero extension, actual
+complex isomorphism and induced homology comparisons are compiled. The
+below-cutoff case is stated separately, without truncated subtraction.
+
+[Shifted link complex](#@@ANCHOR:Reisner.Complex.cechLinkShiftedComplex@@) ·
+[Complex isomorphism](#@@ANCHOR:Reisner.Complex.cechNonpositiveLinkComplexIso@@) ·
+[Integer reduced cohomology](#@@ANCHOR:Reisner.Complex.cechNonpositiveLinkCohomologyIso@@) ·
+[Below-cutoff vanishing](#@@ANCHOR:Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_card_lt_negativeSupport@@) ·
+[Blueprint node](blueprint.html#lem:cech-link-cohomology-comparison)
+:::
+
+<details><summary>Checked shifted complex and zero cutoff</summary>
+
+<!-- LEAN:cech-link-shifted-complex -->
+
+</details>
+
+<details><summary>Checked cochain-complex isomorphism</summary>
+
+<!-- LEAN:cech-link-complex-iso -->
+
+</details>
+
+<details><summary>Checked actual homology and integer reduced-degree comparison</summary>
+
+<!-- LEAN:cech-link-homology -->
+
+</details>
 
 ## The objects, as Lean sees them {#objects}
 
@@ -853,8 +1228,8 @@ and remain unformalized.
 
 <!-- STATUS -->
 
-The main theorem and its supporting project declarations contain no proof
-placeholders or custom axioms. Axiom inspection reports exactly
+The checked project declarations contain no proof placeholders or custom
+axioms. Axiom inspection reports exactly
 
 ```text
 [propext, Classical.choice, Quot.sound]
@@ -867,9 +1242,20 @@ assuming an unproved mathematical theorem as a new project axiom.
 The checked localization grading supplies the modules and transition maps
 for each multidegree of the Čech complex. The finite extended Čech complex,
 its signed differential, square-zero law, and degree restrictions are checked.
-The cohomology decomposition, positive-coordinate contraction, graded local test,
-local-cohomology comparison, augmented homology, link calculus, purity,
-and the full criterion are future formalization work.
+Its homogeneous projections commute with the differential and characterize
+cocycles and homogeneous boundaries.
+The Čech cohomology decomposition and positive-coordinate contraction are
+checked. The actual-face augmented cochain complex, its signed deletion
+differential, square-zero identity, basis-coordinate and basis-insertion
+formulas, empty-face scalar equivalence, no-actual-vertex zero differential,
+and zero modules above the ambient cardinality are also checked. The actual
+degree-$-1$ cohomology endpoints, integer reindexing, restriction and
+homology isomorphisms, and low/high term and cohomology cutoffs are checked.
+The signed termwise Čech/link equivalence, its shifted complex isomorphism and
+induced actual cohomology identification are also checked over arbitrary
+commutative rings. Higher-degree cohomology vanishing, full augmented chains
+and order comparison, duality, the graded local test, local-cohomology
+comparison, purity, and the full criterion remain future formalization work.
 
 ## Reproduce and inspect {#reproduce}
 
@@ -880,6 +1266,7 @@ Lean is pinned to `leanprover/lean4:v4.35.0`; mathlib is pinned to
 lake build
 lake env lean Checks/Axioms.lean
 lake env lean Checks/Cech.lean
+lake env lean Checks/SimplicialCochain.lean
 python3 site/build.py
 python3 -m http.server 8000 --directory site/dist
 ```
@@ -890,7 +1277,11 @@ python3 -m http.server 8000 --directory site/dist
 [Blueprint PDF](blueprint.pdf) ·
 [Face-ring Lean source](source/StanleyReisner.lean) ·
 [Čech Lean source](source/Cech.lean) ·
-[Čech regression checks](source/Checks-Cech.lean)
+[Čech regression checks](source/Checks-Cech.lean) ·
+[Augmented cochain Lean source](source/SimplicialCochain.lean) ·
+[Augmented cochain checks](source/Checks-SimplicialCochain.lean)
+
+[Expand the complete augmented cochain source](#full-simplicial-source)
 
 All the mathematical text, rendered equations, styles, and page interactions
 are included locally. No account or external math-rendering service is needed.

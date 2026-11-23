@@ -1,5 +1,115 @@
 import Reisner
 
+#check Reisner.Complex.link
+#check Reisner.Complex.mem_link_iff
+#check Reisner.Complex.link_empty
+#check Reisner.Complex.notMem_link_singleton_of_mem
+#check Reisner.Complex.mem_link_facet_iff
+#check Reisner.Complex.negativeSupport
+#check Reisner.Complex.mem_negativeSupport
+#check Reisner.Complex.negativeSupport_finite
+#check Reisner.Complex.negativeSupport_subset_iff
+#check Reisner.Complex.positiveSupport_eq_empty_of_nonpos
+#check Reisner.Complex.localizationAdmissible_iff_of_nonpos
+#check Reisner.Complex.nonpositiveLocalizationIndexEquivLink
+#check Reisner.Complex.nonpositiveLocalizationIndexEquivLink_apply
+#check Reisner.Complex.nonpositiveLocalizationIndexEquivLink_symm_apply
+#check Reisner.Complex.nonpositiveLocalizationIndex_card
+#check Reisner.Complex.nonpositiveCechIndexEquivLink
+#check Reisner.Complex.nonpositiveCechIndexEquivLink_apply
+#check Reisner.Complex.nonpositiveCechIndexEquivLink_symm_apply
+#check Reisner.Complex.not_localizationAdmissible_of_card_lt_negativeSupport
+#check Reisner.Complex.not_localizationAdmissible_of_negativeSupport_nonface
+#check Reisner.Complex.cechDegreeSubmodule_eq_bot_of_no_admissible
+#check Reisner.Complex.cechDegreeSubmodule_eq_bot_of_nonpos_negativeSupport_nonface
+#check Reisner.Complex.cechDegreeSubmodule_eq_bot_of_card_lt_negativeSupport
+#check Reisner.Complex.cechComplexDegree_isZero_of_nonpos_negativeSupport_nonface
+#check Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_negativeSupport_nonface
+
+#print axioms Reisner.Complex.link
+#print axioms Reisner.Complex.mem_link_iff
+#print axioms Reisner.Complex.link_empty
+#print axioms Reisner.Complex.notMem_link_singleton_of_mem
+#print axioms Reisner.Complex.mem_link_facet_iff
+#print axioms Reisner.Complex.negativeSupport
+#print axioms Reisner.Complex.mem_negativeSupport
+#print axioms Reisner.Complex.negativeSupport_finite
+#print axioms Reisner.Complex.negativeSupport_subset_iff
+#print axioms Reisner.Complex.positiveSupport_eq_empty_of_nonpos
+#print axioms Reisner.Complex.localizationAdmissible_iff_of_nonpos
+#print axioms Reisner.Complex.nonpositiveLocalizationIndexEquivLink
+#print axioms Reisner.Complex.nonpositiveLocalizationIndexEquivLink_apply
+#print axioms Reisner.Complex.nonpositiveLocalizationIndexEquivLink_symm_apply
+#print axioms Reisner.Complex.nonpositiveLocalizationIndex_card
+#print axioms Reisner.Complex.nonpositiveCechIndexEquivLink
+#print axioms Reisner.Complex.nonpositiveCechIndexEquivLink_apply
+#print axioms Reisner.Complex.nonpositiveCechIndexEquivLink_symm_apply
+#print axioms Reisner.Complex.not_localizationAdmissible_of_card_lt_negativeSupport
+#print axioms Reisner.Complex.not_localizationAdmissible_of_negativeSupport_nonface
+#print axioms Reisner.Complex.cechDegreeSubmodule_eq_bot_of_no_admissible
+#print axioms Reisner.Complex.cechDegreeSubmodule_eq_bot_of_nonpos_negativeSupport_nonface
+#print axioms Reisner.Complex.cechDegreeSubmodule_eq_bot_of_card_lt_negativeSupport
+#print axioms Reisner.Complex.cechComplexDegree_isZero_of_nonpos_negativeSupport_nonface
+#print axioms Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_negativeSupport_nonface
+
+#check Reisner.Complex.cechDifferentialDegree_comp_eq_zero
+#check Reisner.Complex.cechComplexDegree
+#check Reisner.Complex.cechComplexDegree_d
+#check Reisner.Complex.cechDegreeInclusion
+#check Reisner.Complex.cechDegreeProjection
+#check Reisner.Complex.cechDegreeInclusion_projection
+#check Reisner.Complex.cechDegreeInclusion_projection_of_ne
+#check Reisner.Complex.cechCohomologyDegree
+#check Reisner.Complex.cechCohomologyAssembly
+#check Reisner.Complex.cechCohomologyAssembly_lof
+#check Reisner.Complex.cechCohomologyProjection_assembly
+#check Reisner.Complex.cechCohomologyAssembly_injective
+#check Reisner.Complex.cechCohomologyAssembly_surjective
+#check Reisner.Complex.cechCohomologyAssembly_bijective
+#check Reisner.Complex.cechCohomologyDecomposition
+#check Reisner.Complex.cechCohomologyDecomposition_lof
+#check Reisner.Complex.cechCohomologyDecomposition_symm_apply
+#check Reisner.Complex.cechCohomologyDecomposition_support_subset
+#check Reisner.Complex.cechCohomologyQuotientEquiv
+#check Reisner.Complex.cechCohomologyDegreeQuotientEquiv
+#check Reisner.Complex.cechCohomology_outgoing
+#check Reisner.Complex.cechCohomology_incoming
+#check Reisner.Complex.cechCohomologyDegree_outgoing
+#check Reisner.Complex.cechCohomologyDegree_incoming
+#check Reisner.Complex.cechCohomologyQuotientEquiv_homologyπ
+#check Reisner.Complex.cechCohomologyDegreeQuotientEquiv_homologyπ
+#check Reisner.Complex.cechCohomology_boundaries_zero
+#check Reisner.Complex.cechCohomologyDegree_boundaries_zero
+
+#print axioms Reisner.Complex.cechDifferentialDegree_comp_eq_zero
+#print axioms Reisner.Complex.cechComplexDegree
+#print axioms Reisner.Complex.cechComplexDegree_d
+#print axioms Reisner.Complex.cechDegreeInclusion
+#print axioms Reisner.Complex.cechDegreeProjection
+#print axioms Reisner.Complex.cechDegreeInclusion_projection
+#print axioms Reisner.Complex.cechDegreeInclusion_projection_of_ne
+#print axioms Reisner.Complex.cechCohomologyDegree
+#print axioms Reisner.Complex.cechCohomologyAssembly
+#print axioms Reisner.Complex.cechCohomologyAssembly_lof
+#print axioms Reisner.Complex.cechCohomologyProjection_assembly
+#print axioms Reisner.Complex.cechCohomologyAssembly_injective
+#print axioms Reisner.Complex.cechCohomologyAssembly_surjective
+#print axioms Reisner.Complex.cechCohomologyAssembly_bijective
+#print axioms Reisner.Complex.cechCohomologyDecomposition
+#print axioms Reisner.Complex.cechCohomologyDecomposition_lof
+#print axioms Reisner.Complex.cechCohomologyDecomposition_symm_apply
+#print axioms Reisner.Complex.cechCohomologyDecomposition_support_subset
+#print axioms Reisner.Complex.cechCohomologyQuotientEquiv
+#print axioms Reisner.Complex.cechCohomologyDegreeQuotientEquiv
+#print axioms Reisner.Complex.cechCohomology_outgoing
+#print axioms Reisner.Complex.cechCohomology_incoming
+#print axioms Reisner.Complex.cechCohomologyDegree_outgoing
+#print axioms Reisner.Complex.cechCohomologyDegree_incoming
+#print axioms Reisner.Complex.cechCohomologyQuotientEquiv_homologyπ
+#print axioms Reisner.Complex.cechCohomologyDegreeQuotientEquiv_homologyπ
+#print axioms Reisner.Complex.cechCohomology_boundaries_zero
+#print axioms Reisner.Complex.cechCohomologyDegree_boundaries_zero
+
 #check Reisner.Complex.monomial_mem_stanleyReisnerIdeal_iff
 #check Reisner.Complex.mem_stanleyReisnerIdeal_iff
 #check Reisner.Complex.faceRingBasis
@@ -132,6 +242,16 @@ import Reisner
 #print axioms Reisner.Complex.exists_facet_superset
 #print axioms Reisner.Complex.cechDifferential_monomialCochain
 #print axioms Reisner.Complex.cechDegreeSubmodule_isInternal
+#print axioms Reisner.Complex.cechDecomposition
+#print axioms Reisner.Complex.cechDecomposeLinearEquiv
+#print axioms Reisner.Complex.cechHomogeneousComponent
+#print axioms Reisner.Complex.cechHomogeneousComponent_eq_self
+#print axioms Reisner.Complex.cechHomogeneousComponent_eq_zero_of_ne
+#print axioms Reisner.Complex.cechHomogeneousComponent_sum_support
+#print axioms Reisner.Complex.cechHomogeneousComponent_eq_zero_iff
+#print axioms Reisner.Complex.cechHomogeneousComponent_differential
+#print axioms Reisner.Complex.cechDifferential_eq_zero_iff_components
+#print axioms Reisner.Complex.cechBoundary_homogeneous_primitive
 #print axioms Reisner.Complex.stanleyReisnerIdeal_eq_iInf_coordinateIdeal
 #print axioms Reisner.Complex.exists_facet_coordinateIdeal_le
 #print axioms Reisner.Complex.ghost_not_mem_facet
@@ -292,6 +412,16 @@ import Reisner
 #check Reisner.Complex.cechCochainDirectSumEquiv
 #check Reisner.Complex.cechCochainMonomialBasis
 #check Reisner.Complex.cechDegreeSubmodule_isInternal
+#check Reisner.Complex.cechDecomposition
+#check Reisner.Complex.cechDecomposeLinearEquiv
+#check Reisner.Complex.cechHomogeneousComponent
+#check Reisner.Complex.cechHomogeneousComponent_eq_self
+#check Reisner.Complex.cechHomogeneousComponent_eq_zero_of_ne
+#check Reisner.Complex.cechHomogeneousComponent_sum_support
+#check Reisner.Complex.cechHomogeneousComponent_eq_zero_iff
+#check Reisner.Complex.cechHomogeneousComponent_differential
+#check Reisner.Complex.cechDifferential_eq_zero_iff_components
+#check Reisner.Complex.cechBoundary_homogeneous_primitive
 #check Reisner.Complex.cechMonomialCochain
 #check Reisner.Complex.cechDifferential_monomialCochain
 #check Reisner.Complex.cechDifferential
@@ -305,3 +435,160 @@ import Reisner
 #print axioms Reisner.Complex.cechDifferential_comp_eq_zero
 #print axioms Reisner.Complex.cechDifferential_maps_degree
 #print axioms Reisner.Complex.cechDifferentialDegree
+
+#check Reisner.Complex.cechPositiveContraction
+#check Reisner.Complex.cechPositiveContraction_monomial
+#check Reisner.Complex.cechPositiveContractingHomotopy
+#check Reisner.Complex.cechPositiveContractingHomotopy_hom
+#check Reisner.Complex.cechContractionMap_eq_id
+#check Reisner.Complex.cechPositiveContraction_zero
+#check Reisner.Complex.cechPositiveContraction_succ
+#check Reisner.Complex.cechPositiveSupport_contractible
+#check Reisner.Complex.cechPositiveCohomology_isZero
+#check Reisner.Complex.cechPositiveCohomology_subsingleton
+
+#print axioms Reisner.Complex.cechPositiveContraction_monomial
+#print axioms Reisner.Complex.cechPositiveContractingHomotopy
+#print axioms Reisner.Complex.cechPositiveContractingHomotopy_hom
+#print axioms Reisner.Complex.cechContractionMap_eq_id
+#print axioms Reisner.Complex.cechPositiveContraction_zero
+#print axioms Reisner.Complex.cechPositiveContraction_succ
+#print axioms Reisner.Complex.cechPositiveSupport_contractible
+#print axioms Reisner.Complex.cechPositiveCohomology_isZero
+#print axioms Reisner.Complex.cechPositiveCohomology_subsingleton
+
+/- Augmented simplicial cochains indexed by actual face cardinality. -/
+#check Reisner.Complex.SimplicialFaceIndex
+#check Reisner.Complex.SimplicialCochain
+#check Reisner.Complex.SimplicialCochainDirectSum
+#check Reisner.Complex.simplicialCochainDirectSumEquiv
+#check Reisner.Complex.simplicialCochainBasis
+#check Reisner.Complex.simplicialCochainBasis_apply
+#check Reisner.Complex.simplicialFaceInsertIndex
+#check Reisner.Complex.simplicialFaceEraseIndex
+#check Reisner.Complex.simplicialRankBelow
+#check Reisner.Complex.simplicialDifferential
+#check Reisner.Complex.simplicialDifferential_apply
+#check Reisner.Complex.simplicialDifferential_comp_eq_zero
+#check Reisner.Complex.simplicialFaceIndexZeroUnique
+#check Reisner.Complex.simplicialCochainZeroEquiv
+#check Reisner.Complex.simplicialCochainZeroEquiv_apply
+#check Reisner.Complex.simplicialDifferential_zero_apply
+#check Reisner.Complex.simplicialDifferential_zero_of_no_vertices
+#check Reisner.Complex.simplicialDifferential_basis_apply
+#check Reisner.Complex.simplicialDifferential_basis_insertion_apply
+#check Reisner.Complex.simplicialCochainHomologyZeroIsoKer
+#check Reisner.Complex.simplicialCochainHomologyZeroEquivOfNoVertices
+#check Reisner.Complex.simplicialCochainHomologyZero_isZero_of_vertex
+#check Reisner.Complex.simplicialCochain_subsingleton_of_card_lt
+#check Reisner.Complex.simplicialCochain_isZero_of_card_lt
+#check Reisner.Complex.simplicialCochainComplex
+#check Reisner.Complex.simplicialCochainComplex_X
+#check Reisner.Complex.simplicialCochainComplex_d
+
+#print axioms Reisner.Complex.simplicialCochainDirectSumEquiv
+#print axioms Reisner.Complex.simplicialCochainBasis
+#print axioms Reisner.Complex.simplicialDifferential
+#print axioms Reisner.Complex.simplicialDifferential_comp_eq_zero
+#print axioms Reisner.Complex.simplicialCochainZeroEquiv
+#print axioms Reisner.Complex.simplicialDifferential_zero_apply
+#print axioms Reisner.Complex.simplicialDifferential_zero_of_no_vertices
+#print axioms Reisner.Complex.simplicialDifferential_basis_apply
+#print axioms Reisner.Complex.simplicialDifferential_basis_insertion_apply
+#print axioms Reisner.Complex.simplicialCochainHomologyZeroIsoKer
+#print axioms Reisner.Complex.simplicialCochainHomologyZeroEquivOfNoVertices
+#print axioms Reisner.Complex.simplicialCochainHomologyZero_isZero_of_vertex
+#print axioms Reisner.Complex.simplicialCochain_isZero_of_card_lt
+#print axioms Reisner.Complex.simplicialCochainComplex
+
+/- Integer-indexed reduced-degree reindexing and cutoff cohomology. -/
+#check Reisner.Complex.simplicialCochainDegreeEmbedding
+#check Reisner.Complex.simplicialCochainComplexInt
+#check Reisner.Complex.simplicialCochainComplexIntXIso
+#check Reisner.Complex.simplicialCochainComplexIntRestrictionIso
+#check Reisner.Complex.simplicialCochainComplexIntHomologyIso
+#check Reisner.Complex.simplicialCochainComplexInt_d
+#check Reisner.Complex.simplicialCochainComplexInt_isZero_of_lt_minus_one
+#check Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_lt_minus_one
+#check Reisner.Complex.simplicialCochainComplexInt_d_eq_zero_of_lt_minus_one
+#check Reisner.Complex.simplicialCochainComplex_homology_isZero_of_card_lt
+#check Reisner.Complex.simplicialCochainInt_natDegree
+#check Reisner.Complex.simplicialCochainInt_natBound
+#check Reisner.Complex.simplicialCochainComplexInt_isZero_of_card_lt
+#check Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_card_lt
+#check Reisner.Complex.simplicialCochainComplexIntHomologyMinusOneEquivOfNoVertices
+#check Reisner.Complex.simplicialCochainComplexIntHomologyMinusOne_isZero_of_vertex
+
+#print axioms Reisner.Complex.simplicialCochainComplexInt
+#print axioms Reisner.Complex.simplicialCochainComplexIntRestrictionIso
+#print axioms Reisner.Complex.simplicialCochainComplexIntHomologyIso
+#print axioms Reisner.Complex.simplicialCochainComplexInt_d
+#print axioms Reisner.Complex.simplicialCochainComplexInt_isZero_of_lt_minus_one
+#print axioms Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_lt_minus_one
+#print axioms Reisner.Complex.simplicialCochainComplexInt_d_eq_zero_of_lt_minus_one
+#print axioms Reisner.Complex.simplicialCochainComplexInt_isZero_of_card_lt
+#print axioms Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_card_lt
+#print axioms Reisner.Complex.simplicialCochainComplexIntHomologyMinusOneEquivOfNoVertices
+#print axioms Reisner.Complex.simplicialCochainComplexIntHomologyMinusOne_isZero_of_vertex
+
+/- Signed coordinate comparison between nonpositive Cech terms and link cochains. -/
+#check Reisner.Complex.cechLinkSign
+#check Reisner.Complex.cechLinkSign_empty
+#check Reisner.Complex.cechLinkSign_mul_self
+#check Reisner.Complex.cechLinkSign_insert
+#check Reisner.Complex.cechRankBelow_union
+#check Reisner.Complex.cechLinkSign_insertion_compat
+#check Reisner.Complex.nonpositiveCechLinkIndexEquiv
+#check Reisner.Complex.cechNonpositiveLinkEquiv
+#check Reisner.Complex.cechNonpositiveLinkMap
+#check Reisner.Complex.cechNonpositiveLinkEquiv_apply
+#check Reisner.Complex.cechNonpositiveLinkEquiv_monomial
+#check Reisner.Complex.cechNonpositiveLinkEquiv_symm_basis
+#check Reisner.Complex.cechNonpositiveLinkEquiv_symm_apply
+#check Reisner.Complex.cechNonpositiveLinkEquiv_differential
+#check Reisner.Complex.insert_link_admissible_iff
+
+#print axioms Reisner.Complex.cechLinkSign
+#print axioms Reisner.Complex.cechLinkSign_empty
+#print axioms Reisner.Complex.cechLinkSign_mul_self
+#print axioms Reisner.Complex.cechLinkSign_insert
+#print axioms Reisner.Complex.cechRankBelow_union
+#print axioms Reisner.Complex.cechLinkSign_insertion_compat
+#print axioms Reisner.Complex.nonpositiveCechLinkIndexEquiv
+#print axioms Reisner.Complex.cechNonpositiveLinkMap
+#print axioms Reisner.Complex.cechNonpositiveLinkEquiv
+#print axioms Reisner.Complex.cechNonpositiveLinkEquiv_apply
+#print axioms Reisner.Complex.cechNonpositiveLinkEquiv_monomial
+#print axioms Reisner.Complex.cechNonpositiveLinkEquiv_symm_basis
+#print axioms Reisner.Complex.cechNonpositiveLinkEquiv_symm_apply
+#print axioms Reisner.Complex.cechNonpositiveLinkEquiv_differential
+#print axioms Reisner.Complex.insert_link_admissible_iff
+
+/- Shifted link complex packaging and induced homology comparison. -/
+#check Reisner.Complex.cechLinkDegreeEmbedding
+#check Reisner.Complex.cechLinkShiftedComplex
+#check Reisner.Complex.cechLinkShiftedComplexXIso
+#check Reisner.Complex.cechLinkShiftedComplex_d
+#check Reisner.Complex.cechLinkShiftedComplex_isZero_of_lt
+#check Reisner.Complex.componentIsoOfEq
+#check Reisner.Complex.cechNonpositiveLinkComplexComponentIso
+#check Reisner.Complex.cechNonpositiveLinkComplexComponentIso_add
+#check Reisner.Complex.cechNonpositiveLinkComplexIso
+#check Reisner.Complex.cechNonpositiveLinkHomologyIso
+#check Reisner.Complex.cechNonpositiveLinkNaturalHomologyIso
+#check Reisner.Complex.cechNonpositiveLinkCohomologyIso
+#check Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_card_lt_negativeSupport
+
+#print axioms Reisner.Complex.cechLinkDegreeEmbedding
+#print axioms Reisner.Complex.cechLinkShiftedComplex
+#print axioms Reisner.Complex.cechLinkShiftedComplexXIso
+#print axioms Reisner.Complex.cechLinkShiftedComplex_d
+#print axioms Reisner.Complex.cechLinkShiftedComplex_isZero_of_lt
+#print axioms Reisner.Complex.componentIsoOfEq
+#print axioms Reisner.Complex.cechNonpositiveLinkComplexComponentIso
+#print axioms Reisner.Complex.cechNonpositiveLinkComplexComponentIso_add
+#print axioms Reisner.Complex.cechNonpositiveLinkComplexIso
+#print axioms Reisner.Complex.cechNonpositiveLinkHomologyIso
+#print axioms Reisner.Complex.cechNonpositiveLinkNaturalHomologyIso
+#print axioms Reisner.Complex.cechNonpositiveLinkCohomologyIso
+#print axioms Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_card_lt_negativeSupport

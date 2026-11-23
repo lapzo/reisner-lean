@@ -10,10 +10,113 @@ kernels and transition maps, and their integer grading and Laurent monomial
 pieces are checked. The finite extended Čech complex, its signed localization
 differential, square-zero law, fine-degree restrictions, signed action on
 localization monomial cochains, and internal direct-sum decomposition of each
-cochain module by fine degree are now checked. The cohomology decomposition
-and criterion remain future work. The
+cochain module by fine degree are now checked. Homogeneous projections commute
+with the differential and characterize cocycles and homogeneous boundaries.
+The inclusion-induced direct-sum decomposition of actual Čech cohomology by
+fine degree is checked, including the cycles-modulo-boundaries comparison.
+Each degree subcomplex with a positive coordinate is contractible and has
+zero cohomology. Nonpositive admissible indices correspond to faces of the
+link of the negative support, and nonface negative support gives a zero
+degree complex. The actual-face augmented simplicial cochain complex is
+checked through its signed deletion differential and square-zero law,
+empty-face scalar term, coordinate-basis value formula, no-actual-vertex
+differential case, and zero modules above the ambient cardinality. The
+coordinate formula for basis insertion and the degree-minus-one cohomology
+endpoints are checked. Its integer reindexing, natural/integer restriction and
+homology isomorphisms, and low/high term and cohomology cutoffs are checked.
+The signed termwise comparison between nonpositive Čech degree modules and
+augmented link cochains is checked, including explicit inverse/component
+formulas and adjacent-differential compatibility over arbitrary commutative
+rings. The actual zero-extended shifted link complex, its isomorphism with the
+Čech degree complex, and induced actual homology identification are checked,
+including the separate below-cutoff zero case and integer reduced degree
+`r-1`. Higher-degree vanishing, the full chain model and duality, the
+local-cohomology comparison, and the criterion remain future work. The
 ideal, complex, quotient, and dependency pins are unchanged; all work is
 local-only.
+
+Current validation (2026-11-23): `python3 site/build.py` passed, including
+`lake build` (2,454 jobs), axiom inspection, localization-kernel regression,
+Čech and simplicial-cochain checks, blueprint PDF/HTML generation, and
+`checkdecls`. `python3 scripts/check_site.py` passed with 43 blueprint nodes,
+28 checked nodes, 340 linked declarations, 754 local links, and 9,788
+displayed source rows. The three source files contain 2,044, 2,235, and 613
+lines; snapshots match, IDs
+are unique, dependencies are acyclic, and there are no remote assets.
+The PDF log has no box or LaTeX warnings. The static checker does not
+substitute for browser QA.
+
+## Checked links and nonpositive Čech indices
+
+`Complex.link` defines the same-ambient link of a face, including the empty
+link face, ghost vertices and the facet case. For nonpositive `a`, the
+negative support `N` is finite, and admissible subsets are exactly faces
+containing `N`. If `N` is a face, `nonpositiveCechIndexEquivLink` identifies
+admissible `q`-element indices with link faces `T` satisfying
+`N.card + T.card = q`. If `q < N.card`, the degree submodule is zero; if `N`
+is a nonface, all terms and cohomology of the degree complex are zero over
+any commutative ring. The augmented reduced cochain complex and its shifted
+identification with Čech cohomology remain future work, as do the comparison
+with local cohomology and Reisner's criterion.
+
+Local site generation passed Lean, axiom, localization and Čech checks,
+blueprint PDF/HTML generation, `checkdecls`, and source/graph exports. The
+site checker verified 37 blueprint nodes, 22 checked nodes, 268 declarations,
+606 local links and 7,178 displayed source rows, with matching snapshots,
+unique IDs, acyclic dependencies and no remote assets.
+
+## Checked positive-coordinate contraction
+
+For finite linearly ordered `V`, an arbitrary commutative ring `R` and a
+fine degree `a` with `0 < a p`, `cechPositiveContractingHomotopy` constructs
+a homotopy between the identity and zero on `cechComplexDegree R a`.
+The signed removal formula, degree-zero and successor identities, and
+cohomology vanishing are checked. This includes zero coefficients, ghost
+vertices, and the top and empty cochain degrees. The link formula and the
+comparison with local cohomology remain future work.
+
+The local site build passed the Lean build, axiom inspection, localization
+and Čech regressions, blueprint PDF/HTML generation, declaration checks and
+source and graph exports. The site checker verified 36 blueprint nodes,
+20 checked nodes, 243 linked declarations, 566 local links, and 6,716
+displayed source rows, with matching snapshots and no remote assets.
+
+## Checked Čech cohomology decomposition
+
+For every cochain degree, the direct sum of the homology objects of the
+fine-degree subcomplexes is linearly equivalent to the homology of the
+existing Čech complex. The equivalence is induced by subcomplex inclusions;
+its inverse components are induced by projections and have finite support
+bounded by the support of a representative cocycle. The homology objects
+are also identified with the usual quotient of cycles by boundaries, and
+the incoming boundary in degree zero is zero. The result allows arbitrary
+commutative rings, empty vertex sets, ghosts and nonfaces. Čech-to-local
+cohomology comparison and Reisner's criterion remain future work.
+
+The local site build passed Lean compilation, axiom and regression checks,
+blueprint PDF/HTML generation, declaration checks and graph export. The site
+checker verified 36 blueprint nodes, 19 checked nodes, 224 linked declarations,
+540 local links and 6,187 displayed source rows. IDs are unique, dependencies
+are acyclic, snapshots match and there are no remote assets.
+
+## Checked Čech cycle and boundary components
+
+The checked node `lem:cech-cycle-boundary-components` constructs the
+canonical projections to the fine-degree submodules. Each cochain is the
+finite sum of its projections; a projection is the identity on its own
+degree and zero on the others. The projections commute with the restricted
+Čech differential. Thus a cochain is a cocycle exactly when all its
+components are cocycles, and every homogeneous boundary in degree `q + 1`
+has a primitive of the same fine degree. Degree zero has no incoming term.
+These results use arbitrary commutative rings and the actual localization
+coordinates, including the empty subset and nonfaces. The cohomology
+isomorphism has since been constructed in the next milestone.
+
+The local site build passed its Lean build, axiom inspection, localization
+and Čech checks, blueprint generation and declaration checks. Its static
+check reports 35 blueprint nodes, 17 checked nodes, 191 linked declarations,
+494 local links, and 5,567 displayed source rows, with matching snapshots,
+acyclic dependencies, unique IDs, and no remote assets.
 
 ## Checked Lean results
 
@@ -509,6 +612,9 @@ The generated site contains 33 nodes, 15 checked nodes, and 178 declarations.
 The static check resolves 459 links and validates 5,136 source rows across
 the 1,953-line face-ring source and 397-line Cech source; IDs are unique,
 dependencies are acyclic, snapshots match, and no remote assets are used.
+The build retains eight existing unused-section-variable and unused-simp
+linter warnings in `Reisner/Cech.lean`; the new simplicial cochain source
+emitted none.
 Lean emitted three unused-section-variable and five unused-simp-argument
 warnings in `Reisner/Cech.lean`; no compilation errors occurred.
 
@@ -542,3 +648,85 @@ source rows from the 1,953-line face-ring file and 526-line Cech file;
 snapshots match, dependencies are acyclic, IDs are unique, and there are no
 remote assets. Lean emits three unused-section-variable and five
 unused-simp-argument warnings in `Reisner/Cech.lean`.
+
+## Checked augmented face-cardinality cochains (2026-11-21)
+
+The checked nodes `lem:augmented-cochain-complex`,
+`lem:augmented-basis-insertion`, and `lem:augmented-cohomology-minus-one`
+formalize actual cochain modules indexed by faces of each cardinality and package the signed
+deletion maps as a `CochainComplex (ModuleCat R)`. Its proof of
+`simplicialDifferential_comp_eq_zero` pairs the two orders of deleting each
+pair of distinct vertices; the signs are additive inverses, with no division
+by two. The construction works for arbitrary commutative-ring coefficients,
+including characteristic two and the zero ring.
+
+The checked API includes the product/direct-sum equivalence, coordinate
+basis, deletion formula, basis-coordinate value formula, and the coordinate
+criterion for signed insertion on a basis vector. The unique
+cardinality-zero face gives `simplicialCochainZeroEquiv` to `R`, and the
+differential has constant value on actual singleton faces. If there are no
+actual vertices, `simplicialDifferential_zero_of_no_vertices` proves the
+outgoing map is zero. Cochain modules above `Fintype.card V` are actual zero
+objects. Empty ambient sets, ghosts, characteristic two, the zero ring, and
+high-cardinality cases are compiled in `Checks/SimplicialCochain.lean`.
+
+At this milestone, `lem:augmented-cochains` is checked for integer
+reindexing, restriction/homology isomorphisms, and low/high cutoffs. Higher-
+degree cohomology vanishing, full reduced homology and order comparison, and
+the Čech/link and local-cohomology comparisons remain future work, as does
+the full criterion.
+
+Validation passed on 2026-11-22: `lake build` completed 2,454 jobs;
+`Checks/Axioms.lean`, `Checks/Cech.lean`, `Checks/SimplicialCochain.lean`,
+and the localization-kernel regression all passed in the site build. The
+principal square-zero and cochain-complex declarations report exactly
+`[propext, Classical.choice, Quot.sound]`. Blueprint PDF/HTML generation,
+`checkdecls`, combined source anchors, and graph export succeeded.
+At the signed-coordinate milestone, `python3 scripts/check_site.py` reported
+41 blueprint nodes, 26 checked nodes, 310 declarations, 689 local links, and
+8,398 displayed source rows. IDs are unique,
+dependencies are acyclic, snapshots match, and no remote assets are used.
+## Checked integer reindexing and cohomology cutoffs (2026-11-22)
+
+The checked node `lem:augmented-cochains` extends the face-cardinality
+complex to integer reduced degrees using `ComplexShape.embeddingUpIntGE (-1)`.
+The integer term at degree `i ≥ -1` corresponds to natural cardinality
+`n=(i+1).toNat`, with the cast identity proving `(n : ℤ)-1=i`; terms below
+`-1` are zero. Restriction along the embedding recovers the original natural
+complex, and `simplicialCochainComplexIntHomologyIso` identifies their actual
+homology objects in corresponding degrees.
+
+The module and homology cutoffs are both checked: they vanish below `-1` and
+above `(Fintype.card V : ℤ)-1`. The natural-indexed homology also vanishes
+for `n>Fintype.card V`. The degree-minus-one `R`/zero endpoint results are
+transported to the integer complex. These are cutoff results only; vanishing
+in intermediate higher degrees is not claimed. The augmented chain model,
+order-independence, cohomology duality, Čech/link and local-cohomology
+comparisons, and the Reisner criterion remain future work.
+
+## Checked signed Čech/link coordinates (2026-11-22)
+
+For nonpositive `a` whose negative support `N` is a face, the actual
+fine-degree Čech module at `N.card + r` is linearly equivalent to the
+link's actual cochains on `r`-element faces. The map extracts Laurent
+coefficients and multiplies by the explicit negative-support orientation
+sign. The inverse, basis and component formulas, and compatibility with
+adjacent differentials are checked over arbitrary commutative rings.
+
+The first map includes the empty link face. Invalid insertion coordinates
+vanish in their actual localizations, while admissible targets are exactly
+link faces. Ghosts, empty supports, characteristic two and the zero ring
+are retained. The separate checked node
+`lem:cech-link-cohomology-comparison` packages the map as an actual shifted
+complex isomorphism and transports homology to reduced link cohomology in
+integer degree `r-1`; degrees below the cutoff are zero. The local-cohomology
+comparison and full link formula remain future work.
+
+Validation for this milestone passed: full `lake build` (2,454 jobs),
+`Checks/Axioms.lean`, `Checks/Cech.lean`, `Checks/SimplicialCochain.lean`,
+and the existing localization regression; blueprint PDF/HTML and
+`checkdecls`; combined source/graph and local site regeneration; and the
+static site checker. The equivalence and differential theorem report
+exactly `[propext, Classical.choice, Quot.sound]`. Source scans find no
+placeholders or custom axioms. The current artifact counts are reported
+above. All work remains local.

@@ -68,6 +68,39 @@ theorem nonface_of_subset {F G : Finset V} (hFG : F ⊆ G) (hF : F ∉ K.faces) 
     G ∉ K.faces :=
   fun hG => hF (K.face_of_subset hFG hG)
 
+/-- The simplicial link on the same ambient vertex type. A face hypothesis
+ensures that its empty face is present, while vertices of `σ` become ghosts. -/
+noncomputable def link (σ : Finset V) (hσ : σ ∈ K.faces) : Complex V := by
+  classical
+  exact {
+    faces := ⟨{T | Disjoint T σ ∧ σ ∪ T ∈ K.faces}, fun _ _ hFG hG =>
+      ⟨Finset.disjoint_of_subset_left hFG hG.1,
+        K.face_of_subset (Finset.union_subset_union_right hFG) hG.2⟩⟩
+    empty_mem := ⟨by simp, by simpa using hσ⟩ }
+
+open scoped Classical in
+@[simp]
+theorem mem_link_iff (σ : Finset V) (hσ : σ ∈ K.faces) (T : Finset V) :
+    T ∈ (K.link σ hσ).faces ↔ Disjoint T σ ∧ σ ∪ T ∈ K.faces := Iff.rfl
+
+@[simp]
+theorem link_empty : K.link ∅ K.empty_mem = K := by
+  classical
+  cases K with
+  | mk faces empty_mem =>
+    unfold link
+    congr 1
+    ext T
+    change (Disjoint T ∅ ∧ ∅ ∪ T ∈ faces) ↔ T ∈ faces
+    simp
+
+theorem notMem_link_singleton_of_mem (σ : Finset V) (hσ : σ ∈ K.faces)
+    {v : V} (hv : v ∈ σ) : ({v} : Finset V) ∉ (K.link σ hσ).faces := by
+  classical
+  intro h
+  exact Finset.disjoint_left.mp ((K.mem_link_iff σ hσ {v}).mp h).1
+    (Finset.mem_singleton_self v) hv
+
 end Complex
 
 variable {V : Type u}
@@ -704,6 +737,18 @@ variable {V : Type u} (K : Complex V)
 /-- The set of inclusion-maximal faces. -/
 def facets : Set (Finset V) :=
   {F | Maximal (fun G : Finset V => G ∈ K.faces) F}
+
+/-- A facet has the augmented link consisting of exactly the empty face. -/
+theorem mem_link_facet_iff {σ : Finset V} (hf : σ ∈ K.facets) (T : Finset V) :
+    T ∈ (K.link σ hf.1).faces ↔ T = ∅ := by
+  classical
+  constructor
+  · intro h
+    change Disjoint T σ ∧ σ ∪ T ∈ K.faces at h
+    exact h.1.eq_bot_of_le
+      (Finset.subset_union_right.trans (hf.le_of_ge h.2 Finset.subset_union_left))
+  · rintro rfl
+    exact (K.link σ hf.1).empty_mem
 
 /-- A finite ambient vertex type has only finitely many facets. -/
 instance facets_finite [Finite V] : Finite (K.facets) := by
@@ -1494,6 +1539,52 @@ def positiveSupport (a : V →₀ ℤ) : Finset V :=
 /-- Admissible degrees in the localization at the product on `F`. -/
 def LocalizationAdmissible (F : Finset V) (a : V →₀ ℤ) : Prop :=
   (∀ v ∉ F, 0 ≤ a v) ∧ F ∪ positiveSupport a ∈ K.faces
+
+/-- The finite negative support of a fine integer degree. -/
+def negativeSupport (a : V →₀ ℤ) : Finset V :=
+  a.support.filter fun v => a v < 0
+
+@[simp]
+theorem mem_negativeSupport (a : V →₀ ℤ) (v : V) :
+    v ∈ negativeSupport a ↔ a v < 0 := by
+  constructor
+  · intro h
+    exact (Finset.mem_filter.mp h).2
+  · intro h
+    exact Finset.mem_filter.mpr ⟨Finsupp.mem_support_iff.mpr (ne_of_lt h), h⟩
+
+theorem negativeSupport_finite (a : V →₀ ℤ) : {v : V | a v < 0}.Finite :=
+  Set.Finite.ofFinset (negativeSupport a) (mem_negativeSupport a)
+
+theorem negativeSupport_subset_iff (a : V →₀ ℤ) (F : Finset V) :
+    negativeSupport a ⊆ F ↔ ∀ v ∉ F, 0 ≤ a v := by
+  constructor
+  · intro h v hv
+    by_contra hn
+    have hneg : a v < 0 := lt_of_not_ge hn
+    exact hv (h ((mem_negativeSupport a v).2 hneg))
+  · intro h v hv
+    by_contra hvF
+    exact (not_lt_of_ge (h v hvF)) ((mem_negativeSupport a v).1 hv)
+
+theorem positiveSupport_eq_empty_of_nonpos (a : V →₀ ℤ) (ha : a ≤ 0) :
+    positiveSupport a = ∅ := by
+  ext v
+  simp only [positiveSupport, Finset.mem_filter, Finset.notMem_empty]
+  constructor
+  · rintro ⟨_, hpos⟩
+    exact (not_lt_of_ge (Finsupp.le_def.mp ha v)) hpos
+  · intro h
+    exact h.elim
+
+/-- In a nonpositive degree, admissibility says precisely that the inverted
+set is a face containing every negative coordinate. -/
+theorem localizationAdmissible_iff_of_nonpos (a : V →₀ ℤ) (ha : a ≤ 0)
+    (F : Finset V) :
+    K.LocalizationAdmissible F a ↔ negativeSupport a ⊆ F ∧ F ∈ K.faces := by
+  rw [LocalizationAdmissible, negativeSupport_subset_iff,
+    positiveSupport_eq_empty_of_nonpos a ha]
+  simp [Finset.union_empty]
 
 /-- The multidegree of a monomial numerator divided by the indicated product power. -/
 noncomputable def fractionDegree (F : Finset V) (b : V →₀ ℕ) (r : ℕ) : V →₀ ℤ :=

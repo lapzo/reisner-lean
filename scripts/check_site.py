@@ -136,12 +136,17 @@ def main():
         assert anchor.attrs.get("data-source") == declaration.source.relative_path
         assert int(anchor.attrs.get("data-line", "0")) == declaration.line
 
-    snapshots = [*(ROOT / item.relative_path for item in SOURCE_FILES),
-                 ROOT / "Checks/Axioms.lean", ROOT / "Checks/LocalizationKernelAudit.lean",
-                 ROOT / "AUDIT.md", ROOT / "STATUS.md",
-                 ROOT / "lake-manifest.json", ROOT / "lakefile.lean", ROOT / "lean-toolchain"]
-    for original in snapshots:
-        assert original.read_bytes() == (out / "source" / original.name).read_bytes(), (
+    snapshots = [(ROOT / item.relative_path, item.relative_path.rsplit("/", 1)[-1])
+                 for item in SOURCE_FILES] + [
+        (ROOT / "Checks/Axioms.lean", "Axioms.lean"),
+        (ROOT / "Checks/LocalizationKernelAudit.lean", "LocalizationKernelAudit.lean"),
+        (ROOT / "Checks/Cech.lean", "Checks-Cech.lean"),
+        (ROOT / "Checks/SimplicialCochain.lean", "Checks-SimplicialCochain.lean"),
+        (ROOT / "AUDIT.md", "AUDIT.md"), (ROOT / "STATUS.md", "STATUS.md"),
+        (ROOT / "lake-manifest.json", "lake-manifest.json"),
+        (ROOT / "lakefile.lean", "lakefile.lean"), (ROOT / "lean-toolchain", "lean-toolchain")]
+    for original, snapshot_name in snapshots:
+        assert original.read_bytes() == (out / "source" / snapshot_name).read_bytes(), (
             f"Stale source snapshot: {original}"
         )
     for original, name in [(ROOT / "blueprint/print/print.pdf", "blueprint.pdf"),
