@@ -19,8 +19,10 @@ the mathematics.
 [Browse the Lean source](#full-source)
 :::
 
-::: {.milestone}
-**Current milestone — checked in Lean.** The actual variable-product
+<details class="milestone">
+<summary><strong>Current milestone — checked in Lean</strong><span class="milestone-toggle" aria-hidden="true"></span></summary>
+
+The actual variable-product
 localizations carry an integer grading. Each admissible degree has a
 Laurent monomial basis vector, and the other components are zero.
 The transition maps preserve degrees and send surviving basis vectors
@@ -54,7 +56,8 @@ when its maximal-ideal local cohomology vanishes below the maximum face
 cardinality. The augmentation ideal is the unique maximal proper homogeneous
 ideal, and global Cohen–Macaulayness implies this vanishing. The graded-local
 converse and the positive-degree Ext–Čech comparison remain external or open.
-:::
+
+</details>
 
 ## The target {#target}
 
