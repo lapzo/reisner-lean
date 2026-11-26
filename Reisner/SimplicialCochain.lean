@@ -9,6 +9,7 @@ public import Mathlib.Algebra.Homology.Embedding.ExtendHomology
 public import Mathlib.Algebra.Homology.Embedding.Restriction
 public import Mathlib.LinearAlgebra.Pi
 public import Mathlib.LinearAlgebra.StdBasis
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 
 /-!
 # Augmented simplicial cochains indexed by face cardinality
@@ -59,6 +60,25 @@ theorem simplicialCochainBasis_apply (n : ℕ) (F G : K.SimplicialFaceIndex n) :
     K.simplicialCochainBasis R n F G = if G = F then 1 else 0 := by
   classical
   simp [simplicialCochainBasis, Pi.basisFun_apply, Pi.single_apply, eq_comm]
+
+omit [LinearOrder V] in
+
+/-- Over a field, each augmented cochain term is finite-dimensional, with one
+coordinate for each actual face. In particular, the empty face is counted at
+`n = 0`, while ghost vertices contribute no coordinates. -/
+theorem simplicialCochain_finiteDimensional (k : Type v) [Field k] (n : ℕ) :
+    FiniteDimensional k (K.SimplicialCochain k n) := by
+  classical
+  exact (K.simplicialCochainBasis k n).finiteDimensional_of_finite
+
+omit [LinearOrder V] in
+/-- The dimension of an augmented cochain term is the number of actual faces
+of that cardinality. -/
+theorem simplicialCochain_finrank (k : Type v) [Field k] (n : ℕ) :
+    Module.finrank k (K.SimplicialCochain k n) = Nat.card (K.SimplicialFaceIndex n) := by
+  classical
+  rw [Module.finrank_eq_card_basis (K.simplicialCochainBasis k n)]
+  exact (Nat.card_eq_fintype_card (α := K.SimplicialFaceIndex n)).symm
 
 /-- Insert a new vertex into a face, requiring that the resulting set is an
 actual face of `K`. -/
@@ -352,6 +372,25 @@ theorem simplicialCochain_isZero_of_card_lt {n : ℕ}
     CategoryTheory.Limits.IsZero (ModuleCat.of R (K.SimplicialCochain R n)) :=
   ModuleCat.isZero_iff_subsingleton.mpr (K.simplicialCochain_subsingleton_of_card_lt R h)
 
+omit [LinearOrder V] in
+/-- Above the largest actual face cardinality, the cochain term is zero.
+This bound uses actual faces, so it also applies in the presence of ghosts. -/
+theorem simplicialCochain_subsingleton_of_maxFaceCard_lt {n : ℕ}
+    (h : K.maxFaceCard < n) : Subsingleton (K.SimplicialCochain R n) := by
+  classical
+  let : IsEmpty (K.SimplicialFaceIndex n) := ⟨fun F => by
+    have hcard := K.card_le_maxFaceCard F.2.1
+    rw [F.2.2] at hcard
+    exact (Nat.not_le_of_gt h) hcard⟩
+  infer_instance
+
+omit [LinearOrder V] in
+theorem simplicialCochain_isZero_of_maxFaceCard_lt {n : ℕ}
+    (h : K.maxFaceCard < n) :
+    CategoryTheory.Limits.IsZero (ModuleCat.of R (K.SimplicialCochain R n)) :=
+  ModuleCat.isZero_iff_subsingleton.mpr
+    (K.simplicialCochain_subsingleton_of_maxFaceCard_lt R h)
+
 /-- The actual augmented simplicial cochain complex in face-cardinality
 indexing. Index zero is the empty-face/degree-minus-one term. -/
 noncomputable def simplicialCochainComplex : CochainComplex (ModuleCat R) ℕ :=
@@ -533,6 +572,31 @@ theorem simplicialCochainComplexInt_homology_isZero_of_card_lt {i : ℤ}
   exact IsZero.of_iso
     (K.simplicialCochainComplex_homology_isZero_of_card_lt R hcard)
     (K.simplicialCochainComplexIntHomologyIso R hdegree)
+
+/-- Natural cohomology vanishes above the largest actual face cardinality. -/
+theorem simplicialCochainComplex_homology_isZero_of_maxFaceCard_lt {n : ℕ}
+    (hn : K.maxFaceCard < n) :
+    IsZero ((K.simplicialCochainComplex R).homology n) :=
+  (HomologicalComplex.ExactAt.of_isZero
+    (K.simplicialCochain_isZero_of_maxFaceCard_lt R hn)).isZero_homology
+
+/-- Integer cochain terms vanish above the complex's actual dimension. -/
+theorem simplicialCochainComplexInt_isZero_of_dimension_lt {i : ℤ}
+    (hi : K.dimension < i) : IsZero ((K.simplicialCochainComplexInt R).X i) := by
+  have hlow : -1 ≤ i := by unfold dimension at hi; omega
+  have hdegree := simplicialCochainInt_natDegree hlow
+  have hcard : K.maxFaceCard < (i + 1).toNat := by
+    unfold dimension at hi
+    omega
+  exact IsZero.of_iso (K.simplicialCochain_isZero_of_maxFaceCard_lt R hcard)
+    (K.simplicialCochainComplexIntXIso R hdegree)
+
+/-- Integer reduced cohomology vanishes above the actual simplicial dimension. -/
+theorem simplicialCochainComplexInt_homology_isZero_of_dimension_lt {i : ℤ}
+    (hi : K.dimension < i) :
+    IsZero ((K.simplicialCochainComplexInt R).homology i) :=
+  (HomologicalComplex.ExactAt.of_isZero
+    (K.simplicialCochainComplexInt_isZero_of_dimension_lt R hi)).isZero_homology
 
 /-- The actual degree-zero homology object is canonically the kernel of the
 augmentation cochain differential. The incoming map is zero at index zero. -/

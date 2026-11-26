@@ -39,11 +39,26 @@ SOURCE_FILES = (
     SourceFile("cech-indices", "Reisner/Cech/Indices.lean", "lean-Cech-indices-L"),
     SourceFile("cech-link", "Reisner/Cech/LinkComparison.lean", "lean-Cech-link-L"),
     SourceFile("cech-shifted", "Reisner/Cech/ShiftedLink.lean", "lean-Cech-shifted-L"),
+    SourceFile("cech-uniform-link", "Reisner/Cech/UniformLink.lean", "lean-Cech-uniform-link-L"),
+    SourceFile("cech-link-homology", "Reisner/Cech/LinkHomology.lean", "lean-Cech-link-homology-L"),
+    SourceFile("cech-degree-zero", "Reisner/Cech/DegreeZero.lean", "lean-Cech-degree-zero-L"),
+    SourceFile("cech-ext-comparison", "Reisner/Cech/ExtComparison.lean", "lean-Cech-ext-comparison-L"),
+    SourceFile("cech-localized-ext", "Reisner/Cech/LocalizedExt.lean", "lean-Cech-localized-ext-L"),
+    SourceFile("cech-face-ring-linear", "Reisner/Cech/FaceRingLinear.lean", "lean-Cech-face-ring-linear-L"),
+    SourceFile("local-cohomology", "Reisner/LocalCohomology.lean", "lean-Local-cohomology-L"),
+    SourceFile("local-cm", "Reisner/LocalCohenMacaulay.lean", "lean-Local-cm-L"),
+    SourceFile("graded-local", "Reisner/GradedLocalTest.lean", "lean-Graded-local-L"),
+    SourceFile("reisner-criterion", "Reisner/ReisnerCriterion.lean", "lean-Reisner-criterion-L"),
     SourceFile("simplicial", "Reisner/SimplicialCochain.lean", "lean-Simplicial-L"),
+    SourceFile("simplicial-chain", "Reisner/SimplicialChain.lean", "lean-Simplicial-chain-L"),
+    SourceFile("simplicial-duality", "Reisner/SimplicialDuality.lean", "lean-Simplicial-duality-L"),
+    SourceFile("dual-homology", "Reisner/DualHomology.lean", "lean-Dual-homology-L"),
+    SourceFile("link-calculus", "Reisner/LinkCalculus.lean", "lean-Link-calculus-L"),
+    SourceFile("cech-purity", "Reisner/Cech/Purity.lean", "lean-Cech-purity-L"),
 )
 
 DECLARATION = re.compile(
-    r"^(?:(?:noncomputable|protected|private|unsafe|partial)\s+)*"
+    r"^(?:@\[[^\]]+\]\s*)?(?:(?:public|noncomputable|protected|private|unsafe|partial)\s+)*"
     r"(?:structure|theorem|lemma|def|abbrev|instance)\s+"
     # Include the Greek pi used in the mathlib homologyπ compatibility API.
     r"([A-Za-z_][A-Za-z0-9_']*π?)\b"

@@ -83,6 +83,10 @@ Facets of $\operatorname{lk}_K\sigma$ correspond to facets of $K$ containing
 $\sigma$ by $G\mapsto G\setminus\sigma$.
 Always $\dim\operatorname{lk}_K\sigma\le d(K)-|\sigma|-1$.
 If every facet of $K$ has cardinality $d$, equality holds with $d(K)=d$.
+The link of a pure finite complex is pure as well. The same-ambient
+formulation retains ghost vertices.
+\lean{Reisner.Complex.link_link, Reisner.Complex.mem_facets_link_iff, Reisner.Complex.linkFacetEquiv, Reisner.Complex.link_face_card_add_le_maxFaceCard, Reisner.Complex.link_maxFaceCard_add_card_le, Reisner.Complex.link_dimension_le, Reisner.Complex.link_maxFaceCard_eq_zero_of_facet, Reisner.Complex.link_dimension_eq_neg_one_of_facet, Reisner.Complex.link_maxFaceCard_add_card_eq_of_pure, Reisner.Complex.link_dimension_eq_of_pure, Reisner.Complex.link_pure_of_pure}
+\leanok
 \end{lemma}
 \begin{proof}
 Expand the two disjointness conditions in an iterated link: a face $T$ is
@@ -113,10 +117,9 @@ The boundary squares to zero: deleting two different vertices in either
 order gives the same remaining face and opposite signs, and the boundary
 of an edge augments to $1-1=0$. Relabelling the order multiplies an oriented
 face by the sign of its sorting permutation, which commutes with deletion.
-This verifies that the construction and its order independence include the
-augmentation. The augmented chain construction, its order-comparison
-isomorphisms, and the homology assertions remain Lean work. The separate
-cochain construction below has a smaller checked scope.
+The checked Lean chain model is the dual of the actual-face cochain model,
+with the signed boundary and the empty-face degree. Order-comparison
+isomorphisms and the canonical homology-cohomology isomorphism remain work.
 
 \begin{lemma}[The augmented face-cardinality cochain complex]\label{lem:augmented-cochain-complex}
 \uses{def:complex}
@@ -338,27 +341,141 @@ order-independence comparison, and the full reduced homology and duality asserti
 Definition~\ref{def:homology} remain separate formalization work.
 \end{proof}
 
+\begin{lemma}[Finite-dimensional augmented cochain terms]\label{lem:cochain-finite-dim}
+\uses{lem:augmented-cochains}
+Let $V$ be finite and $k$ a field. The augmented cochain term in
+face-cardinality degree $n$ has dimension equal to the number of actual
+$n$-element faces of $K$. In degree $0$, this counts the empty face; ghost
+vertices contribute no basis coordinates.
+\lean{Reisner.Complex.simplicialCochain_finiteDimensional, Reisner.Complex.simplicialCochain_finrank}
+\leanok
+\end{lemma}
+\begin{proof}
+The coordinate basis is indexed by actual faces of cardinality $n$. Its index
+type is finite because the ambient vertex type is finite. The finite-basis
+dimension theorem gives both finite dimensionality and the stated rank.
+\end{proof}
+
+\begin{lemma}[Augmented simplicial chain complex]\label{lem:augmented-chain-complex}
+\uses{lem:cochain-finite-dim,lem:augmented-cochain-complex}
+For a finite ambient vertex type and a field $k$, take the degree-$n$ chain
+space to be the dual of the cochain space indexed by actual $n$-element faces.
+It is finite-dimensional with one basis vector per actual face. Evaluation
+gives a canonical isomorphism from cochains to the dual of chains, compatible
+with the cochain differential and dual chain boundary. The dual differential
+gives the boundary
+\[
+ \partial_n : C_n(K;k)\longrightarrow C_{n-1}(K;k),
+ \qquad C_n(K;k)=\widetilde C_{n-1}(K;k),
+\]
+and $\partial_{n-1}\partial_n=0$. On a basis face it is the signed sum of
+its codimension-one faces. The empty face is the basis in face-cardinality
+degree zero (reduced degree $-1$); ghost vertices are absent. Reindexing
+puts face-cardinality degree $n$ in integer reduced degree $n-1$ and extends
+by zero below $-1$.
+\lean{Reisner.Complex.simplicialChainComplex, Reisner.Complex.simplicialChain_finiteDimensional, Reisner.Complex.simplicialChain_finrank, Reisner.Complex.simplicialCochainEvalEquivDualChain, Reisner.Complex.simplicialCochainEvalEquivDualChain_naturality, Reisner.Complex.simplicialBoundary_comp_eq_zero, Reisner.Complex.simplicialBoundary_basis_apply, Reisner.Complex.simplicialChainComplexInt, Reisner.Complex.simplicialChainComplexIntHomologyIso, Reisner.Complex.simplicialChainComplexInt_homology_isZero_of_lt_minus_one}
+\leanok
+\end{lemma}
+\begin{proof}
+The cochain terms have finite coordinate bases indexed by actual faces. Their
+dual bases give finite-dimensional chain spaces. Bidual evaluation gives the
+stated canonical term isomorphism, and naturality of evaluation proves its
+differential compatibility. The chain differential is the linear dual of
+cochain deletion, so its basis evaluation is the signed deletion formula.
+Dualizing the cochain square-zero identity proves the chain square-zero law.
+\end{proof}
+
+\begin{lemma}[Vanishing part of homology-cohomology duality]\label{lem:dual-vanishing}
+\uses{lem:augmented-chain-complex}
+For each face-cardinality degree $n\in\mathbb N$, the augmented cochain
+homology object is zero if and only if the corresponding augmented chain
+homology object is zero. This is only the vanishing equivalence; it does not
+assert the canonical isomorphism of homology groups in
+Lemma~\ref{lem:dual}.
+\lean{Reisner.Complex.simplicialCochain_homology_isZero_iff_chain_homology_isZero}
+\leanok
+\end{lemma}
+\begin{proof}
+At positive face-cardinality degrees, exactness says that the incoming
+differential has range equal to the outgoing differential's kernel. Taking
+linear duals exchanges ranges with annihilators of kernels and kernels with
+annihilators of ranges. At degree zero, the incoming cochain map is zero,
+while chain exactness says the dual of the augmentation differential is
+surjective; over a field this is equivalent to injectivity of augmentation.
+\end{proof}
+
+\begin{lemma}[Canonical homology--cohomology duality in face-cardinality degrees]\label{lem:dual-isomorphism}
+\uses{lem:augmented-chain-complex}
+For every $n\in\mathbb N$, finite ordered vertex set $V$, augmented
+complex $K$ on $V$, and field $k$, evaluation induces a canonical linear
+isomorphism
+\[
+ H_n(E^\bullet(K;k))\cong
+ \operatorname{Hom}_k(H_n(C_\bullet(K;k)),k),
+\]
+where the face-cardinality index $n$ represents reduced degree $n-1$.
+The statement includes $n=0$, the empty-face degree. Its integer-indexed
+extension is Lemma~\ref{lem:dual}.
+\lean{Reisner.DualHomology.homologyDualEquiv, Reisner.DualHomology.homologyDualEquiv_apply_cycle, Reisner.Complex.simplicialCohomologyDualHomologyEquiv}
+\leanok
+\end{lemma}
+\begin{proof}
+For a short complex of vector spaces, restriction of a dual cycle to the
+original cycles annihilates boundaries, so it descends to homology. Every
+functional on homology extends to the cycle space and then to the middle
+space, giving surjectivity; the kernel consists exactly of dual boundaries.
+This yields the canonical evaluation isomorphism. The finite face-coordinate
+duality commutes with the signed differentials, and the short complexes
+around degree $n$ transport the result to the actual simplicial complexes.
+\end{proof}
+
 \begin{lemma}[Homology versus cohomology]\label{lem:dual}
-\uses{def:homology}
-For every integer $i$,
+\uses{lem:dual-isomorphism,lem:augmented-cochains,lem:augmented-chain-complex}
+Let $K$ be a finite augmented complex on an ordered ambient vertex set and
+$k$ a field. For every integer $i$, canonical evaluation gives
 \[
 \widetilde H^i(K;k)\cong\operatorname{Hom}_k(\widetilde H_i(K;k),k).
 \]
-Consequently their vanishing
-conditions agree. Also $\widetilde H_0(K;k)=0$ for a complex with vertices
-if and only if its graph of vertices and edges is connected.
+Consequently their vanishing conditions agree. Both terms and both homology
+objects vanish for $i<-1$ and for $i>\dim K=d(K)-1$; in particular they
+vanish for $i>|V|-1$. At $i=-1$, the existing augmented empty-face convention
+is preserved: cohomology is $k$ when $K=\{\varnothing\}$, even with ghost
+vertices, and is zero when $K$ has an actual vertex. The same vanishing
+alternative holds for homology.
+\lean{Reisner.Complex.simplicialCohomologyIntDualHomologyEquiv, Reisner.Complex.simplicialCohomologyIntDualHomologyEquiv_reindex, Reisner.Complex.simplicialCochainInt_homology_isZero_iff_chainInt_homology_isZero, Reisner.Complex.simplicialCochainComplexInt_isZero_of_dimension_lt, Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_dimension_lt, Reisner.Complex.simplicialChainComplexInt_homology_isZero_of_lt_minus_one, Reisner.Complex.simplicialChainComplexInt_isZero_of_card_lt, Reisner.Complex.simplicialChainComplexInt_homology_isZero_of_card_lt, Reisner.Complex.simplicialChainComplexInt_isZero_of_dimension_lt, Reisner.Complex.simplicialChainComplexInt_homology_isZero_of_dimension_lt}
+\leanok
 \end{lemma}
 \begin{proof}
-Choose complements to boundaries inside cycles, and to cycles inside each
-chain space. The complex splits into its homology with zero differential
-and two-term complexes with invertible differential. Dualizing preserves
-this decomposition, proving the isomorphism (the resulting cohomology
-identification with the dual is canonical). A finite dimensional vector space
-has zero dual exactly when it is zero. In degree zero, boundaries identify
-the basis vectors at the endpoints of each edge. Quotienting by these
-relations leaves one basis vector per graph component. The augmentation is
-the sum of their coordinates, whose kernel has dimension one less than the
-number of components.
+For $i\geq-1$, put $n=(i+1).\mathrm{toNat}$. Then $(n:\mathbb Z)-1=i$.
+Use the canonical extension homology isomorphisms for chains and cochains,
+apply Lemma~\ref{lem:dual-isomorphism} at $n$, and precompose functionals
+with the chain homology isomorphism. This includes $n=0$, so the augmented
+degree $-1$ is transported without discarding the empty face. For $i<-1$
+both homology objects are zero and the unique linear equivalence is canonical.
+A vector space has zero linear dual exactly when it is zero, giving the
+vanishing equivalence in all integer degrees.
+
+For integer $i>\dim K=d(K)-1$, the corresponding face cardinality
+$i+1$ exceeds $d(K)$, so there are no actual faces in that term.
+Both the cochain term and its dual chain term are zero. Transport along
+the same degree embedding proves that both integer complexes are exact
+there. The ambient-cardinality bounds follow in the same way. The degree
+$-1$ alternatives are those already proved for the cochain complex, together
+with the vanishing equivalence. Ghost vertices add no actual face coordinates.
+\end{proof}
+
+\begin{lemma}[Reduced degree zero and graph connectivity]\label{lem:homology-connectivity}
+\uses{def:homology,lem:augmented-chain-complex,lem:dual}
+For a finite augmented complex over a field $k$ with at least one actual vertex,
+$\widetilde H_0(K;k)=0$ if and only if its graph of actual vertices and
+edges is connected. This graph comparison is not yet formalized.
+\end{lemma}
+\begin{proof}
+Boundaries identify the basis vectors at the endpoints of each edge.
+Quotienting by these relations leaves one basis vector per graph component.
+The augmentation is the sum of their coordinates, whose kernel has dimension
+one less than the number of components. This is a separate comparison with
+the graph model, not a hypothesis of the checked duality theorem.
 \end{proof}
 
 \begin{definition}[Nonface generators and the face ring]\label{def:ring}
@@ -389,10 +506,12 @@ quotients are injective; the final quotient is nonzero. Its depth is the
 supremum of lengths of these sequences. It is Cohen--Macaulay if
 $\operatorname{depth} B=\dim B$, with Krull dimension defined by chains of
 prime ideals. A Noetherian ring $A$ is Cohen--Macaulay if every localization
-$A_{\mathfrak p}$ at a prime is a Cohen--Macaulay local ring. It is equivalent
-to test maximal ideals. These are algebraic definitions, independent of links
-or homology; see Stacks, Sections 10.103--10.104 \cite{stacks-cm}.
+$A_{\mathfrak p}$ at a prime is a Cohen--Macaulay local ring.
+\lean{Reisner.IsLocalCohenMacaulay, Reisner.IsCohenMacaulay}
+\leanok
 \end{definition}
+These are the algebraic definitions in Stacks, Sections 10.103--10.104
+\cite{stacks-cm}. Stacks also gives the equivalent test at all maximal ideals.
 
 \section{The implemented algebraic entry point}
 
@@ -941,43 +1060,542 @@ ring over a field; see Stacks, Sections 10.31, 10.60 and 10.114
 \cite{stacks-dimension}.
 \end{proof}
 
-\section{Visible algebraic foundations still to formalize}
+\section{Local depth and local cohomology}
+
+\begin{lemma}[The unique maximal homogeneous ideal of a face ring]\label{lem:face-ring-graded-maximal}
+\uses{prop:grading,prop:augmentation}
+Let $K$ be a simplicial complex. For the total $\mathbb N$-grading on its
+face ring over any commutative coefficient ring, the irrelevant ideal is
+the augmentation ideal. Over a field $k$, write $A=k[K]$ and
+$\mathfrak m=A_+$. Every proper homogeneous ideal is contained in
+$\mathfrak m$. In particular $\mathfrak m$ is the unique
+maximal element among the proper homogeneous ideals.
+\lean{Reisner.Complex.faceRing_irrelevant_eq_augmentation, Reisner.Complex.faceRing_homogeneousIdeal_le_augmentation, Reisner.Complex.faceRing_isCoatom_homogeneousIdeal_iff}
+\leanok
+\end{lemma}
+\begin{proof}
+\leanok
+Both $A_+$ and $\mathfrak m$ are generated by the positive-degree
+components. An element lies in $A_+$ precisely when its degree-zero
+component vanishes. If $x$ lies in a homogeneous ideal $I$, its
+degree-zero component also belongs to $I$. Since $A_0=k$, a nonzero
+degree-zero component would give a unit in $I$. Thus every element
+of a proper homogeneous ideal belongs to $A_+$. The augmentation
+quotient is the field $k$, so $\mathfrak m$ is itself proper, and it
+therefore is the greatest proper homogeneous ideal.
+\end{proof}
 
 \begin{theorem}[Graded local test: external foundation]\label{found:graded-cm}
-\uses{def:cm}
+\uses{def:cm,found:cm-localization}
 For a finitely generated positively graded commutative $k$-algebra $B$ with
 $B_0=k$, put $\mathfrak n=B_{>0}$. Then $B$ is Cohen--Macaulay if and only
 if $B_{\mathfrak n}$ is Cohen--Macaulay.
 \end{theorem}
-This is the graded local test in Bruns--Herzog, item 2.1.27
-\cite{bh}; its scope is also explicitly confirmed in the authors' corrections,
-page 1 \cite{bh-errata}. It requires finite generation and positive grading.
-It is not merely a restatement of the definition for arbitrary rings.
-This comparison is not implemented here.
+Bruns--Herzog, item 2.1.27 \cite{bh}, tests the Cohen--Macaulay property
+of a Noetherian graded ring at all its maximal homogeneous ideals, as the
+authors confirm in their corrections, page 1, note to 2.1.29
+\cite{bh-errata}. In the displayed specialization finite generation over
+$k$ gives Noetherianity, and the positive grading with $B_0=k$ gives
+a single maximal homogeneous ideal. For a face ring with finite ambient
+vertex set these assumptions follow from Propositions~\ref{prop:grading}
+and~\ref{prop:augmentation}, and Lemma~\ref{lem:face-ring-graded-maximal}
+identifies the ideal. Thus the converse from the augmentation localization
+to all prime localizations is recorded as this external graded-local test,
+not as a checked Lean theorem. One route uses the homogeneous core
+$\mathfrak p^*$ of each prime: it is a homogeneous prime contained in both
+$\mathfrak p$ and $\mathfrak n$, and the ordinary localization theorem for
+Cohen--Macaulay local rings transfers the property from $B_{\mathfrak n}$
+through $B_{\mathfrak p^*}$ to $B_{\mathfrak p}$. The localization theorem
+is recorded separately below.
+
+\begin{theorem}[Cohen--Macaulayness localizes: external foundation]\label{found:cm-localization}
+\uses{def:cm}
+If $(R,\mathfrak m)$ is a Noetherian Cohen--Macaulay local ring and
+$\mathfrak p\subseteq\mathfrak m$ is prime, then $R_{\mathfrak p}$ is a
+Cohen--Macaulay local ring.
+\end{theorem}
+This is Stacks Project, Lemma 10.104.5, tag 00NB
+\cite{stacks-cm-localize}. It is not implemented in the pinned Mathlib
+and is not treated as a Lean declaration.
 
 \begin{definition}[Local cohomology]\label{def:local-cohomology}
-For a Noetherian ring $B$ and ideal $J$, define
-$\Gamma_J(M)=\{m\in M:J^r m=0\text{ for some }r\ge0\}$ and let
-$H^q_J(M)$ be its right derived functors, for $q\ge0$.
-Mathlib's \texttt{localCohomology} is instead constructed as a filtered
-colimit of Ext along powers of $J$. Its identification with this convention
-and with the following Cech model is a required future comparison.
+For a commutative ring $B$, an ideal $J$, a $B$-module $M$, and $q\ge0$,
+use the standard Ext-colimit model
+\[
+ H^q_J(M)=\mathop{\mathrm{colim}}_{n\in\mathbb N}
+           \operatorname{Ext}^q_B(B/J^n,M).
+\]
+For Lean, take $\operatorname{Ext}$ from the derived-category Ext API used
+by Mathlib's depth development and package it with
+\texttt{CategoryTheory.Abelian.linearExtFunctor}. This avoids a conversion
+between Mathlib's two Ext implementations: the older left-derived-functor
+Ext used by \texttt{Mathlib.Algebra.Homology.LocalCohomology}, and the
+derived-category Ext used for depth. Both have the standard Ext meaning, but
+no Lean isomorphism between their colimits is claimed here. The Ext-colimit
+is the standard local cohomology model; homogeneous grading used later is
+transported through the Cech comparison.
+\lean{Reisner.depthExtLocalCohomologyDiagram, Reisner.depthExtLocalCohomology}
+\leanok
 \end{definition}
 
-\begin{theorem}[Cech comparison: external foundation]\label{found:cech}
+\begin{lemma}[Vanishing in positive-power Ext stages]\label{lem:depth-ext-stage-vanishing}
 \uses{def:local-cohomology}
-If $J=(f_v:v\in V)$ with $V$ finite, the extended cochain complex
+Let $(B,\mathfrak n)$ be a Noetherian local ring, let $q\ge0$, and let
+$r\ge1$. If $q<\operatorname{depth}B$, then
+\[
+ \operatorname{Ext}^q_B(B/\mathfrak n^r,B)=0.
+\]
+\lean{Reisner.depthExtLocalCohomology_stage_subsingleton}
+\leanok
+\end{lemma}
+
+\begin{lemma}[Nonvanishing at the depth stage]\label{lem:depth-ext-stage-nontrivial}
+\uses{def:local-cohomology}
+Let $(B,\mathfrak n)$ be a Noetherian local ring and let
+$q=\operatorname{depth}B$. For each $r\ge1$,
+\[
+ \operatorname{Ext}^q_B(B/\mathfrak n^r,B)\ne0.
+\]
+\lean{Reisner.depthExtLocalCohomology_stage_nontrivial}
+\leanok
+\end{lemma}
+
+\begin{lemma}[Local cohomology vanishes below depth]\label{lem:lc-vanishes-below-depth}
+\uses{def:local-cohomology,lem:depth-ext-stage-vanishing}
+Let $(B,\mathfrak n)$ be a Noetherian local ring. If
+$q<\operatorname{depth}B$, then
+\[
+ H^q_{\mathfrak n}(B)=0.
+\]
+\lean{Reisner.depthExtLocalCohomology_vanishes_below_depth}
+\leanok
+\end{lemma}
+
+\begin{theorem}[Local depth cutoff detected by Ext-colimit local cohomology]\label{thm:depth-cutoff}
+\uses{def:local-cohomology,lem:lc-vanishes-below-depth,
+      lem:depth-ext-stage-nontrivial}
+Let $(B,\mathfrak n)$ be a Noetherian local ring. For every finite cutoff
+$d\in\mathbb N$,
+\[
+ d\le\operatorname{depth}B
+ \quad\Longleftrightarrow\quad
+ H^q_{\mathfrak n}(B)=0\text{ for every }q<d.
+\]
+Here local cohomology is the Ext-colimit model defined above. In Lean, zero
+is stated as `Subsingleton` of the corresponding module.
+\lean{Reisner.le_depth_iff_localCohomology_vanishes}
+\leanok
+\end{theorem}
+\begin{proof}
+If $d\le\operatorname{depth}B$, each $q<d$ lies below depth, so every
+positive-power Ext stage vanishes and hence so does the colimit. Conversely,
+if depth is below $d$, it is a finite natural number $r<d$. The stage
+$\operatorname{Ext}^r_B(B/\mathfrak n,B)$ is nonzero. The short exact
+sequences for adjacent powers show that every transition in degree $r$ is
+injective: for $r>0$, the kernel $\mathfrak n^n/\mathfrak n^{n+1}$ is finite
+and supported on $V(\mathfrak n)$, so its Ext groups below $r$ vanish by the
+Rees theorem; for $r=0$, use injectivity of precomposition along the quotient
+epimorphism. Thus the nonzero class survives in the filtered colimit.
+\end{proof}
+
+\begin{lemma}[Principal localization kernel is power torsion]\label{lem:principal-localization-torsion}
+Let $R$ be a commutative ring, $M$ an $R$-module, and $f\in R$. The
+kernel of the localization map from $M$ to its localization at
+$1,f,f^2,\ldots$ consists precisely of the elements $m$ for which
+$f^n m=0$ for some $n\ge0$.
+\lean{Reisner.principalLocalization_kernel_iff_torsion}
+\leanok
+\end{lemma}
+
+\begin{lemma}[Degree-zero derived Ext is Hom]\label{lem:ext-zero-quotient-hom}
+For an ideal $J$ of a commutative ring $R$ and an $R$-module $M$,
+\[
+ \operatorname{Ext}^0_R(R/J,M)\cong\operatorname{Hom}_R(R/J,M).
+\]
+The isomorphism here uses the derived-category Ext model shared with the
+depth development.
+\lean{Reisner.depthExtLocalCohomology_extZero_quotientHomEquiv}
+\leanok
+\end{lemma}
+
+\begin{lemma}[Maps from a quotient are annihilated elements]\label{lem:quotient-hom-annihilator}
+For an ideal $J$ of a commutative ring $R$ and an $R$-module $M$,
+\[
+ \operatorname{Hom}_R(R/J,M)\cong
+ \{m\in M: a m=0\text{ for every }a\in J\}.
+\]
+The map evaluates a homomorphism at $1+J$.
+\lean{Reisner.depthExtQuotientHomTorsionEquiv}
+\leanok
+\end{lemma}
+
+\begin{lemma}[Naturality of the degree-zero Ext/Hom identification]\label{lem:ext-zero-naturality}
+\uses{lem:ext-zero-quotient-hom}
+For a map $f:X\to Y$ and $x\in\operatorname{Ext}^0_R(Y,M)$, the degree-zero
+Ext/Hom equivalences send precomposition by $f$ to composition by $f$:
+\[
+  e_X(f^*x)=f\circ e_Y(x).
+\]
+This checked compatibility identifies the transition maps on the quotient
+stages with the corresponding inclusions of annihilator submodules.
+\lean{Reisner.depthExt_zero_precomp_naturality}
+\leanok
+\end{lemma}
+
+\begin{lemma}[Degree-zero transitions are annihilator inclusions]\label{lem:ext-zero-torsion-transition}
+\uses{lem:ext-zero-quotient-hom,lem:quotient-hom-annihilator,
+      lem:ext-zero-naturality}
+For every ideal $I$, module $M$, and $n\ge0$, the transition from
+$\operatorname{Ext}^0_R(R/I^n,M)$ to $\operatorname{Ext}^0_R(R/I^{n+1},M)$
+corresponds under Ext$^0\cong\operatorname{Hom}$ and evaluation at $1$ to the
+inclusion of the submodule annihilated by $I^n$ into the one annihilated by
+$I^{n+1}$. For $I=(f)$, stage $n$ is precisely the elements killed by $f^n$.
+\lean{Reisner.depthExtLocalCohomology_transition_torsion_natural}
+\lean{Reisner.principalPowerTorsion_eq}
+\leanok
+\end{lemma}
+\begin{lemma}[Degree-zero Ext-colimit is a power-torsion supremum]\label{lem:ext-zero-power-torsion-sup}
+\uses{def:local-cohomology,lem:ext-zero-torsion-transition}
+For every ideal $I$ of a commutative ring $R$ and every $R$-module $M$, the
+Ext-colimit degree-zero local cohomology module is linearly equivalent to
+\[
+  \sup_{n\in\mathbb N}\operatorname{Ann}_M(I^n).
+\]
+The supremum is the union of the nested annihilator submodules, and stage zero
+is included.
+\lean{Reisner.depthExtLocalCohomology_zero_torsionSupEquiv}
+\leanok
+\end{lemma}
+
+\begin{theorem}[Principal degree-zero local cohomology is the localization kernel]\label{thm:principal-degree-zero-localization}
+\uses{lem:ext-zero-power-torsion-sup,lem:principal-localization-torsion}
+Let $R$ be a commutative ring, $M$ an $R$-module, and $f\in R$. For the
+Ext-colimit model used in the depth development, there is a linear equivalence
+\[
+ H^0_{(f)}(M)\cong\ker\bigl(M\longrightarrow M_f\bigr),
+\]
+where localization is at $1,f,f^2,\ldots$. No nonzero or regularity hypothesis
+on $f$ is required; the exponent-zero stage and $f=0$ are included.
+\lean{Reisner.principalExtZeroKernelEquiv}
+\leanok
+\end{theorem}
+\begin{proof}
+At stage $n$, Ext$^0_R(R/(f^n),M)$ identifies with maps from $R/(f^n)$,
+then with elements killed by $f^n$. The checked transition compatibility
+shows the colimit is the supremum of these nested submodules. A class belongs
+to that supremum exactly when it is killed by some power of $f$, which is
+precisely the localization kernel criterion.
+\end{proof}
+
+\begin{lemma}[Finite powers annihilating generators give ideal-power torsion]\label{lem:finite-generator-power-torsion}
+\uses{lem:principal-localization-torsion}
+Let $s$ be a finite set of indices and let $I=(f_i : i\in s)$. If for each
+$i\in s$ some power $f_i^{k_i}$ annihilates $m\in M$, then
+$I^{1+\sum_{i\in s} k_i}m=0$. Consequently, for arbitrary $R$ and $M$,
+\[
+  \bigcup_{n\ge 0}\operatorname{Ann}_M(I^n)
+  =\bigcap_{i\in s}\ker(M\to M_{f_i}).
+\]
+The empty index set is allowed: $I=0$, and the stage-zero annihilator is all
+of $M$, matching the empty intersection.
+\lean{Reisner.finiteGeneratorsLocalizationKernel_eq_powerTorsionSup}
+\leanok
+\end{lemma}
+\begin{proof}
+The forward inclusion uses $f_i^n\in I^n$. For the reverse inclusion, choose
+$k_i$ from the principal localization kernel criterion. Induct on the finite
+generator set, using $(J+K)^{a+b}\subseteq J^a+K^b$ and
+$(f_i)^{k_i}\subseteq\operatorname{Ann}(m)$. The additional one in the total
+exponent handles the empty set and keeps exponent zero valid for zero
+generators.
+\end{proof}
+
+\begin{theorem}[Finite-generator degree-zero localization comparison]\label{thm:finite-generator-degree-zero-localization}
+\uses{lem:ext-zero-power-torsion-sup,lem:finite-generator-power-torsion}
+For $I=(f_i:i\in s)$, the degree-zero Ext-colimit local cohomology module
+used in this development is linearly equivalent to
+\[
+  \bigcap_{i\in s}\ker(M\to M_{f_i}).
+\]
+This is a comparison with the simultaneous localization kernel; no
+higher-degree Cech comparison is asserted here.
+\lean{Reisner.finiteGeneratorsExtZeroLocalizationKernelEquiv}
+\leanok
+\end{theorem}
+\begin{proof}
+Compose the checked equivalence from the Ext-colimit to the supremum of the
+annihilator submodules with the finite-generator kernel identity.
+\end{proof}
+
+\begin{lemma}[Degree-zero Čech cycles are simultaneous localization kernels]\label{lem:cech-degree-zero-kernel}
+\uses{def:complex,lem:localization-kernel}
+Let $K$ be a simplicial complex on a finite linearly ordered vertex set $V$,
+and let $R$ be any commutative ring. Under the canonical identification of
+the degree-zero Čech cochains with the face ring $R[K]$, the kernel of the
+outgoing degree-zero differential is
+\[
+  \bigcap_{v\in V}\ker\bigl(R[K]\longrightarrow R[K]_{\bar x_v}\bigr).
+\]
+The intersection includes ghost vertices and singleton nonfaces, whose
+localizations are zero rings.
+\lean{Reisner.Complex.cechZeroCyclesLocalizationEquiv}
+\leanok
+\end{lemma}
+\begin{proof}
+The degree-zero term has the unique empty-face coordinate. At a singleton
+target coordinate, the alternating sum has one term with sign $+1$, namely
+the localization map. The degree-one index type consists exactly of these
+singletons, so the differential vanishes precisely when every localization
+map vanishes. The argument includes ghost vertices, where the target ring
+is subsingleton.
+\end{proof}
+
+\begin{theorem}[Degree-zero Ext-colimit local cohomology is Čech cycles]\label{thm:ext-zero-cech-cycles}
+\uses{thm:finite-generator-degree-zero-localization,lem:cech-degree-zero-kernel}
+Let $K$ be a simplicial complex on a finite ordered vertex set $V$ and let
+$R$ be a commutative ring. For the face ring $A=R[K]$ and its augmentation
+ideal $\mathfrak m=(\bar x_v:v\in V)$, restrict scalars on the degree-zero
+Ext-colimit module along $R\to A$. Then
+\[
+  \mathrm{colim}_{n\in\mathbb N}\operatorname{Ext}^0_A(A/\mathfrak m^n,A)
+  \cong \ker\bigl(C^0(K;A)\longrightarrow C^1(K;A)\bigr)
+\]
+as $R$-modules.
+\lean{Reisner.Complex.extZeroCechCyclesEquiv}
+\leanok
+\end{theorem}
+\begin{proof}
+Apply the finite-generator degree-zero localization equivalence to the
+singleton face-ring generators. Their span is the augmentation ideal. The
+degree-zero Čech-kernel equivalence identifies the resulting simultaneous
+localization kernel with the kernel of the outgoing Čech differential.
+Restriction of scalars makes both maps $R$-linear.
+\end{proof}
+
+\begin{theorem}[Degree-zero Ext-colimit and Čech cohomology]\label{thm:ext-zero-cech-cohomology}
+\uses{thm:ext-zero-cech-cycles,lem:cech-complex}
+Let $K$ be a simplicial complex on a finite linearly ordered set $V$ and
+let $R$ be any commutative ring. Write $A=R[K]$,
+$\mathfrak m=(\bar x_v:v\in V)$, and $C^\bullet$ for the extended Čech
+complex on these generators, including the ghost variables. There are
+$R$-linear isomorphisms
+\[
+  \mathrm{colim}_{n\in\mathbb N}\operatorname{Ext}^0_A(A/\mathfrak m^n,A)
+  \ \cong\ \ker(d^0:C^0\longrightarrow C^1)
+  \ \cong\ H^0(C^\bullet),
+\]
+where the Ext-colimit carries the scalar action restricted along $R\to A$.
+The second map sends a cycle to its cohomology class.
+\lean{Reisner.Complex.cechZeroCyclesHomologyEquiv, Reisner.Complex.extZeroCechCohomologyEquiv}
+\leanok
+\end{theorem}
+\begin{proof}
+Theorem~\ref{thm:ext-zero-cech-cycles} gives the first isomorphism.
+The module kernel of $d^0$ and the cycles object of $C^\bullet$ are
+kernels of the same map $C^0\to C^1$. Their universal properties give a
+canonical isomorphism respecting the inclusions into $C^0$.
+The natural-number cochain shape allows a differential $C^i\to C^j$
+only when $j=i+1$, so every differential into degree zero vanishes.
+Thus the boundary submodule is zero and the canonical projection from
+cycles to the cohomology object is an isomorphism.
+\end{proof}
+
+\begin{lemma}[Cofinal powers of face-ring generators]\label{lem:generator-power-ideals}
+\uses{prop:augmentation}
+Let $K$ be a simplicial complex on a finite vertex set $V$, let $R$ be any
+commutative ring, and put $A=R[K]$ and $\mathfrak m=(\bar x_v:v\in V)$.
+For each $n\in\mathbb N$, set $J_n=(\bar x_v^n:v\in V)$. Then
+\[
+  J_n\subseteq\mathfrak m^n,\qquad
+  \mathfrak m^{|V|n+1}\subseteq J_n,\qquad J_1=\mathfrak m.
+\]
+Both decreasing ideal diagrams, $n\mapsto\mathfrak m^n$ and
+$n\mapsto J_n$, are initial in the category of ideals $L$ with
+$\mathfrak m\subseteq\sqrt L$. No Noetherian or nontriviality
+hypothesis on $R$ is required. When $V=\varnothing$, every $J_n=0$,
+including $J_0$, while $\mathfrak m^0=A$.
+\lean{Reisner.Complex.faceRingGeneratorPowerIdeal, Reisner.Complex.faceRingGeneratorPowerIdeal_one, Reisner.Complex.faceRingGeneratorPowerIdeal_le_pow, Reisner.Complex.faceRingAugmentationIdeal_pow_le_generatorPowerIdeal, Reisner.Complex.faceRingGeneratorPowerIdeal_antitone, Reisner.Complex.faceRingAugmentationIdeal_fg, Reisner.Complex.faceRingAugmentationIdeal_le_generatorPowerIdeal_radical, Reisner.Complex.faceRingAugmentationPowers_initial, Reisner.Complex.faceRingGeneratorPowers_initial}
+\leanok
+\end{lemma}
+\begin{proof}
+Each generator $\bar x_v^n$ lies in $\mathfrak m^n$. For the other
+bound, apply the finite-generator power estimate to the family
+$(\bar x_v)$ with every exponent equal to $n$. That estimate follows
+by induction on the generator family from
+$(I+J)^{a+b}\subseteq I^a+J^b$; the extra one handles the empty family.
+The augmentation ideal is finitely generated. Thus if
+$\mathfrak m\subseteq\sqrt L$, some power $\mathfrak m^r$ lies in $L$,
+and then $J_r\subseteq L$ as well. The corresponding costructured-arrow
+categories are nonempty, and any two objects are connected by the arrow
+from the larger exponent to the smaller. This proves initiality for
+both diagrams, including zero generators and the empty vertex set.
+\end{proof}
+
+\begin{theorem}[Generator-power stages for derived Ext local cohomology]\label{thm:generator-power-ext-colimit}
+\uses{def:local-cohomology,lem:generator-power-ideals}
+With $A$, $\mathfrak m$ and $J_n$ as above, for every cohomological degree
+$q\in\mathbb N$ there is an $A$-linear isomorphism
+\[
+ \operatorname*{colim}_{n}\operatorname{Ext}^q_A(A/\mathfrak m^n,A)
+ \ \cong\
+ \operatorname*{colim}_{n}\operatorname{Ext}^q_A(A/J_n,A).
+\]
+Both sides use the derived-category Ext implementation of the project.
+The maps come from quotient maps as the exponent increases. The power
+index $n$ and the cohomological degree $q$ are independent; no shift
+in degree is made. This is a normalization of the stage system and
+does not assert a positive-degree comparison with Čech cohomology.
+\lean{Reisner.Complex.faceRingGeneratorPowersDiagram, Reisner.Complex.faceRingGeneratorPowerExtDiagram, Reisner.Complex.faceRingLocalCohomologyIsoGeneratorPowerExtColimit}
+\leanok
+\end{theorem}
+\begin{proof}
+Form the derived Ext diagram with coefficient module $A$ on the opposite
+of the category of ideals $L$ with $\mathfrak m\subseteq\sqrt L$.
+The two opposite initial functors of
+Lemma~\ref{lem:generator-power-ideals} are final, so their restrictions
+have canonically isomorphic colimits. These restricted diagrams are
+definitionally the two displayed quotient Ext diagrams. Finally,
+evaluation at $A$ commutes with the functor-category colimit defining
+the project's local-cohomology functor.
+\end{proof}
+
+\begin{lemma}[Derived Ext vanishing from a scalar]\label{lem:localized-ext-scalar}
+Let $A$ be a commutative ring and $M,N$ $A$-modules. If some $r\in A$
+acts by zero on $M$ and acts invertibly on $N$, then
+\[
+  \operatorname{Ext}^q_A(M,N)=0\qquad(q\in\mathbb N).
+\]
+In particular, if $r\in J$ and its image is a unit in a commutative
+$A$-algebra $B$, then $\operatorname{Ext}^q_A(A/J,B)=0$ for every $q$.
+\lean{Reisner.derivedExt_eq_zero_of_smul_id_eq_zero, Reisner.derivedExt_eq_zero_of_annihilator_isUnit, Reisner.derivedExt_quotient_eq_zero_of_mem_of_isUnit}
+\leanok
+\end{lemma}
+\begin{proof}
+The derived Ext module structure identifies multiplication by $r$ induced
+from the source with multiplication by $r$ induced from the target. The
+source map is zero, while the target map is an isomorphism. Its induced Ext
+map is therefore both zero and injective, so every Ext class vanishes. For
+$A/J$, membership $r\in J$ says exactly that $r$ annihilates the quotient.
+\end{proof}
+
+\begin{theorem}[Ext-colimit vanishing on nonempty Čech rows]\label{thm:localized-ext-rows}
+\uses{lem:localized-ext-scalar,def:local-cohomology}
+Let $K$ be a simplicial complex on an ambient vertex type $V$, let $R$ be
+any commutative ring, put $A=R[K]$ and $\mathfrak m=(\bar x_v:v\in V)$.
+For every nonempty finite index $F\subseteq V$, exponent $n\in\mathbb N$
+and cohomological degree $q\in\mathbb N$,
+\[
+  \operatorname{Ext}^q_A(A/\mathfrak m^n,A_{x_F})=0,
+  \qquad H^q_{\mathfrak m}(A_{x_F})=0,
+\]
+where $A_{x_F}$ inverts the product of the variables indexed by $F$ and
+local cohomology is the project's derived Ext-colimit model. This includes
+$n=0$, ghost variables, and nonface indices; no Noetherian or nontriviality
+hypothesis is required. The empty index $F=\varnothing$ is intentionally
+excluded.
+\lean{Reisner.Complex.faceRingLocalization_variable_isUnit, Reisner.Complex.faceRingLocalization_augmentationPower_ext_eq_zero, Reisner.Complex.faceRingLocalization_generatorPower_ext_eq_zero, Reisner.Complex.faceRingLocalization_augmentationPower_ext_isZero, Reisner.Complex.faceRingLocalization_localCohomology_isZero}
+\leanok
+\end{theorem}
+\begin{proof}
+Choose $v\in F$. Its class belongs to $\mathfrak m$, so $\bar x_v^n$
+annihilates $A/\mathfrak m^n$. Since $\bar x_v$ divides the inverted
+product $x_F$, it is a unit in $A_{x_F}$. Lemma~\ref{lem:localized-ext-scalar}
+gives the stage vanishing for every $q$, including $n=0$. The result is
+valid even when $F$ is a nonface: then the localization is the zero ring,
+where the same unit argument applies. If every stage is zero, the colimit
+is zero, proving the local-cohomology assertion.
+\end{proof}
+
+\begin{theorem}[Acyclicity of positive Čech terms]\label{thm:cech-acyclic-terms}
+\uses{def:local-cohomology,thm:localized-ext-rows}
+Let $K$ be a simplicial complex on a finite vertex set $V$, let $R$ be any
+commutative ring, and let $A=R[K]$ with augmentation ideal $\mathfrak m$.
+The functor $H^q_{\mathfrak m}(-)$ defined by the project's derived
+Ext-colimit is additive and preserves finite products. Consequently, for
+every positive Čech degree $p>0$ and every $q\in\mathbb N$,
+\[
+  \operatorname{Ext}^q_A(A/\mathfrak m^n,C^p(K;A))=0\quad(n\in\mathbb N),
+  H^q_{\mathfrak m}(C^p(K;A))=0,
+  \qquad C^p(K;A)=\prod_{|F|=p} A_{x_F}.
+\]
+No Noetherian hypothesis is needed for this acyclicity statement.
+\lean{Reisner.depthExtTargetFunctor_additive, Reisner.depthExtTargetFunctor_preservesFiniteProducts, Reisner.depthExtLocalCohomology_additive, Reisner.depthExtLocalCohomology_preservesFiniteProducts, Reisner.Complex.faceRingCechCochain_augmentationPower_ext_isZero, Reisner.Complex.faceRingCechCochain_localCohomology_isZero}
+\leanok
+\end{theorem}
+\begin{proof}
+The target Ext functor and its colimit are additive, hence preserve finite
+products. In positive Čech degree every index $F$ is nonempty.
+Theorem~\ref{thm:localized-ext-rows} makes each localized factor Ext-acyclic
+at every stage, so finite-product preservation gives the stagewise vanishing
+for $C^p$. Taking the colimit gives the stated local-cohomology vanishing.
+\end{proof}
+
+\begin{theorem}[The fixed-stage Ext-applied Čech complex]\label{thm:cech-ext-complex}
+\uses{def:local-cohomology,thm:cech-acyclic-terms}
+Let $K$ be a finite simplicial complex, $R$ a commutative ring,
+$A=R[K]$, and $\mathfrak m=(\bar x_v:v\in V)$. For each fixed $n,q$,
+first apply $\operatorname{Ext}^q_A(A/\mathfrak m^n,-)$ termwise to the
+face-ring-linear extended Čech complex of $A$. The resulting complex has
+zero terms in every positive Čech degree, and hence zero homology there.
+Its degree-zero homology is canonically $\operatorname{Ext}^q_A(A/\mathfrak m^n,A)$.
+This is a fixed-stage complex statement; it does not assert that termwise
+application of $\operatorname{Ext}^q$ commutes with Čech cohomology. The
+comparison with the colimit and the double-complex identification are still
+outstanding. Separately, for the cofinal generator-power ideals
+$J_n=(\bar x_v^n:v\in V)$, the same positive-term and positive-homology
+vanishing holds for $\operatorname{Ext}^q_A(A/J_n,-)$. These are the stages
+of the checked local-cohomology Ext colimit. Their quotient-induced transition
+maps are now assembled into a coherent diagram of complexes. The degree-zero
+term diagram is naturally isomorphic to the established generator-power Ext
+diagram; after taking the colimit, its degree-zero term is the local-cohomology
+module. Every positive term, and hence positive homology, of the colimit
+complex vanishes. This colimit complex is obtained by applying each fixed
+$\operatorname{Ext}^q$ functor to the Čech cochains before taking the stage
+colimit. It is not the original Čech complex and does not identify its
+positive-degree cohomology with local cohomology. The double-complex or
+acyclic-resolution comparison remains open.
+\lean{Reisner.Complex.faceRingLocalizationMapA, Reisner.Complex.faceRingLocalizationMapA_algebraMap, Reisner.Complex.faceRingLocalizationMapA_toRingHom, Reisner.Complex.cechDifferentialA, Reisner.Complex.cechDifferentialA_apply, Reisner.Complex.cechDifferentialA_comp_eq_zero, Reisner.Complex.faceRingCechComplex, Reisner.Complex.faceRingCechExtComplex, Reisner.Complex.faceRingCechExtComplex_X_isZero, Reisner.Complex.faceRingCechExtComplex_exactAt, Reisner.Complex.faceRingCechExtComplex_homology_isZero, Reisner.Complex.faceRingLocalizationEmptyEquivA, Reisner.Complex.cechZeroFaceRingEquivA, Reisner.Complex.faceRingCechExtZeroTermIso, Reisner.Complex.faceRingCechExtComplex_zeroTermIso, Reisner.Complex.faceRingCechExtComplex_zeroHomologyIso, Reisner.Complex.faceRingCechExtComplex_zeroExtIso, Reisner.Complex.faceRingCechCochain_generatorPower_ext_isZero, Reisner.Complex.faceRingGeneratorPowerCechExtComplex, Reisner.Complex.faceRingGeneratorPowerCechExtComplex_X_isZero, Reisner.Complex.faceRingGeneratorPowerCechExtComplex_homology_isZero, Reisner.Complex.faceRingGeneratorPowerExtFunctorDiagram, Reisner.Complex.faceRingGeneratorPowerCechExtDiagram, Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_obj, Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_map_f, Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_evalIso, Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_zeroTermIso, Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_X_isZero, Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_zeroTermColimitIso, Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_colimitZeroTermIso, Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_colimit_X_isZero, Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_colimit_homology_isZero, Reisner.Complex.faceRingLocalCohomologyIsoGeneratorPowerCechExtZeroTermColimit}
+\leanok
+\end{theorem}
+\begin{proof}
+The localization transition maps are maps of $A$-algebras. Their induced
+signed differential agrees with the existing coefficient-ring differential,
+so the checked square-zero identity gives a complex in $A$-modules. The
+fixed-stage Ext functor maps this complex to another complex. By
+Theorem~\ref{thm:cech-acyclic-terms}, every positive-degree term is zero;
+exactness and homology vanishing follow immediately.
+In degree zero the Čech term is the face ring itself, so its Ext image is
+canonically $\operatorname{Ext}^q_A(A/\mathfrak m^n,A)$. The vanishing of the next term
+and the absent incoming differential at zero identify this with the degree-zero
+homology of the Ext-applied complex.
+\end{proof}
+
+\begin{theorem}[Cech comparison: external foundation]\label{found:cech}
+\uses{def:local-cohomology,thm:generator-power-ext-colimit,thm:localized-ext-rows,thm:cech-acyclic-terms}
+Let $B$ be Noetherian and let $J=(f_v:v\in V)$ for a finite ordered set
+$V$. For a $B$-module $M$, the extended cochain complex
 \[
  C^q(f;M)=\bigoplus_{|F|=q}M_{f_F},\qquad f_F=\prod_{v\in F}f_v,
  \quad C^0=M,
 \]
-with alternating localization maps computes $H^q_J(M)$.
+with alternating localization maps has cohomology naturally isomorphic to
+the Ext-colimit model $H^q_J(M)$. For this project the required instance
+is only $B=A=R[K]$, $M=A$, and $J=\mathfrak m=(\bar x_v:v\in V)$; use
+this natural isomorphism to transport the Cech fine grading. No theorem
+for arbitrary modules or ideals should be implemented first.
 \end{theorem}
-This is Stacks, Lemma 47.9.1, together with the Noetherian comparison in
-Section 47.10 \cite{stacks-cech}. Localizations are flat, so the displayed
-complex for a module represents the derived tensor expression there.
-Inverting zero gives the zero module, which handles ghost variables and
-nonface products. The comparison is a substantial unformalized node.
+This follows from the Ext-colimit description in Stacks, Lemma 47.8.2,
+and its extended Cech model in Lemma 47.9.1 and Section 47.10
+\cite{stacks-cech}. Mathlib supplies the Ext-colimit definition but does
+not supply this Cech comparison. Theorem~\ref{thm:ext-zero-cech-cohomology}
+proves the degree-zero comparison for the face ring as an $R$-module.
+Theorem~\ref{thm:generator-power-ext-colimit} supplies the generator-power
+Ext stage system in all degrees, but does not identify it with Koszul
+or Čech cohomology. In particular, the variables can be zero divisors,
+so their Koszul complexes must not be assumed to resolve the quotients.
+The grading-compatible comparison in all degrees remains an external
+input to the informal proof. Inverting zero gives zero, which handles
+ghost variables and nonface products.
 
 \begin{theorem}[Depth detection: external foundation]\label{found:depth}
 \uses{def:cm,def:local-cohomology}
@@ -987,8 +1605,9 @@ $\operatorname{depth}_J$ is maximal regular-sequence length in $J$.
 For a local ring with $J$ maximal this is ordinary local depth.
 \end{theorem}
 This is Stacks, Lemma 47.11.1, tag 0AVZ \cite{stacks-depth}.
-Mathlib has Ext depth and a regular-sequence comparison, but no use of a
-depth/local-cohomology bridge is assumed to be available in this milestone.
+Mathlib supplies Ext-defined ideal depth and its regular-sequence
+characterization. Theorem~\ref{thm:depth-cutoff} proves the finite-cutoff
+form for a Noetherian local ring as a module over itself.
 
 \begin{theorem}[Depth bound: external foundation]\label{found:depth-bound}
 \uses{def:cm}
@@ -996,26 +1615,94 @@ For a nonzero finite module $M$ over a Noetherian local ring $B$,
 $\operatorname{depth} M\le\dim\operatorname{Supp} M$.
 In particular $\operatorname{depth} B\le\dim B$.
 \end{theorem}
-This is Stacks, Lemma 10.72.3 \cite{stacks-depth-def}. It is a separate
-algebraic comparison still required for the formal route.
+This is Stacks, Lemma 10.72.3 \cite{stacks-depth-def}.
 
-\begin{corollary}[Cohen--Macaulayness detected by local cohomology]\label{cor:cm-lc}
-\uses{prop:dimension,found:graded-cm,found:depth,found:depth-bound,found:cech}
-Writing $d=d(K)$, $A$ is Cohen--Macaulay if and only if
-$H^q_{\mathfrak m}(A)=0$ for all $0\le q<d$.
+\begin{lemma}[Depth bound at the augmentation ideal]\label{lem:augmentation-depth-bound}
+\uses{prop:dimension,def:cm}
+Let $K$ be a simplicial complex on a finite ambient vertex set and $k$ a
+field. For the localization $B=k[K]_{\mathfrak m}$ at the augmentation
+ideal, $\operatorname{depth} B\le d(K)$, the maximum face cardinality.
+\lean{Reisner.Complex.faceRing_atAugmentation_depth_le}
+\leanok
+\end{lemma}
+\begin{proof}
+\leanok
+The Noetherian local ring $B$ has depth equal to the supremum of the
+lengths of its regular sequences in the maximal ideal. Take one such
+sequence of length $r$ and let $J$ be the ideal it generates.
+The quotient $B/J$ is nonzero by regularity, so $\dim(B/J)\ge 0$.
+The regular-sequence dimension formula gives $\dim(B/J)+r=\dim B$.
+Thus $r\le \dim B=d(K)$ by Proposition~\ref{prop:dimension}.
+Taking the supremum proves the bound.
+\end{proof}
+
+\begin{corollary}[Cohen--Macaulayness at the augmentation ideal]\label{cor:augmentation-local-cm}
+\uses{lem:augmentation-depth-bound,prop:dimension,thm:depth-cutoff}
+Let $B=k[K]_{\mathfrak m}$ be the augmentation localization of the face
+ring of a simplicial complex on a finite ambient vertex set over a field
+$k$, and let $\mathfrak n$ be the maximal ideal of $B$. Then
+\[
+  \operatorname{depth}B=\dim B
+  \quad\Longleftrightarrow\quad
+  H^q_{\mathfrak n}(B)=0\quad\text{for all }0\le q<d(K).
+\]
+\lean{Reisner.Complex.faceRing_atAugmentation_depth_eq_iff_localCohomology_vanishes}
+\leanok
 \end{corollary}
 \begin{proof}
-The graded local test reduces to depth at $\mathfrak m$.
-Localize the Cech complex to get local cohomology of $A_{\mathfrak m}$;
-flatness of localization lets it commute with kernels, images and cohomology.
-Each cohomology module is $\mathfrak m$-power torsion
-(use the colimit-of-Ext description in Stacks, Lemma 47.8.2),
-and its localization at $\mathfrak m$ detects zero. Indeed, for an element
-annihilated by $\mathfrak m^r$, any $s\notin\mathfrak m$ is a unit modulo
-$\mathfrak m^r$ because that quotient is local. Thus $sz=0$ implies $z=0$.
-Apply depth detection in the local ring and the bound
-$\operatorname{depth} A_{\mathfrak m}\le\dim A_{\mathfrak m}=d$.
-All these comparison steps remain future Lean work; none is an axiom.
+\leanok
+By Theorem~\ref{thm:depth-cutoff}, the vanishing condition is equivalent
+to $d(K)\le\operatorname{depth}B$. Lemma~\ref{lem:augmentation-depth-bound}
+gives the reverse inequality and Proposition~\ref{prop:dimension}
+identifies $d(K)$ with $\dim B$. When $K=\{\varnothing\}$, the cutoff
+is zero, so the vanishing condition is vacuous and depth and dimension
+are both zero.
+\end{proof}
+
+\begin{corollary}[Vanishing and the homogeneous maximal ideal test]\label{cor:homogeneous-maximal-cm-cutoff}
+\uses{def:cm,lem:face-ring-graded-maximal,cor:augmentation-local-cm}
+Let $A=k[K]$ over a field, with finite ambient vertex set. Write
+$B=A_{\mathfrak m}$, $\mathfrak n=\mathfrak m B$, and $d=d(K)$.
+The following conditions are equivalent.
+\begin{enumerate}
+\item $A_{\mathfrak p}$ is a Cohen--Macaulay local ring for every
+prime $\mathfrak p$ maximal among proper homogeneous ideals of $A$.
+\item $H^q_{\mathfrak n}(B)=0$ for every $0\le q<d$.
+\end{enumerate}
+\lean{Reisner.Complex.faceRing_homogeneousMaximal_cm_iff_localCohomology_vanishes}
+\leanok
+\end{corollary}
+\begin{proof}
+\leanok
+Lemma~\ref{lem:face-ring-graded-maximal} identifies the only ideal to
+test with $\mathfrak m$, which is prime since $A/\mathfrak m=k$.
+Apply Corollary~\ref{cor:augmentation-local-cm} to $B$.
+\end{proof}
+
+\begin{corollary}[Global Cohen--Macaulayness implies augmentation-local vanishing]\label{cor:global-cm-implies-vanishing}
+\uses{def:cm,prop:augmentation,cor:augmentation-local-cm}
+Under the same assumptions on $A$ and $B$, if $A$ is Cohen--Macaulay
+then $H^q_{\mathfrak n}(B)=0$ for every $0\le q<d(K)$.
+\lean{Reisner.Complex.faceRing_localCohomology_vanishes_of_isCohenMacaulay}
+\leanok
+\end{corollary}
+\begin{proof}
+\leanok
+Apply the global algebraic definition at the augmentation prime
+and then Corollary~\ref{cor:augmentation-local-cm}.
+\end{proof}
+
+\begin{corollary}[Cohen--Macaulayness detected by local cohomology]\label{cor:cm-lc}
+\uses{found:graded-cm,cor:homogeneous-maximal-cm-cutoff,cor:global-cm-implies-vanishing}
+Let $B=A_{\mathfrak m}$ and $\mathfrak n=\mathfrak mB$. Writing
+$d=d(K)=\dim B$, the algebraic ring $A$ is Cohen--Macaulay if and only if
+$H^q_{\mathfrak n}(B)=0$ for all $0\le q<d$.
+\end{corollary}
+\begin{proof}
+The forward implication is Corollary~\ref{cor:global-cm-implies-vanishing}.
+For the converse, Corollary~\ref{cor:homogeneous-maximal-cm-cutoff} gives
+Cohen--Macaulayness at every maximal homogeneous ideal. The external
+graded local test gives Cohen--Macaulayness of $A$.
 \end{proof}
 
 \section{Computing the Cech pieces}
@@ -1698,9 +2385,118 @@ integer degree equality.
 The complex isomorphism and its homology comparisons use the checked
 component maps, the embedding extension, and mathlib homology transport.
 The positive-coordinate and nonface-negative-support zero cases remain
-the separate checked results. The local-cohomology
-comparison, full reduced chain model and duality, and full link formula
-remain future work.
+the separate checked results. The positive-degree local-cohomology
+comparison and the local-cohomology link formula remain future work; the
+augmented chain complex is checked separately in
+Lemma~\ref{lem:augmented-chain-complex}, while canonical homology duality
+remains open.
+\end{proof}
+
+\begin{theorem}[Uniform vanishing for the actual Cech complex]\label{cor:cech-uniform-link}
+\uses{lem:cech-grading,lem:contraction,lem:cech-nonpositive-indices,
+lem:cech-link-cohomology-comparison}
+Let $K$ be a complex on a finite linearly ordered ambient set $V$, let $R$
+be a commutative ring, and let $d\in\mathbb N$. Then the actual extended
+Cech complex satisfies
+\[
+ H^q(C^\bullet(K;R))=0\quad(0\le q<d)
+\]
+if and only if for every face $F\in K$ and every $r\in\mathbb N$ with
+$|F|+r<d$, the augmented reduced cohomology of the link vanishes in degree
+$r-1$:
+\[
+ \widetilde H^{r-1}(\operatorname{lk}_K F;R)=0.
+\]
+This statement is about the checked Cech complex and link cohomology. It does
+not identify Cech cohomology with Ext-colimit local cohomology or replace
+cohomology by homology.
+\lean{Reisner.Complex.cechCohomology_vanishes_iff_linkCohomology_vanishes}
+\leanok
+\end{theorem}
+\begin{proof}
+\leanok
+The checked fine-degree decomposition identifies total Cech cohomology with
+the direct sum of its fine-degree cohomology objects. A strand with a positive
+coordinate is contractible. In a nonpositive degree, a nonface negative
+support gives the zero complex, and a face negative support $N$ gives zero
+below $|N|$ and the reduced cohomology of $\operatorname{lk}_K N$ in degree
+$q-|N|-1$ at or above the cutoff. This proves one direction by taking the
+fine degree equal to $-1$ on a chosen face and zero elsewhere; the converse
+applies the checked strand cases and the assumed vanishing for each face.
+The argument includes the empty face and $r=0$, hence reduced degree $-1$.
+When $d=0$ both sides are vacuous. No field or nonempty-vertex hypothesis is
+needed.
+\end{proof}
+
+\begin{corollary}[Čech cutoff in link homology]\label{cor:cech-uniform-link-homology}
+\uses{cor:cech-uniform-link,lem:dual}
+Let $K$ be a finite augmented complex, $k$ a field, and $d\in\mathbb N$.
+The actual extended Čech cohomology vanishes in degrees $q<d$ if and only if
+for every face $F\in K$ and $r\in\mathbb N$ with $|F|+r<d$, the augmented
+chain homology of $\operatorname{lk}_K F$ vanishes in face-cardinality
+degree $r$ (reduced degree $r-1$). Equivalently, for every face $F$ and
+every $i\in\mathbb Z$ with $|F|+i+1<d$, the integer reduced homology
+$\widetilde H_i(\operatorname{lk}_K F;k)$ vanishes.
+\lean{Reisner.Complex.cechCohomology_vanishes_iff_linkHomology_vanishes, Reisner.Complex.cechCohomology_vanishes_iff_linkHomologyInt_vanishes}
+\leanok
+\end{corollary}
+\begin{proof}
+The checked cohomological cutoff theorem reduces the claim to each link,
+where Lemma~\ref{lem:dual} converts cohomology vanishing to homology
+vanishing. For $i\geq-1$ put $r=(i+1).\mathrm{toNat}$; then $r-1=i$
+and the two cutoffs agree. Degrees below $-1$ already vanish by the zero
+extension. This includes $r=0$, where the empty face supplies the reduced
+degree $-1$ term, and includes $d=0$ without imposing an extra condition.
+\end{proof}
+
+\begin{corollary}[Čech vanishing, purity, and link vanishing]\label{cor:cech-purity}
+\uses{cor:cech-uniform-link,lem:link-calculus,def:dimension}
+Let $K$ be a finite augmented complex and $k$ a field. Vanishing of the
+actual extended Čech cohomology below $d(K)$ is equivalent to the conjunction
+that every facet has cardinality $d(K)$ and that, for every face $F$,
+\[
+ \widetilde H^i(\operatorname{lk}_K F;k)=0
+ \quad\text{for all }i<\dim(\operatorname{lk}_K F).
+\]
+This is a Čech-side characterization. It does not assert the missing
+positive-degree comparison with algebraic local cohomology.
+\lean{Reisner.Complex.cechCohomology_vanishes_iff_pure_and_linkCohomology_vanishes}
+\leanok
+\end{corollary}
+\begin{proof}
+The actual Čech cutoff gives uniform link-cohomology vanishing. A facet of
+size less than $d(K)$ has link $\{\varnothing\}$, whose degree $-1$
+cohomology is nonzero over a field; hence all facets have size $d(K)$.
+Purity gives equality in the link-dimension bound. Conversely, under purity,
+vanishing below each link's own dimension implies the uniform bound and thus
+actual Čech vanishing. The empty face, facet links and reduced degree $-1$
+are included.
+\end{proof}
+
+\begin{corollary}[Čech vanishing, purity, and reduced link homology]\label{cor:cech-purity-homology}
+\uses{cor:cech-purity,lem:dual}
+Let $K$ be a finite augmented complex and $k$ a field. The actual extended
+Čech cohomology vanishes in every natural degree $q<d(K)$ if and only if
+every facet has cardinality $d(K)$ and
+\[
+ \widetilde H_i(\operatorname{lk}_K F;k)=0
+ \quad\text{for every face }F\text{ and every }i\in\mathbb Z
+ \text{ with }i<\dim(\operatorname{lk}_K F).
+\]
+The purity conjunct and own-link dimension cutoffs are retained exactly.
+No connectivity hypothesis is added. The statement includes
+$K=\{\varnothing\}$, ghost vertices, and facet links of dimension $-1$.
+It remains a Čech-side statement pending comparison with algebraic local
+cohomology.
+\lean{Reisner.Complex.cechCohomology_vanishes_iff_pure_and_linkHomology_vanishes}
+\leanok
+\end{corollary}
+\begin{proof}
+Apply Corollary~\ref{cor:cech-purity} and replace the cohomology vanishing
+condition for each link in each integer degree by the equivalent homology
+vanishing condition from Lemma~\ref{lem:dual}. This leaves purity and all
+dimension bounds unchanged. Below degree $-1$ the condition is automatic;
+at degree $-1$ it uses augmented homology and retains the empty-face term.
 \end{proof}
 
 \begin{theorem}[Local-cohomology link formula]\label{thm:lc-link}
@@ -1763,7 +2559,7 @@ For $d=0$ both assertions are vacuous after the below-minus-one convention.
 \section{Purity and the complete criterion}
 
 \begin{lemma}[Linkwise vanishing forces purity]\label{lem:purity}
-\uses{lem:link-calculus,lem:dual}
+\uses{lem:link-calculus,lem:dual,lem:homology-connectivity}
 If $\widetilde H_i(\operatorname{lk}_K F;k)=0$ for every face $F$ and
 every integer $i<\dim\operatorname{lk}_K F$, then $K$ is pure: all facets
 have the same cardinality.
@@ -1772,7 +2568,8 @@ have the same cardinality.
 Induct on $\dim K\ge-1$. Dimension $-1$ has only the empty facet, and
 dimension zero has only singleton facets. For dimension at least one,
 the hypothesis for the empty face gives $\widetilde H_0(K;k)=0$, so the
-vertex-edge graph is connected. For an actual vertex $v$, its link has
+vertex-edge graph is connected by Lemma~\ref{lem:homology-connectivity}.
+For an actual vertex $v$, its link has
 smaller dimension and satisfies the same hypothesis: every link inside it
 is the link of a face containing $v$, by link calculus. The induction
 hypothesis makes this vertex link pure. Its facets correspond to facets
@@ -1786,8 +2583,9 @@ derives purity and does not add it as an extra assumption.
 
 \begin{theorem}[Reisner's criterion]\label{thm:reisner}
 \uses{cor:cm-lc,cor:uniform,lem:purity,lem:link-calculus}
-Let $k$ be any field and $K$ a complex on a finite ambient set containing
-the empty face. Its Stanley--Reisner ring is Cohen--Macaulay, in the
+\lean{Reisner.Complex.LinkHomologyVanishesBelowDimension, Reisner.Complex.reisner_criterion}
+Let $k$ be any field and $K$ a complex containing the empty face on a
+finite ambient vertex set. Its Stanley--Reisner ring is Cohen--Macaulay, in the
 algebraic sense of Definition~\ref{def:cm}, if and only if
 \[
  \widetilde H_i(\operatorname{lk}_K\sigma;k)=0
@@ -1872,12 +2670,16 @@ Lemma~\ref{lem:cech-link-cohomology-comparison} now packages these maps as
 an actual isomorphism to the link complex extended by zero below $|N|$.
 It identifies actual Cech cohomology in degree $|N|+r$ with the link's
 integer-indexed cohomology in degree $(r:\mathbb Z)-1$, including $r=0$,
-and proves vanishing below $|N|$. The augmented chain model,
-order independence,
-homology--cohomology duality, the remaining link calculus, and comparison
-with local cohomology in
-Theorem~\ref{thm:lc-link}, depth comparison, and Reisner's criterion remain
-future Lean work.
+and proves vanishing below $|N|$. The augmented chain model and canonical
+homology--cohomology duality are now checked in every integer degree,
+including degree $-1$ and the low and high zero extensions. The link/facet
+calculus, the uniform Čech cutoff, and its characterization as explicit
+purity together with reduced link homology vanishing below each link's own
+dimension are checked as well. Order independence, the graph-connectivity
+comparison, the positive-degree comparison with local cohomology in
+Theorem~\ref{thm:lc-link}, and the graded-local transfer remain future Lean
+work. The statement of Theorem~\ref{thm:reisner} is present in Lean. Its
+proof remains open.
 
 \begin{thebibliography}{99}
 \bibitem{panov} T. Panov, \emph{Cohomology of face rings, and torus actions},
@@ -1898,11 +2700,15 @@ for the Cech calculation given above.
 \bibitem{stacks-cm} The Stacks Project, Sections 10.103--10.104,
 algebraic Cohen--Macaulay modules and rings.
 \url{https://stacks.math.columbia.edu/tag/00N7}.
+\bibitem{stacks-cm-localize} The Stacks Project, Lemma 10.104.5,
+localization of a Cohen--Macaulay local ring, tag 00NB.
+\url{https://stacks.math.columbia.edu/tag/00NB}.
 \bibitem{stacks-dimension} The Stacks Project, Sections 10.31, 10.60,
 10.114, Noetherian rings and dimension of finite type algebras over fields.
 \url{https://stacks.math.columbia.edu/tag/00OO}.
 \bibitem{stacks-cech} The Stacks Project, Lemma 47.9.1 and Section 47.10,
-extended Cech model and Noetherian comparison.
+extended Cech model and Noetherian comparison; Lemma 47.8.2, the Ext-colimit
+description of local cohomology.
 \url{https://stacks.math.columbia.edu/tag/0952}.
 \bibitem{stacks-depth} The Stacks Project, Lemma 47.11.1, depth and
 first nonzero local cohomology.

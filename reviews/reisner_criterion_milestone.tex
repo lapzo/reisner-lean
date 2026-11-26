@@ -1,0 +1,297 @@
+% !TeX program = xelatex
+\documentclass[11pt]{amsart}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{russian}
+\setotherlanguage{english}
+\setmainfont{Libertinus Serif}
+\setmonofont{DejaVu Sans Mono}
+\usepackage{microtype}
+\setlength{\emergencystretch}{2em}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,mathtools,unicode-math,tikz,listings,booktabs,tabularx,array,hyperref}
+\setmathfont{Libertinus Math}
+\usetikzlibrary{arrows.meta,positioning}
+\hypersetup{hidelinks,pdftitle={Критерий Райснера}}
+\newtheorem{lemma}{Лемма}[section]
+\newtheorem{theorem}{Теорема}[section]
+\lstdefinestyle{leanstyle}{basicstyle=\ttfamily\footnotesize,
+  columns=fullflexible,keepspaces=true,breaklines=true,frame=none,
+  showstringspaces=false,literate={σ}{{$\sigma$}}1 {ℤ}{{$\mathbb Z$}}1
+    {ℕ}{{$\mathbb N$}}1 {↔}{{$\leftrightarrow$}}1 {∀}{{$\forall$}}1
+    {∈}{{$\in$}}1 {→}{{$\to$}}1 {←}{{$\leftarrow$}}1
+    {∧}{{$\land$}}1 {∅}{{$\varnothing$}}1}
+\title{Обзор Lean-проекта. \\ \tiny{Критерий Райснера}}
+\author{Лев Ерченков}
+\date{}
+\begin{document}
+\begin{abstract}
+В данном файле изложен обзор теоремы из комбинаторной алгебры, которую автор
+формализовывал в Lean. Обзор состоит из формулировки утверждения и описания
+Lean-формализации.
+\end{abstract}
+\maketitle
+
+\section{Обзор утверждения: критерий Райснера}
+Пусть $\mathcal{K}$ — симплициальный комплекс\footnote{Напомним, что это семейство
+подмножеств множества вершин, замкнутое относительно перехода к
+подмножествам; пустое множество также принадлежит комплексу.} на конечном
+множестве вершин $V$, а $\mathbf{k}$ — поле. \textit{Кольцом
+Стэнли--Райснера} комплекса $\mathcal{K}$ над $\mathbf{k}$ называется
+фактор-кольцо
+\[
+  \mathbf{k}[\mathcal{K}]
+  :=\mathbf{k}[x_v\mid v\in V]/I_{\mathcal{K}},\qquad
+  I_{\mathcal{K}}:=\langle x_\sigma\mid \sigma\subseteq V,
+      \ \sigma\notin\mathcal{K}\rangle,
+  \qquad x_\sigma:=\prod_{v\in\sigma}x_v.
+\]
+Иными словами, $I_{\mathcal{K}}$ порождён мономами,
+носители которых не являются гранями $\mathcal{K}$.
+
+\textit{Глубиной} локального кольца $(R,\mathfrak n)$ называется максимальная длина
+регулярной последовательности $a_1,\ldots,a_r$ элементов $\mathfrak n$;
+это означает, что для каждого $j$ элемент $a_j$ не является делителем нуля
+в фактор-кольце $R/(a_1,\ldots,a_{j-1})$.
+
+Кольцо Стэнли--Райснера $\mathbf{k}[\mathcal{K}]$ называется
+\textit{кольцом Коэн--Маколея}, если каждая его
+локализация по простому идеалу является локальным кольцом с равными глубиной
+и размерностью Крулля \cite[Definitions~10.103.1 and 10.104.6]{Stacks}.
+Для грани $\sigma$ \textit{линк} определяется как
+\[
+  \operatorname{link}_{\mathcal{K}}(\sigma)
+  =\{\tau\in\mathcal{K}: \tau\cap\sigma=\varnothing,
+                    \ \tau\cup\sigma\in\mathcal{K}\}.
+\]
+Критерий Райснера утверждает \cite[Theorem~2.5]{Panov}:
+\begin{theorem}
+Следующие условия эквивалентны:
+\begin{itemize}
+  \item $\mathbf{k}[\mathcal{K}]$ — кольцо Коэн--Маколея;
+  \item $\widetilde H_i(\operatorname{link}_{\mathcal{K}}(\sigma);\mathbf{k})=0$
+    для каждой грани $\sigma\in\mathcal{K}$ и каждого $i\in\mathbb Z$,
+    удовлетворяющего $i<\dim\operatorname{link}_{\mathcal{K}}(\sigma)$.
+\end{itemize}
+\end{theorem}
+Условие проверяется для каждой грани, в том числе для пустой грани
+$\varnothing$, чей линк равен самому $\mathcal{K}$. Используется
+аугментированые гомологии: пустая грань лежит в степени $-1$, а группы
+ниже $-1$ равны нулю.
+
+В Lean условие Коэн--Маколея записано как \texttt{IsCohenMacaulay}, а
+условие о занулении гомологии линков как
+\texttt{LinkHomologyVanishesBelowDimension}. Ниже представлено объявление теоремы
+из файла \texttt{Reisner/ReisnerCriterion.lean}; контекст переменных и
+локальный экземпляр \texttt{IsNoetherianRing} заданы в этом файле. Объявление
+компилируется, но доказательство пока не завершено: в нём стоит
+\texttt{sorry}.
+
+\begin{lstlisting}[style=leanstyle]
+theorem reisner_criterion :
+    IsCohenMacaulay (K.FaceRing k) ↔
+      K.LinkHomologyVanishesBelowDimension k := by
+  sorry
+\end{lstlisting}
+
+\section{Схема доказательства критерия}
+
+Обозначим $A=\mathbf{k}[\mathcal{K}]$,
+$\mathfrak m=(x_v:v\in V)$ и
+$d=\max\{|\sigma|:\sigma\in\mathcal{K}\}=\dim A$.
+Доказательство сводит Коэн-Маколеевость кольца к занулению
+когомологий, а затем описываются эти когомологии через линки. Опишем план доказательства в обе стороны.
+
+Для вычислений нам понадобится \textit{комплекс Чеха} на переменных $x_v$, $v\in V$, — это коцепной
+комплекс с членами
+\[
+  C^q_{\check C}(A;x_v)
+  =\prod_{\substack{F\subseteq V\\|F|=q}} A_{x_F},
+  \qquad x_F=\prod_{v\in F}x_v,
+  \qquad 0\leqslant q\leqslant |V|.
+\]
+Здесь $x_\varnothing=1$, поэтому $C^0_{\check C}(A;x_v)=A$;
+дифференциалы являются знакопеременными суммами естественных отображений
+локализации $A_{x_F}\to A_{x_G}$ при $F\subset G$. Так как $A$ нётерово,
+когомологии этого комплекса совпадают с локальными когомологиями
+$H^q_{\mathfrak m}(A)$.
+
+\paragraph{\textbf{Коэн--Маколеевость $\Rightarrow$ условие на линки.}}
+Если $A$ — кольцо Коэн--Маколея, то локальное кольцо $A_{\mathfrak m}$ имеет
+глубину $d$. Критерий глубины через локальные когомологии даёт
+$H^q_{\mathfrak m}(A)=0$ при $q<d$ \cite[Lemma~47.11.1]{StacksDepth}. Кольцо Стэнли-Райснера $\mathbb{Z}^n$-градуировано, применяем
+формулу Хохстера для когомологий в степени $-\mathbf 1_\sigma$
+:
+\[
+  \bigl(H^q_{\mathfrak m}(A)\bigr)_{-\mathbf 1_\sigma}
+  \cong \widetilde H^{\,q-|\sigma|-1}
+       (\operatorname{link}_{\mathcal{K}}(\sigma);\mathbf{k}).
+\]
+(См. \cite[Theorem~5.1]{Welker}.)
+Здесь $\mathbf 1_\sigma$ — вектор, равный $1$ на вершинах грани $\sigma$
+и $0$ на остальных вершинах. Для требуемой степени $i\geqslant -1$ берём
+$q=|\sigma|+i+1$. Если
+$i<\dim\operatorname{link}_{\mathcal{K}}(\sigma)$, то
+$\dim\operatorname{link}_{\mathcal{K}}(\sigma)\leqslant d-|\sigma|-1$ (факт, верный для произвольного симплициального комплекса),
+следовательно $q<d$ и когомологии линка в этой размерности зануляются. Поскольку коэффиценты беруется в поле $\mathbf{k}$, то гомологии тоже зануляются. Степени ниже $-1$ зануляются по принятому
+аугментированному соглашению.
+
+\paragraph{\textbf{Условие на линки $\Rightarrow$  Коэн--Маколеевость.}}
+Сначала условие на зануление гомологий линков влечёт чистоту $\mathcal{K}$. Это доказывается
+индукцией по размерности. Для чистого комплекса
+\[
+  \dim\operatorname{link}_{\mathcal{K}}(\sigma)=d-|\sigma|-1.
+\]
+Тогда условие на все линки равносильно занулению групп локальных когомологий
+$H^q_{\mathfrak m}(A)$ при $q<d$. Критерий глубины показывает, что
+локализация $A_{\mathfrak m}$ является кольцом Коэн--Маколея. Затем, с помощью критерия
+для градуированных колец переносим этот результат на всё кольцо $A$
+\cite[Item~2.1.27]{BrunsHerzog}.
+
+Комбинаторный переход в этой схеме уже формализован через когомологии
+фактического комплекса Чеха. Сравнение их с локальными когомологиями в
+положительных степенях и остальные недоказанные переходы перечислены в конце.
+
+Приведём небольшой пример. Возьмём $\mathcal{K}=\partial\Delta^2$: три вершины и три ребра, но без внутренней
+двумерной грани. Геометрически это окружность, $\dim\mathcal{K}=1$. Кольцо
+Стэнли--Райснера имеет вид
+\[
+  \mathbf{k}[\mathcal{K}]\cong
+  \mathbf{k}[x_1,x_2,x_3]/(x_1x_2x_3).
+\]
+\begin{center}
+\small
+\begin{tabularx}{\textwidth}{@{}p{2cm}p{3.5cm}p{2.6cm}X@{}}
+\toprule
+\textbf{Грань $\sigma$} & \textbf{Линк} & \textbf{Размерность} &
+\textbf{Требуемое зануление групп гомологии} \\
+\midrule
+Пустое $\varnothing$ & $\mathcal{K}$ (окружность) & $1$ &
+Степени $-1,0$; обе группы равны нулю. Верхняя группа
+$\widetilde H_1(\mathcal{K};\mathbf{k})\cong\mathbf{k}$ разрешена. \\
+Вершина $\{v_1\}$ & Две изолированные вершины & $0$ &
+Только степень $-1$; группа равна нулю. Группа
+$\widetilde H_0\cong\mathbf{k}$ разрешена. \\
+Ребро $\{v_1,v_2\}$ & $\{\varnothing\}$ & $-1$ &
+Степени $i<-1$ равны нулю. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+Линки остальных вершин и рёбер имеют тот же вид. Значит, условие выполнено
+для каждой грани, и критерий заключает, что $\mathbf{k}[\mathcal{K}]$ является
+кольцом Коэн--Маколея.
+
+\section{Промежуточная лемма и её Lean-формализация}
+
+Следующая лемма доказана в Lean. Положим
+$d(\mathcal{K})=\max\{|\sigma|:\sigma\in\mathcal{K}\}$ — максимальное
+число вершин в грани. Через
+$C^\bullet_{\check C}(\mathbf{k}[\mathcal{K}])$ обозначим
+комплекс Чеха кольца
+Стэнли--Райснера, реализованный в проекте как
+\texttt{K.cechComplex k}.
+
+\begin{lemma}[Зануление комплекса Чеха и гомологии линков]\label{lem:cech-link-homology}
+Пусть $\mathcal{K}$ содержит пустую грань и задан на конечном
+линейно упорядоченном множестве вершин $V$, а $\mathbf{k}$ — поле.
+Следующие условия Эквивалентны:
+\begin{enumerate}
+\item $H^q(C^\bullet_{\check C}(\mathbf{k}[\mathcal{K}]))=0$ для всех
+      $q\in\mathbb N$ с $q<d(\mathcal{K})$;
+\item $\mathcal{K}$ чистый и для каждой грани $\sigma\in\mathcal{K}$ группы
+      редуцированных гомологий её линка зануляются ниже размерности линка:
+      \[
+        \forall i\in\mathbb Z,\qquad
+        i<\dim\operatorname{link}_{\mathcal{K}}(\sigma)
+        \ \Longrightarrow\
+        \widetilde H_i(\operatorname{link}_{\mathcal{K}}(\sigma);\mathbf{k})=0.
+      \]
+\end{enumerate}
+Здесь чистота означает, что все максимальные грани имеют $d(\mathcal{K})$ вершин;
+\end{lemma}
+
+Критерий Райснера формулирует комбинаторное условие через группы гомологий
+каждого линка. Эта лемма переводит его (вместе с чистотой) в единое условие на
+низкие степени комплекса Чеха. Так комбинаторную часть доказательства можно
+свести к занулению комплекса Чеха и затем сопоставить его с локальными
+когомологиями и глубиной кольца. Сама лемма такого сопоставления не доказывает:
+для полного критерия ещё нужны вывод чистоты из условия на все линки и переход
+от алгебраического свойства Коэн--Маколея к нужному занулению комплекса Чеха
+или к занулению локальных когомологий. Итоговая теорема
+\texttt{reisner\_criterion} в Lean пока содержит \texttt{sorry}.
+
+Ниже приведено точное объявление с доказательством. Заметим, что в Lean условие нулевой
+группы гомологии выражено через \texttt{Subsingleton}.
+\begin{lstlisting}[style=leanstyle]
+namespace Reisner.Complex
+universe u v
+
+variable {V : Type u} (K : Reisner.Complex V)
+  (k : Type v) [Field k] [Fintype V] [LinearOrder V]
+
+theorem cechCohomology_vanishes_iff_pure_and_linkHomology_vanishes :
+    (∀ q : ℕ, q < K.maxFaceCard →
+      Subsingleton ((K.cechComplex k).homology q)) ↔
+    (∀ F : K.facets, F.1.card = K.maxFaceCard) ∧
+      (∀ (σ : Finset V) (hσ : σ ∈ K.faces) (i : ℤ),
+        i < (K.link σ hσ).dimension →
+          Subsingleton (((K.link σ hσ).simplicialChainComplexInt k).homology i)) := by
+  rw [K.cechCohomology_vanishes_iff_pure_and_linkCohomology_vanishes k]
+  apply and_congr_right
+  intro _
+  refine forall_congr' fun σ => forall_congr' fun hσ => forall_congr' fun i =>
+    imp_congr_right fun _ => ?_
+  rw [← ModuleCat.isZero_iff_subsingleton,
+    ← ModuleCat.isZero_iff_subsingleton]
+  exact (K.link σ hσ).simplicialCochainInt_homology_isZero_iff_chainInt_homology_isZero k i
+
+end Reisner.Complex
+\end{lstlisting}
+
+Доказательство сначала переписывает зануление комплекса Чеха через уже
+установленное зануление когомологий линков. Затем с помощью двойственности
+аугментированных цепных и коцепных комплексов заменяются когомологии линков на
+гомологии, сохраняя целую степень, включая $-1$.
+\section{Что сделано в Lean}
+
+В Lean формализовано кольцо Стэнли--Райснера и использовано алгебраическое
+свойство Коэн--Маколея. Точная формулировка критерия записана для конечного
+множества вершин и поля; объявление компилируется, но доказательство пока
+содержит \texttt{sorry}.
+
+Уже доказано, что зануление когомологий фактического комплекса Чеха ниже
+$d(\mathcal{K})$ эквивалентно чистоте $\mathcal{K}$ и занулению
+гомологий каждого линка ниже его собственной размерности. Также доказана
+двойственность аугментированных цепных и коцепных комплексов во всех целых
+степенях, включая степень $-1$; степени ниже $-1$ зануляются по определению.
+
+
+\begin{thebibliography}{9}
+\bibitem{Panov}
+T. Panov, \emph{Cohomology of face rings, and torus actions},
+arXiv:math/0506526v3 (2007), Sections~2.1--2.2, Theorem~2.5.
+\url{https://arxiv.org/html/math/0506526v3}.
+
+\bibitem{Stacks}
+The Stacks Project, \emph{Algebra}, Definitions~10.103.1 and~10.104.6,
+Tags 00N3 and 00NC.
+\url{https://stacks.math.columbia.edu/tag/00N3};
+\url{https://stacks.math.columbia.edu/tag/00NC}.
+
+\bibitem{StacksDepth}
+The Stacks Project, Lemma~47.11.1, depth and the first nonzero local
+cohomology group, Tag 0AVZ.
+\url{https://stacks.math.columbia.edu/tag/0AVZ}.
+
+\bibitem{Welker}
+V. Welker, \emph{Which properties of Stanley--Reisner rings and simplicial
+complexes are topological?}, Section~5, Theorem~5.1.
+\url{https://www.mathematik.uni-marburg.de/~welker/preprints/top_survey.pdf}.
+
+\bibitem{BrunsHerzog}
+W. Bruns and J. Herzog, \emph{Cohen--Macaulay Rings}, revised edition,
+Cambridge Studies in Advanced Mathematics~39, Cambridge University Press,
+1998, Item~2.1.27.
+\end{thebibliography}
+
+\end{document}

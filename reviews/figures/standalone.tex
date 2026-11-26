@@ -1,0 +1,10 @@
+\documentclass[tikz,border=5pt]{standalone}
+\usepackage{amsmath}
+\usetikzlibrary{arrows.meta,positioning}
+\begin{document}
+\IfFileExists{reviews/figures/triangle_boundary.tikz}
+  {\input{reviews/figures/triangle_boundary.tikz}}
+  {\IfFileExists{figures/triangle_boundary.tikz}
+    {\input{figures/triangle_boundary.tikz}}
+    {\input{triangle_boundary.tikz}}}
+\end{document}

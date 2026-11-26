@@ -44,8 +44,16 @@ The signed termwise comparison with augmented link cochains, its extension to
 a shifted cochain-complex isomorphism, and the induced actual cohomology
 identification are checked. Below the shift, both cohomology objects vanish;
 at and above it, the result identifies Čech cohomology with link reduced
-cohomology in integer degree $r-1$. Higher-degree vanishing and the comparison
-with local cohomology remain future work.
+cohomology in integer degree $r-1$. In particular, vanishing of total Čech
+cohomology below any finite cutoff is equivalent to vanishing of the matching
+reduced cohomology of every link. This result also covers cutoff zero and
+degree $-1$. The degree-zero comparison with
+Ext-colimit local cohomology is checked over every commutative coefficient
+ring. Over a field, the augmentation localization is Cohen–Macaulay exactly
+when its maximal-ideal local cohomology vanishes below the maximum face
+cardinality. The augmentation ideal is the unique maximal proper homogeneous
+ideal, and global Cohen–Macaulayness implies this vanishing. The graded-local
+converse and the positive-degree Ext–Čech comparison remain external or open.
 :::
 
 ## The target {#target}
@@ -678,7 +686,7 @@ the empty-face and ghost-vertex conventions.
 
 The degreewise Čech cohomology decomposition and its positive-coordinate
 contracting homotopy are checked below. The comparison to local cohomology
-remains future work.
+in positive cohomological degrees remains open.
 
 ### Signed action on monomial cochains {#cech-basis-action}
 
@@ -838,7 +846,7 @@ These statements hold for arbitrary commutative coefficient rings.
 
 This establishes the index correspondence. The actual signed cochain
 comparison and its differential compatibility are described in the next
-section; the comparison with local cohomology and the full link formula remain
+section; the positive-degree comparison with local cohomology and the full link formula remain
 future work.
 
 ## Augmented simplicial cochains by face cardinality {#augmented-cochains}
@@ -959,11 +967,70 @@ integer-indexed complex.
 
 </details>
 
-This reindexing does not prove vanishing in higher degrees below the
-simplicial dimension. The augmented chain model and order-independence,
-cohomology duality, shifted Čech/link complex and cohomology identifications,
-local-cohomology comparison,
-and the full Reisner criterion remain future work.
+The local Ext-colimit depth cutoff is now checked: for every finite $d$,
+$d\le\operatorname{depth}(B)$ exactly when local cohomology vanishes below
+$d$. For a principal localization, the kernel is also checked to be exactly
+the submodule of elements killed by some power of the generator. This is the
+degree-zero starting point for the Čech comparison. For the face ring and its
+augmentation ideal, the degree-zero Ext-colimit module, with scalars
+restricted to the coefficient ring, is isomorphic to $H^0$ of the extended
+Čech complex. The map first gives a cycle in the kernel of the outgoing
+differential and then takes its cohomology class. Every incoming differential
+at degree zero vanishes, so this second map is an isomorphism.
+[Degree-zero comparison and checked source](blueprint.html#thm:ext-zero-cech-cohomology)
+
+Degree-zero derived Ext at each quotient stage is checked to be the usual Hom
+module, and maps from each quotient are identified with elements annihilated
+by its ideal. Positive-degree comparison, higher cohomology vanishing below
+the simplicial dimension, chain order-independence, homology-cohomology
+duality, and the proof of Reisner's criterion remain future work. Its full
+statement is linked in Lean with the proof explicitly pending. The augmented
+chain complex itself is checked using dual cochain terms and signed deletion.
+
+<details><summary>Checked local depth cutoff theorem</summary>
+
+<!-- LEAN:local-depth-cutoff -->
+
+</details>
+
+Over a field $k$, let $B=k[K]_{\mathfrak m}$ be the face ring localized at
+its augmentation ideal, and let $\mathfrak n$ be the maximal ideal of $B$.
+For a finite ambient vertex set, write $d$ for the maximum face cardinality.
+A regular sequence of length $r$ in $B$ gives a nonzero quotient of dimension
+$d-r$, so $\operatorname{depth} B\le d$. Since $\dim B=d$, the checked
+cutoff theorem gives the local Cohen–Macaulay criterion
+$$
+\operatorname{depth}B=\dim B
+\quad\Longleftrightarrow\quad
+H^q_{\mathfrak n}(B)=0\ \text{for every }0\le q<d.
+$$
+When the only face is the empty face, $d=0$ and the vanishing condition
+is vacuous.
+[Augmentation-local criterion and proof](blueprint.html#cor:augmentation-local-cm)
+
+<details><summary>Checked augmentation-local depth bound and vanishing criterion</summary>
+
+<!-- LEAN:full-local-cm-source -->
+
+</details>
+
+For the total grading of $A=k[K]$, every proper homogeneous ideal $I$ is
+contained in $\mathfrak m=A_+$. Indeed, if $x\in I$, then $x_0\in I$.
+A nonzero $x_0$ would be a unit, since $A_0=k$. Thus $x_0=0$ and
+$x\in A_+$. As $A/\mathfrak m=k$, the augmentation ideal is itself
+maximal. Testing local Cohen–Macaulayness at every maximal homogeneous
+ideal therefore amounts to the single vanishing test above. Global
+Cohen–Macaulayness implies this condition by specialization at
+$\mathfrak m$. The converse requires the Bruns–Herzog graded local theorem
+to extend from maximal homogeneous ideals to arbitrary primes.
+[Checked homogeneous maximal ideal test](blueprint.html#cor:homogeneous-maximal-cm-cutoff) ·
+[Graded local theorem](blueprint.html#found:graded-cm)
+
+<details><summary>Algebraic Cohen–Macaulayness and the homogeneous maximal ideal test</summary>
+
+<!-- LEAN:full-graded-local-source -->
+
+</details>
 
 <details id="full-simplicial-source"><summary>Complete augmented cochain Lean source</summary>
 
@@ -1032,7 +1099,7 @@ two, and the zero ring are included.
 
 This result compares terms and adjacent differentials. The next section
 packages the maps as an actual shifted complex isomorphism and transports its
-homology. The comparison with local cohomology and the full link formula
+homology. The positive-degree comparison with local cohomology and the full link formula
 remain future work.
 
 ## Shifted link complex and Čech cohomology {#cech-link-cohomology}
@@ -1253,9 +1320,42 @@ degree-$-1$ cohomology endpoints, integer reindexing, restriction and
 homology isomorphisms, and low/high term and cohomology cutoffs are checked.
 The signed termwise Čech/link equivalence, its shifted complex isomorphism and
 induced actual cohomology identification are also checked over arbitrary
-commutative rings. Higher-degree cohomology vanishing, full augmented chains
-and order comparison, duality, the graded local test, local-cohomology
-comparison, purity, and the full criterion remain future formalization work.
+commutative rings. Higher-degree cohomology vanishing, chain order comparison,
+duality, the graded local test, positive-degree
+local-cohomology comparison, and purity remain future formalization work. The
+criterion statement is linked in Lean; its proof remains open and contains
+the project's single intentional `sorry`.
+
+The Ext-colimit stage system now has a checked normalization in every
+cohomological degree: for $A=R[K]$ and $J_n=(\bar x_v^n:v\in V)$,
+augmentation-supported local cohomology of $A$ is the colimit of
+$\operatorname{Ext}^q_A(A/J_n,A)$. The bounds
+$J_n\subseteq\mathfrak m^n$ and
+$\mathfrak m^{|V|n+1}\subseteq J_n$ hold over every commutative
+coefficient ring, including the zero ring and the empty vertex set.
+This is a cofinality step toward the positive-degree comparison; the
+remaining Koszul or acyclic-resolution bridge is not yet checked.
+
+<!-- LEAN:generator-power-ideals -->
+
+<!-- LEAN:generator-power-ext-colimit -->
+
+<!-- LEAN:localized-ext-scalar -->
+
+<!-- LEAN:localized-ext-rows -->
+
+<!-- LEAN:cech-acyclic-terms -->
+
+The actual extended Čech complex is also now packaged in face-ring modules.
+Its face-ring-linear differential is proved equal to the existing
+coefficient-ring differential, so its square-zero law follows without a
+second sign computation. At a fixed augmentation-power quotient and Ext
+degree, applying the derived Ext functor gives a complex whose positive
+Čech-degree terms and homology are zero. Its degree-zero object and
+degree-zero homology are identified with the Ext of the face ring itself.
+The double-complex comparison with the colimit remains open.
+
+<!-- LEAN:cech-ext-complex -->
 
 ## Reproduce and inspect {#reproduce}
 
@@ -1277,11 +1377,19 @@ python3 -m http.server 8000 --directory site/dist
 [Blueprint PDF](blueprint.pdf) ·
 [Face-ring Lean source](source/StanleyReisner.lean) ·
 [Čech Lean source](source/Cech.lean) ·
+[Degree-zero Čech and Ext source](source/DegreeZero.lean) ·
+[Generator-power Ext comparison source](source/ExtComparison.lean) ·
+[Localized-target Ext vanishing source](source/LocalizedExt.lean) ·
 [Čech regression checks](source/Checks-Cech.lean) ·
 [Augmented cochain Lean source](source/SimplicialCochain.lean) ·
 [Augmented cochain checks](source/Checks-SimplicialCochain.lean)
 
+[Local cohomology Lean source](source/LocalCohomology.lean) ·
+[Augmentation-local criterion Lean source](source/LocalCohenMacaulay.lean) ·
+[Homogeneous maximal ideal test Lean source](source/GradedLocalTest.lean)
+
 [Expand the complete augmented cochain source](#full-simplicial-source)
+[Expand the complete local cohomology source](#full-local-cohomology-source)
 
 All the mathematical text, rendered equations, styles, and page interactions
 are included locally. No account or external math-rendering service is needed.
@@ -1289,6 +1397,12 @@ are included locally. No account or external math-rendering service is needed.
 <details id="full-source"><summary>Complete Lean source</summary>
 
 <!-- LEAN:full-source -->
+
+</details>
+
+<details id="full-local-cohomology-source"><summary>Complete local cohomology Lean source</summary>
+
+<!-- LEAN:full-local-cohomology-source -->
 
 </details>
 

@@ -1,5 +1,135 @@
 import Reisner
 
+#check Reisner.depthExtLocalCohomologyDiagram
+#check Reisner.depthExtLocalCohomology
+#check Reisner.depthExtLocalCohomology_stage_subsingleton
+#check Reisner.exists_nat_eq_depth_below_nat
+#check Reisner.depthExtLocalCohomology_stage_nontrivial
+#check Reisner.depthExtLocalCohomology_vanishes_below_depth
+#check Reisner.depthExtLocalCohomology_nontrivial_at_depth
+#check Reisner.le_depth_iff_localCohomology_vanishes
+#check Reisner.Complex.faceRing_atAugmentation_depth_le
+#check Reisner.Complex.faceRing_atAugmentation_depth_eq_iff_localCohomology_vanishes
+#check Reisner.IsLocalCohenMacaulay
+#check Reisner.IsCohenMacaulay
+#check Reisner.Complex.LinkHomologyVanishesBelowDimension
+#check Reisner.Complex.reisner_criterion
+#check Reisner.Complex.faceRing_irrelevant_eq_augmentation
+#check Reisner.Complex.faceRing_homogeneousIdeal_le_augmentation
+#check Reisner.Complex.faceRing_isCoatom_homogeneousIdeal_iff
+#check Reisner.Complex.faceRing_homogeneousMaximal_cm_iff_localCohomology_vanishes
+#check Reisner.Complex.faceRing_localCohomology_vanishes_of_isCohenMacaulay
+#check Reisner.principalLocalization_kernel_iff_torsion
+#check Reisner.depthExtLocalCohomology_extZero_quotientHomEquiv
+#check Reisner.depthExtQuotientHomTorsionEquiv
+#check Reisner.depthExt_zero_precomp_naturality
+#check Reisner.depthExtLocalCohomologyModuleDiagram_map_succ
+#check Reisner.depthExtQuotientHomTorsionEval_natural_of_one
+#check Reisner.depthExtLocalCohomology_transition_torsion_natural
+#check Reisner.principalPowerTorsion_eq
+#check Reisner.principalExtZeroKernelEquiv
+#check Reisner.depthExtLocalCohomology_zero_torsionSupEquiv
+#check Reisner.finiteLocalizationKernel
+#check Reisner.finiteGeneratorsLocalizationKernel_eq_powerTorsionSup
+#check Reisner.finiteGeneratorsExtZeroLocalizationKernelEquiv
+#check Reisner.Complex.cechZeroFaceRingEquiv
+#check Reisner.Complex.cechDifferential_zero_eq_zero_iff
+#check Reisner.Complex.cechZeroCyclesLocalizationEquiv
+#check Reisner.Complex.extZeroCechCyclesEquiv
+#check Reisner.Complex.cechZeroCyclesHomologyEquiv
+#check Reisner.Complex.extZeroCechCohomologyEquiv
+#check Reisner.span_finset_pow_le_of_generator_powers_mem
+#check Reisner.Complex.faceRingGeneratorPowerIdeal
+#check Reisner.Complex.faceRingGeneratorPowerIdeal_one
+#check Reisner.Complex.faceRingGeneratorPowerIdeal_le_pow
+#check Reisner.Complex.faceRingAugmentationIdeal_pow_le_generatorPowerIdeal
+#check Reisner.Complex.faceRingGeneratorPowerIdeal_antitone
+#check Reisner.Complex.faceRingGeneratorPowersDiagram
+#check Reisner.Complex.faceRingAugmentationIdeal_fg
+#check Reisner.Complex.faceRingAugmentationIdeal_le_generatorPowerIdeal_radical
+#check Reisner.Complex.faceRingGeneratorPowersToSelfLERadical
+#check Reisner.Complex.faceRingAugmentationPowers_initial
+#check Reisner.Complex.faceRingGeneratorPowers_initial
+#check Reisner.Complex.faceRingSupportedExtDiagram
+#check Reisner.Complex.faceRingGeneratorPowerExtDiagram
+#check Reisner.Complex.faceRingAugmentationPowerExtDiagramIso
+#check Reisner.Complex.faceRingGeneratorPowerExtDiagramIso
+#check Reisner.Complex.faceRingLocalCohomologyIsoGeneratorPowerExtColimit
+#check Reisner.derivedExt_eq_zero_of_smul_id_eq_zero
+#check Reisner.derivedExt_eq_zero_of_annihilator_isUnit
+#check Reisner.derivedExt_quotient_eq_zero_of_mem_of_isUnit
+#check Reisner.Complex.faceRingLocalization_variable_isUnit
+#check Reisner.Complex.faceRingLocalization_augmentationPower_ext_eq_zero
+#check Reisner.Complex.faceRingLocalization_generatorPower_ext_eq_zero
+#check Reisner.Complex.faceRingLocalization_augmentationPower_ext_isZero
+#check Reisner.Complex.faceRingLocalization_localCohomology_isZero
+#check Reisner.depthExtTargetFunctor_additive
+#check Reisner.depthExtTargetFunctor_preservesFiniteProducts
+#check Reisner.depthExtLocalCohomology_additive
+#check Reisner.depthExtLocalCohomology_preservesFiniteProducts
+#check Reisner.Complex.faceRingCechCochain_augmentationPower_ext_isZero
+#check Reisner.Complex.faceRingCechCochain_localCohomology_isZero
+
+#print axioms Reisner.depthExtLocalCohomologyDiagram
+#print axioms Reisner.depthExtLocalCohomology
+#print axioms Reisner.depthExtLocalCohomology_stage_subsingleton
+#print axioms Reisner.exists_nat_eq_depth_below_nat
+#print axioms Reisner.depthExtLocalCohomology_stage_nontrivial
+#print axioms Reisner.depthExtLocalCohomology_vanishes_below_depth
+#print axioms Reisner.depthExtLocalCohomology_nontrivial_at_depth
+#print axioms Reisner.le_depth_iff_localCohomology_vanishes
+#print axioms Reisner.Complex.faceRing_atAugmentation_depth_le
+#print axioms Reisner.Complex.faceRing_atAugmentation_depth_eq_iff_localCohomology_vanishes
+#print axioms Reisner.IsLocalCohenMacaulay
+#print axioms Reisner.IsCohenMacaulay
+#print axioms Reisner.Complex.faceRing_irrelevant_eq_augmentation
+#print axioms Reisner.Complex.faceRing_homogeneousIdeal_le_augmentation
+#print axioms Reisner.Complex.faceRing_isCoatom_homogeneousIdeal_iff
+#print axioms Reisner.Complex.faceRing_homogeneousMaximal_cm_iff_localCohomology_vanishes
+#print axioms Reisner.Complex.faceRing_localCohomology_vanishes_of_isCohenMacaulay
+#print axioms Reisner.principalLocalization_kernel_iff_torsion
+#print axioms Reisner.depthExtLocalCohomology_extZero_quotientHomEquiv
+#print axioms Reisner.depthExtQuotientHomTorsionEquiv
+#print axioms Reisner.depthExt_zero_precomp_naturality
+#print axioms Reisner.depthExtLocalCohomologyModuleDiagram_map_succ
+#print axioms Reisner.depthExtQuotientHomTorsionEval_natural_of_one
+#print axioms Reisner.depthExtLocalCohomology_transition_torsion_natural
+#print axioms Reisner.principalPowerTorsion_eq
+#print axioms Reisner.principalExtZeroKernelEquiv
+#print axioms Reisner.depthExtLocalCohomology_zero_torsionSupEquiv
+#print axioms Reisner.finiteGeneratorsLocalizationKernel_eq_powerTorsionSup
+#print axioms Reisner.finiteGeneratorsExtZeroLocalizationKernelEquiv
+#print axioms Reisner.Complex.cechZeroCyclesLocalizationEquiv
+#print axioms Reisner.Complex.extZeroCechCyclesEquiv
+#print axioms Reisner.Complex.cechZeroCyclesHomologyEquiv
+#print axioms Reisner.Complex.extZeroCechCohomologyEquiv
+#print axioms Reisner.span_finset_pow_le_of_generator_powers_mem
+#print axioms Reisner.Complex.faceRingGeneratorPowerIdeal_one
+#print axioms Reisner.Complex.faceRingGeneratorPowerIdeal_le_pow
+#print axioms Reisner.Complex.faceRingAugmentationIdeal_pow_le_generatorPowerIdeal
+#print axioms Reisner.Complex.faceRingGeneratorPowerIdeal_antitone
+#print axioms Reisner.Complex.faceRingAugmentationIdeal_fg
+#print axioms Reisner.Complex.faceRingAugmentationIdeal_le_generatorPowerIdeal_radical
+#print axioms Reisner.Complex.faceRingAugmentationPowers_initial
+#print axioms Reisner.Complex.faceRingGeneratorPowers_initial
+#print axioms Reisner.Complex.faceRingAugmentationPowerExtDiagramIso
+#print axioms Reisner.Complex.faceRingGeneratorPowerExtDiagramIso
+#print axioms Reisner.Complex.faceRingLocalCohomologyIsoGeneratorPowerExtColimit
+#print axioms Reisner.derivedExt_eq_zero_of_smul_id_eq_zero
+#print axioms Reisner.derivedExt_eq_zero_of_annihilator_isUnit
+#print axioms Reisner.derivedExt_quotient_eq_zero_of_mem_of_isUnit
+#print axioms Reisner.Complex.faceRingLocalization_variable_isUnit
+#print axioms Reisner.Complex.faceRingLocalization_augmentationPower_ext_eq_zero
+#print axioms Reisner.Complex.faceRingLocalization_generatorPower_ext_eq_zero
+#print axioms Reisner.Complex.faceRingLocalization_augmentationPower_ext_isZero
+#print axioms Reisner.Complex.faceRingLocalization_localCohomology_isZero
+#print axioms Reisner.depthExtTargetFunctor_additive
+#print axioms Reisner.depthExtTargetFunctor_preservesFiniteProducts
+#print axioms Reisner.depthExtLocalCohomology_additive
+#print axioms Reisner.depthExtLocalCohomology_preservesFiniteProducts
+#print axioms Reisner.Complex.faceRingCechCochain_augmentationPower_ext_isZero
+#print axioms Reisner.Complex.faceRingCechCochain_localCohomology_isZero
+
 #check Reisner.Complex.link
 #check Reisner.Complex.mem_link_iff
 #check Reisner.Complex.link_empty
@@ -25,6 +155,9 @@ import Reisner
 #check Reisner.Complex.cechDegreeSubmodule_eq_bot_of_card_lt_negativeSupport
 #check Reisner.Complex.cechComplexDegree_isZero_of_nonpos_negativeSupport_nonface
 #check Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_negativeSupport_nonface
+#check Reisner.DualHomology.homologyDualEquiv
+#check Reisner.DualHomology.homologyDualEquiv_apply_cycle
+#check Reisner.Complex.simplicialCohomologyDualHomologyEquiv
 
 #print axioms Reisner.Complex.link
 #print axioms Reisner.Complex.mem_link_iff
@@ -51,6 +184,9 @@ import Reisner
 #print axioms Reisner.Complex.cechDegreeSubmodule_eq_bot_of_card_lt_negativeSupport
 #print axioms Reisner.Complex.cechComplexDegree_isZero_of_nonpos_negativeSupport_nonface
 #print axioms Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_negativeSupport_nonface
+#print axioms Reisner.DualHomology.homologyDualEquiv
+#print axioms Reisner.DualHomology.homologyDualEquiv_apply_cycle
+#print axioms Reisner.Complex.simplicialCohomologyDualHomologyEquiv
 
 #check Reisner.Complex.cechDifferentialDegree_comp_eq_zero
 #check Reisner.Complex.cechComplexDegree
@@ -464,6 +600,8 @@ import Reisner
 #check Reisner.Complex.simplicialCochainDirectSumEquiv
 #check Reisner.Complex.simplicialCochainBasis
 #check Reisner.Complex.simplicialCochainBasis_apply
+#check Reisner.Complex.simplicialCochain_finiteDimensional
+#check Reisner.Complex.simplicialCochain_finrank
 #check Reisner.Complex.simplicialFaceInsertIndex
 #check Reisner.Complex.simplicialFaceEraseIndex
 #check Reisner.Complex.simplicialRankBelow
@@ -488,6 +626,8 @@ import Reisner
 
 #print axioms Reisner.Complex.simplicialCochainDirectSumEquiv
 #print axioms Reisner.Complex.simplicialCochainBasis
+#print axioms Reisner.Complex.simplicialCochain_finiteDimensional
+#print axioms Reisner.Complex.simplicialCochain_finrank
 #print axioms Reisner.Complex.simplicialDifferential
 #print axioms Reisner.Complex.simplicialDifferential_comp_eq_zero
 #print axioms Reisner.Complex.simplicialCochainZeroEquiv
@@ -578,6 +718,7 @@ import Reisner
 #check Reisner.Complex.cechNonpositiveLinkNaturalHomologyIso
 #check Reisner.Complex.cechNonpositiveLinkCohomologyIso
 #check Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_card_lt_negativeSupport
+#check Reisner.Complex.cechCohomology_vanishes_iff_linkCohomology_vanishes
 
 #print axioms Reisner.Complex.cechLinkDegreeEmbedding
 #print axioms Reisner.Complex.cechLinkShiftedComplex
@@ -592,3 +733,125 @@ import Reisner
 #print axioms Reisner.Complex.cechNonpositiveLinkNaturalHomologyIso
 #print axioms Reisner.Complex.cechNonpositiveLinkCohomologyIso
 #print axioms Reisner.Complex.cechCohomologyDegree_isZero_of_nonpos_card_lt_negativeSupport
+#print axioms Reisner.Complex.cechCohomology_vanishes_iff_linkCohomology_vanishes
+
+/- Augmented simplicial chains, dual boundary and signed deletion formula. -/
+#check Reisner.Complex.SimplicialChain
+#check Reisner.Complex.simplicialChainBasis
+#check Reisner.Complex.simplicialChain_finiteDimensional
+#check Reisner.Complex.simplicialChain_finrank
+#check Reisner.Complex.simplicialCochainEvalEquivDualChain
+#check Reisner.Complex.simplicialCochainEvalEquivDualChain_apply
+#check Reisner.Complex.simplicialCochainEvalEquivDualChain_naturality
+#check Reisner.Complex.simplicialBoundary
+#check Reisner.Complex.simplicialBoundary_comp_eq_zero
+#check Reisner.Complex.simplicialChainComplex
+#check Reisner.Complex.simplicialChainComplex_d
+#check Reisner.Complex.simplicialChainDegreeEmbedding
+#check Reisner.Complex.simplicialChainComplexInt
+#check Reisner.Complex.simplicialChainComplexIntXIso
+#check Reisner.Complex.simplicialChainComplexIntHomologyIso
+#check Reisner.Complex.simplicialChainComplexInt_isZero_of_lt_minus_one
+#check Reisner.Complex.simplicialChainComplexInt_homology_isZero_of_lt_minus_one
+#check Reisner.Complex.simplicialBoundary_basis_apply
+#check Reisner.Complex.simplicialCochain_homology_isZero_iff_chain_homology_isZero
+#check Reisner.Complex.cechCohomology_vanishes_iff_linkHomology_vanishes
+
+#print axioms Reisner.Complex.simplicialChainBasis
+#print axioms Reisner.Complex.simplicialChain_finiteDimensional
+#print axioms Reisner.Complex.simplicialChain_finrank
+#print axioms Reisner.Complex.simplicialCochainEvalEquivDualChain
+#print axioms Reisner.Complex.simplicialCochainEvalEquivDualChain_naturality
+#print axioms Reisner.Complex.simplicialBoundary_comp_eq_zero
+#print axioms Reisner.Complex.simplicialChainComplex
+#print axioms Reisner.Complex.simplicialChainComplexInt
+#print axioms Reisner.Complex.simplicialChainComplexIntHomologyIso
+#print axioms Reisner.Complex.simplicialChainComplexInt_isZero_of_lt_minus_one
+#print axioms Reisner.Complex.simplicialBoundary_basis_apply
+#print axioms Reisner.Complex.simplicialCochain_homology_isZero_iff_chain_homology_isZero
+#print axioms Reisner.Complex.cechCohomology_vanishes_iff_linkHomology_vanishes
+
+/- Link/facet calculus and the checked Čech-side purity characterization. -/
+#check Reisner.Complex.link_link
+#check Reisner.Complex.mem_facets_link_iff
+#check Reisner.Complex.linkFacetEquiv
+#check Reisner.Complex.link_face_card_add_le_maxFaceCard
+#check Reisner.Complex.link_maxFaceCard_add_card_le
+#check Reisner.Complex.link_dimension_le
+#check Reisner.Complex.link_maxFaceCard_eq_zero_of_facet
+#check Reisner.Complex.link_dimension_eq_neg_one_of_facet
+#check Reisner.Complex.link_maxFaceCard_add_card_eq_of_pure
+#check Reisner.Complex.link_dimension_eq_of_pure
+#check Reisner.Complex.link_pure_of_pure
+#check Reisner.Complex.facet_card_ge_of_uniform_linkCohomology_vanishes
+#check Reisner.Complex.facet_card_eq_maxFaceCard_of_uniform_linkCohomology_vanishes
+#check Reisner.Complex.facet_card_eq_maxFaceCard_of_cechCohomology_vanishes
+#check Reisner.Complex.link_dimension_eq_of_cechCohomology_vanishes
+#check Reisner.Complex.linkCohomology_vanishes_below_dimension_of_cechCohomology_vanishes
+#check Reisner.Complex.cechCohomology_vanishes_of_pure_linkCohomology_vanishes
+#check Reisner.Complex.cechCohomology_vanishes_iff_pure_and_linkCohomology_vanishes
+
+#print axioms Reisner.Complex.link_link
+#print axioms Reisner.Complex.mem_facets_link_iff
+#print axioms Reisner.Complex.link_dimension_le
+#print axioms Reisner.Complex.link_dimension_eq_of_pure
+#print axioms Reisner.Complex.facet_card_eq_maxFaceCard_of_cechCohomology_vanishes
+#print axioms Reisner.Complex.linkCohomology_vanishes_below_dimension_of_cechCohomology_vanishes
+#print axioms Reisner.Complex.cechCohomology_vanishes_iff_pure_and_linkCohomology_vanishes
+
+/- Face-ring-linear Čech complex and fixed-stage derived Ext application. -/
+#check Reisner.Complex.faceRingLocalizationMapA
+#check Reisner.Complex.cechDifferentialA
+#check Reisner.Complex.faceRingCechComplex
+#check Reisner.Complex.faceRingCechExtComplex_homology_isZero
+#check Reisner.Complex.cechZeroFaceRingEquivA
+#check Reisner.Complex.faceRingCechExtComplex_zeroTermIso
+#check Reisner.Complex.faceRingCechExtComplex_zeroExtIso
+#check Reisner.Complex.faceRingCechCochain_generatorPower_ext_isZero
+#check Reisner.Complex.faceRingGeneratorPowerCechExtComplex_X_isZero
+#check Reisner.Complex.faceRingGeneratorPowerCechExtComplex_homology_isZero
+#check Reisner.Complex.faceRingGeneratorPowerExtFunctorDiagram
+#check Reisner.Complex.faceRingGeneratorPowerCechExtDiagram
+#check Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_zeroTermIso
+#check Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_zeroTermColimitIso
+#check Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_colimitZeroTermIso
+#check Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_X_isZero
+#check Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_colimit_X_isZero
+#check Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_colimit_homology_isZero
+#check Reisner.Complex.faceRingLocalCohomologyIsoGeneratorPowerCechExtZeroTermColimit
+#print axioms Reisner.Complex.cechDifferentialA_comp_eq_zero
+#print axioms Reisner.Complex.faceRingCechExtComplex_homology_isZero
+#print axioms Reisner.Complex.faceRingCechExtComplex_zeroTermIso
+#print axioms Reisner.Complex.faceRingCechExtComplex_zeroExtIso
+
+/- Integer canonical duality, actual dimension cutoffs, and reduced link homology. -/
+#check Reisner.Complex.simplicialCohomologyIntDualHomologyEquiv
+#check Reisner.Complex.simplicialCohomologyIntDualHomologyEquiv_reindex
+#check Reisner.Complex.simplicialCochainInt_homology_isZero_iff_chainInt_homology_isZero
+#check Reisner.Complex.simplicialCochain_subsingleton_of_maxFaceCard_lt
+#check Reisner.Complex.simplicialCochain_isZero_of_maxFaceCard_lt
+#check Reisner.Complex.simplicialCochainComplex_homology_isZero_of_maxFaceCard_lt
+#check Reisner.Complex.simplicialCochainComplexInt_isZero_of_dimension_lt
+#check Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_dimension_lt
+#check Reisner.Complex.simplicialChain_isZero_of_card_lt
+#check Reisner.Complex.simplicialChain_isZero_of_maxFaceCard_lt
+#check Reisner.Complex.simplicialChainComplex_homology_isZero_of_card_lt
+#check Reisner.Complex.simplicialChainComplex_homology_isZero_of_maxFaceCard_lt
+#check Reisner.Complex.simplicialChainComplexInt_isZero_of_card_lt
+#check Reisner.Complex.simplicialChainComplexInt_homology_isZero_of_card_lt
+#check Reisner.Complex.simplicialChainComplexInt_isZero_of_dimension_lt
+#check Reisner.Complex.simplicialChainComplexInt_homology_isZero_of_dimension_lt
+#check Reisner.Complex.cechCohomology_vanishes_iff_linkHomologyInt_vanishes
+#check Reisner.Complex.cechCohomology_vanishes_iff_pure_and_linkHomology_vanishes
+
+#print axioms Reisner.Complex.simplicialCohomologyIntDualHomologyEquiv
+#print axioms Reisner.Complex.simplicialCohomologyIntDualHomologyEquiv_reindex
+#print axioms Reisner.Complex.simplicialCochainInt_homology_isZero_iff_chainInt_homology_isZero
+#print axioms Reisner.Complex.simplicialCochainComplexInt_homology_isZero_of_dimension_lt
+#print axioms Reisner.Complex.simplicialChainComplexInt_homology_isZero_of_card_lt
+#print axioms Reisner.Complex.simplicialChainComplexInt_homology_isZero_of_dimension_lt
+#print axioms Reisner.Complex.cechCohomology_vanishes_iff_linkHomologyInt_vanishes
+#print axioms Reisner.Complex.cechCohomology_vanishes_iff_pure_and_linkHomology_vanishes
+#print axioms Reisner.Complex.faceRingGeneratorPowerCechExtComplex_homology_isZero
+#print axioms Reisner.Complex.faceRingGeneratorPowerCechExtDiagram_colimit_homology_isZero
+#print axioms Reisner.Complex.faceRingLocalCohomologyIsoGeneratorPowerCechExtZeroTermColimit

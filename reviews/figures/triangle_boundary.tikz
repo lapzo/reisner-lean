@@ -1,0 +1,17 @@
+\begin{tikzpicture}[
+  vtx/.style={circle,fill=black,inner sep=2.7pt},
+  edge/.style={draw=black,line width=1.2pt},
+  every node/.style={font=\small}]
+  \coordinate (a) at (0,0); \coordinate (b) at (2.4,0);
+  \coordinate (c) at (1.2,1.95);
+  \draw[edge] (a)--(b)--(c)--cycle;
+  \node[vtx,label=below left:$v_1$] at (a) {};
+  \node[vtx,label=below right:$v_2$] at (b) {};
+  \node[vtx,label=above:$v_3$] at (c) {};
+  \node[font=\small\bfseries] at (1.2,-0.55) {$K=\partial\Delta^2$};
+  \draw[-{Stealth[length=2.4mm]},thick] (3.0,0.9)--(4.0,0.9);
+  \node[above,font=\small] at (3.5,0.9) {$\operatorname{link}_K(v_1)$};
+  \node[vtx,label=below:$v_2$] at (4.55,0.5) {};
+  \node[vtx,label=below:$v_3$] at (5.65,0.5) {};
+  \node[font=\small] at (5.1,-0.1) {нет ребра};
+\end{tikzpicture}

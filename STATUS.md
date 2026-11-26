@@ -1,5 +1,38 @@
 # Milestone status
 
+## Full statement of Reisner's criterion
+
+`Reisner.Complex.reisner_criterion` compiles and is exported by `Reisner`.
+Its right-hand side, `LinkHomologyVanishesBelowDimension`, uses integer
+reduced homology of every face link over the field, including the link of
+the empty face. For the complex consisting of the empty face alone, the
+link has dimension `-1` and the required groups are all in degrees below
+`-1`. The statement permits any number of ghost vertices.
+
+The criterion's proof is open. Its single `sorry` is in
+`Reisner/ReisnerCriterion.lean`. Direct `#print axioms` inspection reports
+`[propext, sorryAx, Classical.choice, Quot.sound]` for the theorem and
+`[propext, Classical.choice, Quot.sound]` for the linkwise predicate. The
+blueprint node `thm:reisner` links to the declaration and retains its open
+proof status.
+
+## Previously checked milestones
+
+One checked intermediate theorem is
+`faceRingLocalCohomologyIsoGeneratorPowerExtColimit` in
+`Reisner/Cech/ExtComparison.lean`. In every cohomological degree `q`, it
+identifies augmentation-supported local cohomology of the face ring `A`
+with the colimit of derived `Ext^q_A(A / J_n, A)`, where
+`J_n = (x_v^n : v ∈ V)`. Both quotient diagrams are cofinal through the
+category of ideals whose radical contains the augmentation ideal. The
+checked ideal bounds are `J_n ≤ m^n` and `m^(|V|*n+1) ≤ J_n`.
+Only finite generation of the augmentation ideal is used, so the result
+allows arbitrary commutative coefficient rings, the zero ring, ghost
+variables, and an empty vertex set. For empty `V`, all `J_n` are zero,
+even at `n = 0`. This theorem normalizes the Ext stages; the remaining
+Koszul or acyclic-resolution bridge and positive-degree Ext–Čech
+comparison are not yet formalized.
+
 The current checked milestone includes the standard monomial quotient basis,
 weighted homogeneity, quotient fine and total gradings, augmentation/residue
 foundations, and coordinate-prime/facet structure. Finite type and Noetherianity
@@ -30,21 +63,65 @@ formulas and adjacent-differential compatibility over arbitrary commutative
 rings. The actual zero-extended shifted link complex, its isomorphism with the
 Čech degree complex, and induced actual homology identification are checked,
 including the separate below-cutoff zero case and integer reduced degree
-`r-1`. Higher-degree vanishing, the full chain model and duality, the
-local-cohomology comparison, and the criterion remain future work. The
-ideal, complex, quotient, and dependency pins are unchanged; all work is
-local-only.
+`r-1`. The cutoff equivalence between total Čech vanishing and reduced link
+cohomology vanishing is also checked over arbitrary commutative rings. The
+augmented chain model and canonical integer-indexed homology-cohomology
+duality over fields are checked, as is the Čech purity-and-link criterion in
+integer reduced homology. The positive-degree Čech-to-local-cohomology
+comparison and the full Reisner criterion remain future work. The completed
+time-boxed local algebra milestone is the depth
+cutoff theorem: for every finite `d`, depth is at least `d` iff local
+cohomology vanishes below `d`. At `d = dim(B)`, this gives the depth
+lower-bound half of the local Cohen--Macaulay criterion; the standard depth
+upper bound remains a separate prerequisite for equality. The project model
+uses the derived-category Ext groups used by depth and does not claim a Lean
+comparison with Mathlib's older left-derived Ext implementation in its
+`localCohomology` constant. This route does not require the graded Čech
+comparison or the combinatorial tail. The aligned Ext-colimit diagram,
+positive-power stage vanishing, and one-way theorem
+`depthExtLocalCohomology_vanishes_below_depth` compile in the project. The
+converse is formalized too: `le_depth_iff_localCohomology_vanishes` proves
+the finite-cutoff equivalence for every commutative Noetherian local ring,
+with no extra smallness hypothesis. Its proof extracts the depth degree,
+proves the depth-stage Ext group nonzero, and shows the class survives the
+powers colimit. Each adjacent transition is injective: its kernel is the
+kernel of `B/m^(n+1) → B/m^n`, finite and supported on `V(m)` because `m`
+annihilates it. Rees gives lower Ext vanishing; degree zero uses epi
+precomposition. The colimit representative theorem then transports the
+nonzero class. The local algebra cutoff target is complete; the graded
+Čech-to-local-cohomology comparison, link formula, and full Reisner criterion
+remain future work. The separate right-derived-functor conversion is not
+claimed. The next degree-zero bridge has started: the checked theorem
+`principalLocalization_kernel_iff_torsion` identifies the kernel of
+`LocalizedModule.mkLinearMap (.powers f)` with elements killed by some power
+of `f`. The checked equivalence
+`depthExtLocalCohomology_extZero_quotientHomEquiv` identifies each derived
+Ext-zero quotient stage with its ordinary module of linear maps, and
+`depthExtQuotientHomTorsionEquiv` identifies maps from `R/J` with elements
+annihilated by `J`. Thus the degree-zero stages are concretely the expected
+annihilator submodules. The checked lemma
+`depthExt_zero_precomp_naturality` shows that degree-zero Ext transition maps
+become ordinary precomposition. The checked theorem
+`depthExtLocalCohomology_transition_torsion_natural` verifies that the actual
+powers-diagram transitions become inclusions of annihilator submodules, and
+`principalPowerTorsion_eq` identifies the principal-ideal stages with the
+submodules killed by `f^n`, including `n = 0`. The general theorem
+`depthExtLocalCohomology_zero_torsionSupEquiv` identifies degree-zero
+Ext-colimit local cohomology for any ideal with the supremum of its power
+annihilator stages. The principal specialization
+`principalExtZeroKernelEquiv` then proves, for every ring, module, and `f`
+(including `f = 0`), a linear equivalence with the kernel of localization at
+powers of `f`.
 
-Current validation (2026-11-23): `python3 site/build.py` passed, including
-`lake build` (2,454 jobs), axiom inspection, localization-kernel regression,
+Current validation (2026-11-24): `python3 site/build.py` passed, including
+`lake build` (2,741 jobs), axiom inspection, localization-kernel regression,
 Čech and simplicial-cochain checks, blueprint PDF/HTML generation, and
-`checkdecls`. `python3 scripts/check_site.py` passed with 43 blueprint nodes,
-28 checked nodes, 340 linked declarations, 754 local links, and 9,788
-displayed source rows. The three source files contain 2,044, 2,235, and 613
-lines; snapshots match, IDs
-are unique, dependencies are acyclic, and there are no remote assets.
-The PDF log has no box or LaTeX warnings. The static checker does not
-substitute for browser QA.
+`checkdecls`. `python3 scripts/check_site.py` passed with 66 blueprint nodes,
+52 checked nodes, 370 linked declarations, 876 local links, and 11,813
+displayed source rows across 13 Lean modules. Snapshots match, IDs are
+unique, dependencies are acyclic, and there are no remote assets. The PDF
+log has no box or LaTeX warnings. The static checker does not substitute for
+browser QA.
 
 ## Checked links and nonpositive Čech indices
 
@@ -55,9 +132,10 @@ containing `N`. If `N` is a face, `nonpositiveCechIndexEquivLink` identifies
 admissible `q`-element indices with link faces `T` satisfying
 `N.card + T.card = q`. If `q < N.card`, the degree submodule is zero; if `N`
 is a nonface, all terms and cohomology of the degree complex are zero over
-any commutative ring. The augmented reduced cochain complex and its shifted
-identification with Čech cohomology remain future work, as do the comparison
-with local cohomology and Reisner's criterion.
+any commutative ring. The shifted identification with augmented reduced
+cochains and the uniform Čech/link-cohomology cutoff theorem are checked.
+Comparison with Ext-colimit local cohomology and Reisner's criterion remain
+future work.
 
 Local site generation passed Lean, axiom, localization and Čech checks,
 blueprint PDF/HTML generation, `checkdecls`, and source/graph exports. The
@@ -730,3 +808,398 @@ static site checker. The equivalence and differential theorem report
 exactly `[propext, Classical.choice, Quot.sound]`. Source scans find no
 placeholders or custom axioms. The current artifact counts are reported
 above. All work remains local.
+
+## Finite-generator degree-zero localization (2026-11-24)
+
+The finite-generator extension is now checked over arbitrary commutative rings
+and modules. `Reisner.finiteGeneratorsLocalizationKernel_eq_powerTorsionSup`
+identifies the union of the submodules annihilated by powers of
+`Ideal.span (f '' s)` with the intersection of kernels of localization at
+each listed generator. The proof chooses a killing exponent for each
+generator and uses the explicit bound `1 + ∑ k_i`; this includes the empty
+index set, zero generators, and exponent zero. The public equivalence
+`Reisner.finiteGeneratorsExtZeroLocalizationKernelEquiv` composes this with
+the existing degree-zero Ext-colimit-to-supremum theorem.
+
+The statements are algebraic localization-kernel comparisons. They do not
+yet identify the Ext-colimit construction with the project's Čech complex and
+make no claim in positive cohomological degrees. Validation passed: `lake
+build` (2,650 jobs), `Checks/Axioms.lean`, site generation, and
+`scripts/check_site.py`. Both new theorems report only
+`[propext, Classical.choice, Quot.sound]`. The site has 56 blueprint nodes,
+42 checked nodes, 356 linked declarations, and 802 local links. `git diff
+--check` passes; changes remain local.
+
+## Degree-zero Čech cocycle kernel (2026-11-24)
+
+`Reisner.Complex.cechZeroCyclesLocalizationEquiv` now identifies the actual
+kernel of the degree-zero Čech differential with the simultaneous kernel of
+the face-ring maps to the singleton localizations. The module also proves the
+componentwise differential formula and that vanishing of the differential is
+equivalent to vanishing under every singleton localization map. The proof
+keeps the extended Čech index set, including ghost vertices and nonfaces, and
+works over arbitrary commutative coefficient rings.
+
+The subsequent Ext composition is recorded below. The cycle-kernel theorem
+depends only on `[propext, Classical.choice, Quot.sound]` and is covered by
+the full `lake build` and axiom checks.
+
+## Degree-zero Ext-to-Čech cycles (2026-11-24)
+
+`Reisner.Complex.extZeroCechCyclesEquiv` now composes the finite-generator
+Ext/localization-kernel equivalence with the checked Čech cycle-kernel
+equivalence. It identifies the degree-zero Ext-colimit local cohomology module
+for the face ring supported at the augmentation ideal, after restricting
+scalars to the coefficient ring, with the kernel of the outgoing degree-zero
+Čech differential. The construction is valid over arbitrary commutative
+coefficient rings, including the zero ring.
+
+The equivalence depends only on `[propext, Classical.choice, Quot.sound]`.
+The subsequent homology identification is recorded below. Positive-degree
+Ext/Čech comparison is still open.
+
+## Degree-zero Ext-to-Čech cohomology (2026-11-24)
+
+`Reisner.Complex.extZeroCechCohomologyEquiv` identifies the face ring's
+degree-zero Ext-colimit local cohomology at the augmentation ideal with
+`HomologicalComplex.homology (K.cechComplex R) 0`, as an `R`-module after
+restricting scalars along `R → K.FaceRing R`. The proof identifies the concrete
+outgoing kernel with the categorical cycles object by its universal property,
+then uses the natural-number cochain shape: the incoming differential at zero
+vanishes, so taking the cohomology class is an isomorphism. This works over
+arbitrary commutative coefficient rings, including the zero ring.
+
+Both new equivalences depend only on `[propext, Classical.choice, Quot.sound]`.
+Full `lake build` (2,652 jobs), `Checks/Axioms.lean`, site generation, and
+`scripts/check_site.py` passed. The site has 59 blueprint nodes, 45 checked
+nodes, 360 linked declarations, and 819 local links. Positive-degree
+Ext/Čech comparison remains open. Changes remain local.
+
+## Augmentation-local CM cutoff (2026-11-24)
+
+`Reisner.Complex.faceRing_atAugmentation_depth_le` proves that for a finite
+complex over a field, the depth of the face ring localized at its augmentation
+ideal is at most the maximum face cardinality. The proof takes the supremum
+over regular-sequence lengths and uses the regular-sequence Krull-dimension
+formula. The companion theorem
+`faceRing_atAugmentation_depth_eq_iff_localCohomology_vanishes` packages the
+existing local Ext-colimit cutoff theorem with the checked local dimension
+formula: local depth equals local Krull dimension exactly when maximal-ideal
+Ext-colimit local cohomology vanishes below that dimension. This is the
+standard local algebraic CM condition and is independent of any link or
+homology criterion.
+
+Both results assume a field and finite ambient vertex type and use only
+`[propext, Classical.choice, Quot.sound]`. Full `lake build` (2,739 jobs),
+`Checks/Axioms.lean`, site generation, and the static site checker passed. The
+site has 61 blueprint nodes, 47 checked nodes, 362 linked declarations, and
+835 local links. The remaining bridge to
+Reisner is the graded local test transferring global algebraic
+Cohen–Macaulayness to the augmentation localization, followed by the link
+cohomology vanishing comparison.
+
+## Graded maximal-ideal reduction (2026-11-24)
+
+`Reisner.IsLocalCohenMacaulay` uses the standard local definition
+`depth = ringKrullDim`; `Reisner.IsCohenMacaulay` requires every prime
+localization to satisfy it. For a face ring over a field, the total grading's
+irrelevant ideal equals the augmentation ideal, every proper homogeneous ideal
+lies inside it, and it is the unique maximal proper homogeneous ideal.
+`faceRing_homogeneousMaximal_cm_iff_localCohomology_vanishes` identifies
+Cohen–Macaulayness at all maximal homogeneous ideals with the checked
+augmentation-local vanishing criterion. The theorem
+`faceRing_localCohomology_vanishes_of_isCohenMacaulay` proves the forward
+implication from global algebraic Cohen–Macaulayness to that local vanishing.
+
+This uses only `[propext, Classical.choice, Quot.sound]`. Full `lake build`
+(2,740 jobs), `Checks/Axioms.lean`, site generation, and the static site
+checker passed. The site has 64 nodes, 51 checked nodes, 369 linked
+declarations, and 865 local links. The converse graded-local transfer from
+maximal homogeneous localizations to arbitrary prime localizations remains
+external. Positive-degree Ext–Čech/link comparison also remains open.
+
+## Localization-transfer audit (2026-11-24)
+
+The next attempted bridge is the converse graded-local transfer. Mathlib's
+`RingTheory.Sequence.IsWeaklyRegular.isRegular_of_isLocalization_of_mem`
+localizes regular sequences, but the pin has no standard Cohen–Macaulay
+localization theorem or depth/height inequality
+`depth(R) ≤ depth(R_p) + dim(R/p)` for a Noetherian local ring. The latter,
+or an equivalent grade/height result, is what the usual proof of CM stability
+under localization needs; its associated-prime/depth lemmas are absent too.
+The homogeneous-core argument identifies how the graded maximal test would
+reduce to ordinary localization stability, but does not itself prove that
+stability. No theorem was added and no checked claim was broadened. The next
+formalization task is to establish the depth inequality from pinned APIs, or
+to keep this transfer external and proceed to the local-cohomology/link
+comparison.
+
+## Graded-local transfer handoff (2026-11-24)
+
+The converse transfer from augmentation-local Cohen--Macaulayness to all
+prime localizations is recorded as an external foundation in the blueprint.
+Stacks Project Lemma 10.104.5 (tag 00NB) gives the localization theorem for
+Cohen--Macaulay local rings; Bruns--Herzog 2.1.27 supplies the graded local
+test. No Lean declaration was added for this transfer, and the unavailable
+depth/height bridge remains unformalized.
+
+The next active target is the Ext-colimit/extended-Čech comparison feeding
+the already checked fine-degree link calculation. Its degree-zero instance
+`extZeroCechCohomologyEquiv` is checked. Positive degrees and the grading
+compatibility are not. Mathlib's pinned local-cohomology file lists this
+comparison as future work and has no Koszul or weak-proregularity API; a
+formal proof would first need that infrastructure. The blueprint records
+Schenzel's weak-proregularity route, including the arbitrary coefficient-ring
+and empty-vertex edge cases. No positive-degree comparison is claimed here.
+
+## Uniform Čech and link-cohomology vanishing (2026-11-24)
+
+`Reisner.Complex.cechCohomology_vanishes_iff_linkCohomology_vanishes` proves,
+for every finite linearly ordered ambient vertex type, simplicial complex,
+commutative coefficient ring, and finite cutoff `d`, that actual Čech
+cohomology vanishes in all degrees below `d` exactly when each link's
+augmented reduced cohomology vanishes in degree `r - 1` whenever
+`|F| + r < d`. The proof uses the checked fine-degree direct-sum
+decomposition, positive-coordinate contraction, zero cases for nonface
+negative support and below-cutoff terms, and the shifted link cohomology
+isomorphism. It covers `d = 0`, the empty face, ghost vertices, and reduced
+degree `-1` without a field hypothesis.
+
+This is a theorem about the project's actual Čech complex. It does not assert
+the positive-degree Ext-colimit/Čech comparison or change link cohomology to
+homology. The all-degree comparison and the graded-local Cohen--Macaulay
+transfer remain external foundations. The new theorem reports only
+`[propext, Classical.choice, Quot.sound]`. Validation passed: `lake build`
+(2,741 jobs), `python3 site/build.py`, and `python3 scripts/check_site.py`
+(66 nodes, 52 checked, 370 declarations). The task tracker now points to
+finite-dimensional homology–cohomology duality (`lem:dual`) as the next node.
+
+## Duality prerequisite in progress (2026-11-24)
+
+Pinned Mathlib provides abstract alternating face-map chain/cochain
+constructions and finite-dimensional vector-space duality, but no directly
+matching simplicial-complex model with this project's actual-face and
+augmented degree `-1` conventions. The checked project cochain complex does
+have a coordinate basis indexed by actual faces. Added and focused-compiled
+the prerequisite that each cochain term over a field is finite-dimensional,
+with dimension exactly the number of actual faces of that cardinality. The
+empty face is counted in cardinality zero; ghosts contribute no coordinates.
+The new declarations report only `[propext, Classical.choice, Quot.sound]`.
+Validation passed: focused compilation, `lake build` (2,742 jobs),
+`Checks/Axioms.lean`, `python3 site/build.py`, and `python3 scripts/check_site.py`
+(68 nodes, 54 checked, 379 declarations, 894 local links). `git diff --check`
+also passed. The augmented chain complex is now constructed as the linear
+dual of the checked cochain complex, with the actual-face basis, dual signed
+boundary, chain-complex law and basis evaluation formula. Its new declarations
+also include the canonical evaluation isomorphism from cochains to dual chains
+and its differential naturality. They report only `[propext, Classical.choice,
+Quot.sound]`. Homology duality remains open.
+
+## Integer reduced duality and the homological Čech criterion (2026-11-24)
+
+`simplicialCohomologyIntDualHomologyEquiv` now canonically identifies
+integer reduced cohomology with the linear dual of integer reduced homology
+over every field. At `i ≥ -1` it transports the checked face-cardinality
+evaluation isomorphism through the existing chain and cochain extension
+homology isomorphisms, using natural index `(i + 1).toNat`. The explicit
+reindexing equation records this construction. Below `-1` both groups are
+zero. Cochain and chain terms and homology vanish above the actual dimension
+`maxFaceCard - 1`; the ambient `|V| - 1` chain bounds are checked as well.
+The augmented degree `-1`, empty complex and ghost vertices are preserved.
+
+`simplicialCochainInt_homology_isZero_iff_chainInt_homology_isZero` derives
+the integer vanishing equivalence from the canonical isomorphism.
+`cechCohomology_vanishes_iff_linkHomologyInt_vanishes` states the uniform
+cutoff for all integer reduced link degrees: `|F| + i + 1 < d`.
+`cechCohomology_vanishes_iff_pure_and_linkHomology_vanishes` presents the
+checked Čech purity criterion in integer reduced homology, retaining the
+exact facet-cardinality purity conjunct and each link's own dimension bound.
+No graph-connectivity assumption or conclusion is added. The graph
+comparison is a separate unformalized blueprint node.
+
+Validation passed: focused `lake build Reisner.Cech.LinkHomology` (2,656
+jobs), full `lake build` (2,747 jobs), `lake env lean Checks/Axioms.lean`,
+`python3 site/build.py`, `python3 scripts/check_site.py`, and `git diff
+--check`. The axiom inspection confirms the new duality and cutoff theorems
+use only `[propext, Classical.choice, Quot.sound]`. The site has 74 blueprint
+nodes, 61 checked nodes, 411 linked declarations, 960 local links, and 12,883
+displayed source rows across 19 linked Lean files.
+The positive-degree Ext-colimit/Čech comparison, graded-local transfer and
+the full algebraic Reisner criterion remain unformalized.
+
+## Generator-power stages for Ext-colimit local cohomology (2026-11-24)
+
+`Reisner/Cech/ExtComparison.lean` proves that the augmentation-supported
+derived Ext-colimit for a finite face ring can be computed from the
+individual-variable power quotients
+`A/(x_v^n : v ∈ V)` in every cohomological degree. The ideal bounds are
+`(x_v^n) ≤ m^n` and `m^(|V|*n+1) ≤ (x_v^n)`. Initiality in the category of
+ideals whose radical contains the augmentation ideal gives the colimit
+isomorphism. The argument uses finite generation of the augmentation ideal,
+not Noetherianity, and includes the zero ring, ghost variables, and empty
+ambient vertex set. This is a normalization of Ext stages; it is not the
+positive-degree Ext-colimit/Čech comparison.
+
+The main declaration
+`faceRingLocalCohomologyIsoGeneratorPowerExtColimit` and the power bound use
+only `[propext, Classical.choice, Quot.sound]`. Validation passed: focused
+compilation, `lake build` (2,748 jobs), `lake env lean Checks/Axioms.lean`,
+`python3 site/build.py`, `python3 scripts/check_site.py`, and
+`git diff --check`. The site has 76 blueprint nodes, 63 checked nodes, 423
+linked declarations, 981 local links, and 13,071 displayed source rows across
+20 linked Lean files. The next substep is vanishing of Ext stages with a
+localized target, followed by the missing complex comparison.
+
+## Ext vanishing on nonempty Čech rows (2026-11-24)
+
+`Reisner/Cech/LocalizedExt.lean` proves a general derived-Ext vanishing
+principle: if a scalar annihilates the source and acts invertibly on the
+target, then every Ext class vanishes. For a nonempty localization index,
+a selected face-ring variable belongs to the augmentation ideal and becomes
+a unit after inverting the product. Thus all augmentation-power Ext stages
+vanish against that localization in every cohomological degree. The
+colimit/evaluation isomorphism then proves vanishing of the project local
+cohomology evaluated at every nonempty Čech localization target. This covers
+exponent zero, ghost variables, nonface indices (including zero
+localizations), and arbitrary commutative coefficient rings. It is an
+acyclicity input, not the comparison of the whole Čech complex with local
+cohomology.
+
+Validation passed: full `lake build` (2,749 jobs),
+`lake env lean Checks/Axioms.lean`, `python3 site/build.py`,
+`python3 scripts/check_site.py`, and `git diff --check`. The new declarations
+use only `[propext, Classical.choice, Quot.sound]`. The site now has 78
+blueprint nodes, 65 checked nodes, 431 linked declarations, 996 local links,
+and 13,263 displayed source rows across 21 linked Lean files. The next task
+is to construct the complex or double-complex comparison from the normalized
+Ext-colimit stages and nonempty-row acyclicity; no full comparison is yet
+claimed.
+
+## Acyclicity of positive Čech terms (2026-11-24)
+
+The Ext-colimit local-cohomology functor is now proved additive in its
+coefficient module and therefore preserves finite products in `ModuleCat`.
+The proof uses additivity of the derived Ext target functor at each stage and
+the pointwise colimit construction in the functor category. For finite `V`,
+each positive Čech cochain module is a finite product indexed by the
+nonempty subsets of the given cardinality. Combining product preservation
+with the checked vanishing on each nonempty localization proves
+`faceRingCechCochain_localCohomology_isZero` in every local-cohomology
+degree, over any commutative coefficient ring. This is the acyclic-terms
+input for a derived comparison; exactness/computing the Ext-colimit of the
+whole augmented Čech complex is still open.
+
+Validation passed: full `lake build` (2,750 jobs),
+`lake env lean Checks/Axioms.lean`, `python3 site/build.py`,
+`python3 scripts/check_site.py`, and `git diff --check`. The new additive,
+finite-product, and positive-term acyclicity declarations use only
+`[propext, Classical.choice, Quot.sound]`. The site now has 79 blueprint
+nodes, 66 checked nodes, 434 linked declarations, 1,004 local links, and
+13,416 displayed source rows across 21 linked Lean files. The full
+Ext-colimit/Čech cohomology comparison remains open.
+
+The next step added the stronger stagewise version: for each `n`, Ext from
+`A/𝔪^n` into every positive Čech cochain term vanishes in all degrees.
+The derived Ext target functor preserves finite products, so the already
+checked localization-row vanishing passes to the full finite cochain term
+before taking the colimit. This is the row-zero input for forming a
+derived-Hom double complex; no totalization or comparison map is claimed yet.
+
+Validation passed: full `lake build` (2,750 jobs),
+`lake env lean Checks/Axioms.lean`, `python3 site/build.py`,
+`python3 scripts/check_site.py`, and `git diff --check`. The stagewise
+cochain Ext vanishing, its finite-product dependency, and the local
+cohomology cochain vanishing use only `[propext, Classical.choice,
+Quot.sound]`. The site reports 79 blueprint nodes, 66 checked nodes, 437
+linked declarations, 1,007 local links, and 13,489 displayed source rows.
+
+The current step packages the actual Čech complex over the face ring. Its
+localization transition maps are face-ring algebra homomorphisms, and the
+resulting face-ring-linear differential is checked equal to the existing
+coefficient-ring differential. The induced complex and its fixed-stage
+derived Ext image are checked. Positive-degree terms and homology of that
+image vanish by the already established stagewise row vanishing. The new
+square-zero and homology-vanishing theorems depend only on
+`[propext, Classical.choice, Quot.sound]`.
+
+Validation passed: full `lake build` (2,751 jobs),
+`lake env lean Checks/Axioms.lean`, `python3 site/build.py`,
+`python3 scripts/check_site.py`, and `git diff --check`. The site reports
+80 blueprint nodes, 67 checked nodes, 448 linked declarations, 1,022 local
+links, and 13,669 displayed source rows across 22 source files. The genuine
+double-complex/totalization comparison with the Ext-colimit, and therefore
+the positive-degree Čech-to-local-cohomology comparison, remain open.
+
+The next fixed-stage detail is now checked as well: the degree-zero Čech term
+is face-ring-linearly equivalent to the face ring, and applying the fixed
+stage Ext functor identifies that term with `Ext^q_A(A/𝔪^n,A)`. This does
+not assert that applying `Ext^q` termwise commutes with taking cohomology.
+
+Validation passed again: full `lake build` (2,751 jobs),
+`lake env lean Checks/Axioms.lean`, site regeneration, site consistency, and
+`git diff --check`. The site reports 80 blueprint nodes, 67 checked nodes,
+452 linked declarations, 1,026 local links, and 13,735 displayed source rows.
+
+The fixed-stage statement now reaches actual homology: the Ext-applied
+complex has degree-zero homology canonically isomorphic to
+`Ext^q_A(A/𝔪^n,A)`, and all positive-degree homology vanishes. The proof uses
+the zero target in Čech degree one and the absent incoming differential at
+degree zero. This remains a statement about the termwise Ext-applied complex;
+it is not yet a hypercohomology comparison with the Čech complex's own
+cohomology.
+
+Validation passed: full `lake build` (2,751 jobs),
+`lake env lean Checks/Axioms.lean`, site regeneration, site consistency, and
+`git diff --check`. The new degree-zero homology equivalences use only
+`[propext, Classical.choice, Quot.sound]`. The site reports 80 blueprint
+nodes, 67 checked nodes, 454 linked declarations, 1,028 local links, and
+13,813 displayed source rows.
+
+## Generator-power stagewise Ext--Cech complexes (2026-11-25)
+
+The positive-row argument has now been repeated at the cofinal generator-
+power stages `A/(x_v^n : v ∈ V)`, rather than only at augmentation-power
+stages `A/m^n`. In every nonempty localization, a selected variable power
+annihilates the quotient source and acts invertibly on the target. Finite
+product preservation then gives zero for every positive Cech cochain term
+after applying derived `Ext^q_A(A/(x_v^n), -)`. Mapping the face-ring-linear
+Cech complex through this fixed-stage Ext functor gives a complex with zero
+positive terms and therefore zero positive homology. These are the same
+stages as in the checked Ext-colimit normalization of local cohomology.
+
+At this point it did not yet provide transition maps between the Ext-applied
+complexes, a totalization, or a comparison to positive-degree Cech cohomology.
+The first direct packaging attempt was discarded after exposing mathlib's
+need for zero-preservation instances. A later proof supplies these instances
+locally at each stage, without axioms; that coherent diagram is recorded
+below.
+
+Validation passed: full `lake build` (2,751 jobs), `lake env lean
+Checks/Axioms.lean`, site generation, `python3 scripts/check_site.py`, and
+`git diff --check`. The new generator-power stage homology theorem depends
+only on `[propext, Classical.choice, Quot.sound]`. The site reports 80
+blueprint nodes, 67 checked nodes, 458 linked declarations, 1,032 local
+links, and 13,813 displayed source rows across 22 Lean files.
+
+## Coherent generator-power Ext--Cech diagram (2026-11-25)
+
+`Reisner/Cech/FaceRingLinear.lean` now assembles the fixed generator-power
+Ext-applied Cech complexes into a functorial diagram. The arrows are induced
+by the quotient-stage maps, and the complex-map functor laws compile using
+stage-local zero-preservation instances for the derived Ext functors.
+Evaluation in each Cech degree is identified with the corresponding
+Ext-functor diagram. In degree zero, the diagram is naturally isomorphic to
+the existing `faceRingGeneratorPowerExtDiagram`; hence its colimit is
+canonically the project local-cohomology module in each Ext degree.
+
+The degreewise colimit complex has zero terms and zero homology in every
+positive Cech degree, since its stagewise positive terms are zero and
+evaluation preserves colimits. This is a genuine coherent-colimit result,
+but its construction first applies a fixed `Ext^q` to each Cech term and then
+takes the stage colimit. It is not the original Cech complex and supplies no
+comparison to its positive-degree cohomology. The remaining mathematical
+task is the hypercohomology/double-complex or acyclic-resolution comparison.
+
+Validation passed: focused and full `lake build` (2,751 jobs), direct axiom
+inspection, `Checks/Axioms.lean`, and `git diff --check`. The new declarations
+use only `[propext, Classical.choice, Quot.sound]`.

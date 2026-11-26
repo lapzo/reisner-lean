@@ -276,7 +276,50 @@ EXCERPTS = {
         "cechCohomologyDegree_isZero_of_nonpos_negativeSupport_nonface"],
     "simplicial-cochain-modules": ["SimplicialFaceIndex", "SimplicialCochain",
         "SimplicialCochainDirectSum", "simplicialCochainDirectSumEquiv",
-        "simplicialCochainBasis", "simplicialCochainBasis_apply"],
+        "simplicialCochainBasis", "simplicialCochainBasis_apply",
+        "simplicialCochain_finiteDimensional", "simplicialCochain_finrank"],
+    "simplicial-chain-model": ["SimplicialChain", "simplicialChainBasis",
+        "simplicialChain_finiteDimensional", "simplicialChain_finrank",
+        "simplicialCochainEvalEquivDualChain",
+        "simplicialCochainEvalEquivDualChain_apply",
+        "simplicialCochainEvalEquivDualChain_naturality",
+        "simplicialBoundary", "simplicialBoundary_comp_eq_zero",
+        "simplicialChainComplex", "simplicialChainComplex_d",
+        "simplicialChainDegreeEmbedding", "simplicialChainComplexInt",
+        "simplicialChainComplexIntXIso", "simplicialChainComplexIntHomologyIso",
+        "simplicialChainComplexInt_isZero_of_lt_minus_one",
+        "simplicialChainComplexInt_homology_isZero_of_lt_minus_one",
+        "simplicialBoundary_basis_apply"],
+    "simplicial-duality": ["simplicialCohomologyDualHomologyEquiv"],
+    "simplicial-integer-duality": ["simplicialCohomologyIntDualHomologyEquiv",
+        "simplicialCohomologyIntDualHomologyEquiv_reindex",
+        "simplicialCochainInt_homology_isZero_iff_chainInt_homology_isZero"],
+    "simplicial-actual-dimension-cutoffs": ["simplicialCochain_subsingleton_of_maxFaceCard_lt",
+        "simplicialCochain_isZero_of_maxFaceCard_lt",
+        "simplicialCochainComplex_homology_isZero_of_maxFaceCard_lt",
+        "simplicialCochainComplexInt_isZero_of_dimension_lt",
+        "simplicialCochainComplexInt_homology_isZero_of_dimension_lt",
+        "simplicialChain_isZero_of_card_lt", "simplicialChain_isZero_of_maxFaceCard_lt",
+        "simplicialChainComplex_homology_isZero_of_card_lt",
+        "simplicialChainComplex_homology_isZero_of_maxFaceCard_lt",
+        "simplicialChainComplexInt_isZero_of_card_lt",
+        "simplicialChainComplexInt_homology_isZero_of_card_lt",
+        "simplicialChainComplexInt_isZero_of_dimension_lt",
+        "simplicialChainComplexInt_homology_isZero_of_dimension_lt"],
+    "dual-homology": ["dualShort", "homologyDualEquiv", "homologyDualEquiv_apply_cycle"],
+    "link-calculus": ["link_link", "mem_facets_link_iff", "linkFacetEquiv",
+        "linkFacetEquiv_apply", "linkFacetEquiv_symm_apply",
+        "link_face_card_add_le_maxFaceCard", "link_maxFaceCard_add_card_le",
+        "link_dimension_le", "link_maxFaceCard_eq_zero_of_facet",
+        "link_dimension_eq_neg_one_of_facet", "link_maxFaceCard_add_card_eq_of_pure",
+        "link_dimension_eq_of_pure", "link_pure_of_pure"],
+    "cech-purity": ["facet_card_ge_of_uniform_linkCohomology_vanishes",
+        "facet_card_eq_maxFaceCard_of_uniform_linkCohomology_vanishes",
+        "facet_card_eq_maxFaceCard_of_cechCohomology_vanishes",
+        "link_dimension_eq_of_cechCohomology_vanishes",
+        "linkCohomology_vanishes_below_dimension_of_cechCohomology_vanishes",
+        "cechCohomology_vanishes_of_pure_linkCohomology_vanishes",
+        "cechCohomology_vanishes_iff_pure_and_linkCohomology_vanishes"],
     "simplicial-differential": ["simplicialFaceEraseIndex", "simplicialRankBelow",
         "simplicialDifferential", "simplicialDifferential_apply",
         "simplicialDifferential_comp_eq_zero", "simplicialCochainComplex",
@@ -318,12 +361,75 @@ EXCERPTS = {
         "cechNonpositiveLinkNaturalHomologyIso",
         "cechNonpositiveLinkCohomologyIso",
         "cechCohomologyDegree_isZero_of_nonpos_card_lt_negativeSupport"],
+    "cech-uniform-link": ["cechCohomology_vanishes_iff_linkCohomology_vanishes"],
+    "cech-link-homology": ["cechCohomology_vanishes_iff_linkHomology_vanishes",
+        "cechCohomology_vanishes_iff_linkHomologyInt_vanishes"],
+    "cech-purity-homology": ["cechCohomology_vanishes_iff_pure_and_linkHomology_vanishes"],
+    "reisner-criterion": ["LinkHomologyVanishesBelowDimension", "reisner_criterion"],
     "simplicial-integer-endpoints": ["simplicialCochainComplexIntHomologyMinusOneEquivOfNoVertices",
         "simplicialCochainComplexIntHomologyMinusOne_isZero_of_vertex"],
+    "local-cohomology-definition": ["depthExtLocalCohomologyDiagram",
+                                    "depthExtLocalCohomology"],
+    "local-cohomology-stage": ["depthExtLocalCohomology_stage_subsingleton"],
+    "local-cohomology-stage-nontrivial": ["depthExtLocalCohomology_stage_nontrivial"],
+    "local-cohomology-vanishing": ["depthExtLocalCohomology_vanishes_below_depth"],
+    "local-depth-cutoff": ["le_depth_iff_localCohomology_vanishes"],
+    "augmentation-depth-bound": ["length_le_ringKrullDim_of_isRegular", "faceRing_atAugmentation_depth_le"],
+    "augmentation-local-cm": ["faceRing_atAugmentation_depth_eq_iff_localCohomology_vanishes"],
+    "algebraic-cm": ["IsLocalCohenMacaulay", "IsCohenMacaulay"],
+    "graded-maximal": ["faceRing_irrelevant_eq_augmentation",
+                       "faceRing_homogeneousIdeal_le_augmentation", "faceRing_isCoatom_homogeneousIdeal_iff"],
+    "homogeneous-maximal-cutoff": ["faceRing_homogeneousMaximal_cm_iff_localCohomology_vanishes"],
+    "global-cm-vanishing": ["faceRing_localCohomology_vanishes_of_isCohenMacaulay"],
+    "principal-localization-torsion": ["principalLocalization_kernel_iff_torsion"],
+    "ext-zero-quotient-hom": ["depthExtLocalCohomology_extZero_quotientHomEquiv"],
+    "quotient-hom-annihilator": ["depthExtQuotientHomTorsionEquiv"],
+    "ext-zero-naturality": ["depthExt_zero_precomp_naturality"],
+    "ext-zero-torsion-transition": ["depthExtLocalCohomologyModuleDiagram_map_succ",
+        "depthExtLocalCohomology_transition_torsion_natural", "principalPowerTorsion_eq"],
+    "principal-degree-zero-localization": ["principalExtZeroKernelEquiv"],
+    "ext-zero-power-torsion-sup": ["depthExtLocalCohomology_zero_torsionSupEquiv"],
+    "finite-generator-power-torsion": ["finiteGeneratorsLocalizationKernel_eq_powerTorsionSup"],
+    "finite-generator-degree-zero-localization": ["finiteGeneratorsExtZeroLocalizationKernelEquiv"],
+    "cech-degree-zero-kernel": ["cechZeroFaceRingEquiv", "cechDifferential_zero_apply",
+        "cechDifferential_zero_eq_zero_iff", "cechZeroCyclesLocalizationEquiv"],
+    "ext-zero-cech-cycles": ["extZeroCechCyclesEquiv"],
+    "ext-zero-cech-cohomology": ["cechZeroCyclesHomologyEquiv", "extZeroCechCohomologyEquiv"],
+    "generator-power-ideals": ["faceRingGeneratorPowerIdeal", "faceRingGeneratorPowerIdeal_one",
+        "faceRingGeneratorPowerIdeal_le_pow", "faceRingAugmentationIdeal_pow_le_generatorPowerIdeal",
+        "faceRingGeneratorPowerIdeal_antitone", "faceRingAugmentationIdeal_fg",
+        "faceRingAugmentationIdeal_le_generatorPowerIdeal_radical",
+        "faceRingAugmentationPowers_initial", "faceRingGeneratorPowers_initial"],
+    "generator-power-ext-colimit": ["faceRingGeneratorPowersDiagram",
+        "faceRingGeneratorPowerExtDiagram", "faceRingLocalCohomologyIsoGeneratorPowerExtColimit"],
+    "localized-ext-scalar": ["derivedExt_eq_zero_of_smul_id_eq_zero",
+        "derivedExt_eq_zero_of_annihilator_isUnit",
+        "derivedExt_quotient_eq_zero_of_mem_of_isUnit"],
+    "localized-ext-rows": ["faceRingLocalization_variable_isUnit",
+        "faceRingLocalization_augmentationPower_ext_eq_zero",
+        "faceRingLocalization_generatorPower_ext_eq_zero",
+        "faceRingLocalization_augmentationPower_ext_isZero",
+        "faceRingLocalization_localCohomology_isZero"],
+    "cech-acyclic-terms": ["depthExtTargetFunctor_additive",
+        "depthExtTargetFunctor_preservesFiniteProducts",
+        "depthExtLocalCohomology_additive",
+        "depthExtLocalCohomology_preservesFiniteProducts",
+        "faceRingCechCochain_augmentationPower_ext_isZero",
+        "faceRingCechCochain_localCohomology_isZero"],
+    "cech-ext-complex": ["faceRingLocalizationMapA",
+        "faceRingLocalizationMapA_algebraMap", "faceRingLocalizationMapA_toRingHom",
+        "cechDifferentialA", "cechDifferentialA_apply", "cechDifferentialA_comp_eq_zero",
+        "faceRingCechComplex", "faceRingCechExtComplex",
+        "faceRingCechExtComplex_X_isZero", "faceRingCechExtComplex_exactAt",
+        "faceRingCechExtComplex_homology_isZero",
+        "faceRingLocalizationEmptyEquivA", "cechZeroFaceRingEquivA",
+        "faceRingCechExtZeroTermIso", "faceRingCechExtComplex_zeroTermIso",
+        "faceRingCechExtComplex_zeroHomologyIso",
+        "faceRingCechExtComplex_zeroExtIso"],
 }
 
 
-def code_block(start, end, anchors=False, source_key="stanley"):
+def code_block(start, end, anchors=False, source_key="stanley", anchor_lines=None):
     source_file = next(source for source in SOURCE_FILES if source.key == source_key)
     lines = (ROOT / source_file.relative_path).read_text().splitlines()
     keywords = r"\b(module|public|import|namespace|universe|structure|where|theorem|noncomputable|def|abbrev|variable|by|classical|constructor|intro|have|simpa|using|exact|by_cases|simp|only|rw|rintro|end|fun|if|then|else)\b"
@@ -331,14 +437,15 @@ def code_block(start, end, anchors=False, source_key="stanley"):
     for number in range(start, end + 1):
         line = escape(lines[number - 1])
         line = re.sub(keywords, r'<span class="kw">\1</span>', line)
-        ident = f' id="{source_file.anchor_prefix}{number}"' if anchors else ""
+        ident = (f' id="{source_file.anchor_prefix}{number}"'
+                 if anchors or (anchor_lines is not None and number in anchor_lines) else "")
         rows.append(f'<span class="code-line" data-source="{source_file.relative_path}"{ident}><span class="line-no" aria-hidden="true">{number}</span><span class="source-line">{line}</span></span>')
     return (f'<div class="code-wrap"><div class="code-header"><span>{escape(source_file.relative_path)}'
             f' · lines {start}–{end}</span><button type="button" class="copy-button" aria-label="Copy Lean code">Copy</button>'
             '</div><pre><code>' + "".join(rows) + '</code></pre></div>')
 
 
-def code_for(key):
+def code_for(key, anchors=False, anchor_lines=None):
     if key == "full-source":
         return code_block(1, len(SOURCE.read_text().splitlines()), anchors=True)
     if key == "full-cech-source":
@@ -346,11 +453,23 @@ def code_for(key):
             code_block(1, len(SOURCE_PATHS[source_key].read_text().splitlines()),
                        anchors=True, source_key=source_key)
             for source_key in ("cech-core", "cech-grading", "cech-contraction",
-                               "cech-indices", "cech-link", "cech-shifted")
+                               "cech-indices", "cech-link", "cech-shifted",
+                               "cech-uniform-link")
         )
     if key == "full-simplicial-source":
         lines = SOURCE_PATHS["simplicial"].read_text().splitlines()
-        return code_block(1, len(lines), anchors=True, source_key="simplicial")
+        chain_lines = SOURCE_PATHS["simplicial-chain"].read_text().splitlines()
+        return (code_block(1, len(lines), anchors=True, source_key="simplicial") +
+                code_block(1, len(chain_lines), anchors=True, source_key="simplicial-chain"))
+    if key == "full-local-cohomology-source":
+        lines = SOURCE_PATHS["local-cohomology"].read_text().splitlines()
+        return code_block(1, len(lines), anchors=True, source_key="local-cohomology")
+    if key == "full-local-cm-source":
+        lines = SOURCE_PATHS["local-cm"].read_text().splitlines()
+        return code_block(1, len(lines), anchors=True, source_key="local-cm")
+    if key == "full-graded-local-source":
+        lines = SOURCE_PATHS["graded-local"].read_text().splitlines()
+        return code_block(1, len(lines), anchors=True, source_key="graded-local")
     ranges = []
     for name in EXCERPTS[key]:
         declaration = resolve_declaration(name, ROOT)
@@ -369,7 +488,8 @@ def code_for(key):
         while end >= start and not lines[end - 1].strip():
             end -= 1
         ranges.append((source_key, start, end))
-    return ''.join(code_block(start, end, source_key=source_key)
+    return ''.join(code_block(start, end, anchors=anchors, source_key=source_key,
+                              anchor_lines=anchor_lines)
                    for source_key, start, end in ranges)
 
 
@@ -399,13 +519,20 @@ def status_panel(nodes, linked):
             'no-vertex differential case, and zero modules above the ambient '
             'cardinality are checked, as are the coordinate insertion criterion, '
             'degree-minus-one cohomology endpoints, integer reindexing by n ↦ n − 1, '
-            'and low/high term and cohomology cutoffs. Higher-degree cohomology '
-            'vanishing and chain/duality comparisons remain future work. '
+            'and low/high term and cohomology cutoffs. Uniform vanishing of actual '
+            'Cech cohomology below a cutoff is equivalent to reduced link-cohomology '
+            'vanishing. The Ext-colimit comparison, higher-degree local-cohomology '
+            'comparison, and chain/duality comparisons remain future work. '
             'The signed termwise equivalence from nonpositive Čech degrees to augmented link '
             'cochains, its inverse/component formulas and differential compatibility are checked. '
             'The shifted-complex isomorphism and induced actual cohomology identifications are '
             'also checked, including the below-cutoff zero case and integer reduced degree. '
-            'The comparison with local cohomology remains future work. The count includes definitions; '
+            'The degree-zero Ext-colimit and Čech cohomology modules are isomorphic over the '
+            'coefficient ring. At the augmentation ideal over a field, the local ring has depth equal '
+            'to dimension exactly when its maximal-ideal Ext-colimit groups vanish below the maximum '
+            'face cardinality. This ideal is the unique maximal proper homogeneous ideal of the face ring. '
+            'Global algebraic Cohen–Macaulayness implies the vanishing condition. The converse and the '
+            'positive-degree comparison with Čech cohomology remain open. The count includes definitions; '
             'implemented proof blocks carry proof markers.</p>')
 
 
@@ -427,13 +554,25 @@ def route(nodes):
         ("lem:cech-cohomology-decomposition", "Degree subcomplexes → Čech cohomology", "The inclusion-induced map is a direct-sum isomorphism, with inverse given by homogeneous projections."),
         ("lem:contraction", "Positive degree → contractible subcomplex", "A signed removal map contracts each degree subcomplex with a positive coordinate."),
         ("lem:cech-nonpositive-indices", "Nonpositive degree → link faces", "The admissible subset indices correspond to faces of the link of the negative support, with a cardinality shift."),
+        ("lem:link-calculus", "Face inclusion → exact link and facet rules", "Prove iterated-link identities, facet correspondence, dimension bounds, and preservation of purity in the actual-face convention."),
         ("lem:augmented-cochain-complex", "Actual faces → augmented simplicial cochains", "Use face-cardinality products, the signed deletion differential, and pairwise sign cancellation to construct a genuine cochain complex."),
+        ("lem:cochain-finite-dim", "Actual faces → finite-dimensional cochain terms", "The coordinate basis gives finite dimension over a field, with rank equal to the number of actual faces in each cardinality."),
+        ("lem:augmented-chain-complex", "Dual cochains → augmented simplicial chains", "Dualize the signed cochain differential; actual face basis vectors have the signed deletion boundary, and the chain differential squares to zero."),
+        ("lem:dual-vanishing", "Dual exactness → equal vanishing", "Finite-dimensional linear duality converts exactness of the cochain complex to exactness of the dual chain complex, including the augmentation endpoint."),
+        ("lem:dual-isomorphism", "Dual cycles → canonical homology duality", "The evaluation pairing on cycles descends through boundaries to identify cohomology with the linear dual of homology in each face-cardinality degree."),
+        ("lem:dual", "Integer extension → reduced homology duality", "Transport canonical evaluation to every integer degree, retaining the empty face, zero extension, and actual-dimension cutoffs."),
         ("lem:augmented-basis-insertion", "Deletion coordinates → insertion signs", "Characterize the support of each basis differential by inserting an actual vertex and compute its order sign."),
         ("lem:augmented-cohomology-minus-one", "Empty face → degree-minus-one cohomology", "Identify actual cochain-complex homology with the outgoing-map kernel, then prove the empty complex and actual-vertex cases."),
         ("lem:augmented-cochains", "Face cardinality → integer reduced degree", "Extend the natural complex by zero below degree −1, identify its restriction and homology, and transport the endpoint and cutoff results."),
         ("lem:cech-link-coordinate-comparison", "Nonpositive degree → signed link coordinates", "Extract actual Laurent coefficients, correct orientations, and compare adjacent differentials, including the empty link face and zero targets."),
         ("lem:cech-link-cohomology-comparison", "Signed link coordinates → shifted cohomology", "Extend the link cochain complex by zero below the support cardinality, package the term maps as a complex isomorphism, and transport homology to integer reduced degree."),
-        ("cor:cm-lc", "Algebraic depth → local cohomology", "Use the graded local test and depth detection to translate Cohen–Macaulayness into vanishing below the dimension."),
+        ("cor:cech-uniform-link", "Čech cutoff → link cohomology", "Use the fine-degree decomposition and shifted link comparison to identify total Čech vanishing below d with the corresponding reduced link-cohomology vanishing."),
+        ("cor:cech-uniform-link-homology", "Link cohomology → link homology vanishing", "Use finite-dimensional dual exactness in each degree to state the actual Čech cutoff directly in augmented link homology."),
+        ("cor:cech-purity", "Uniform link cutoff → purity and own-dimension vanishing", "At a small facet, its link has nonzero degree-minus-one cohomology; purity then aligns all own-link dimension bounds with the uniform cutoff."),
+        ("cor:cech-purity-homology", "Integer duality → reduced link homology criterion", "Express the same Čech purity criterion in integer reduced homology with every own-link dimension bound unchanged."),
+        ("cor:augmentation-local-cm", "Local depth and dimension → vanishing", "At the augmentation ideal, combine the regular-sequence depth bound with Ext-colimit vanishing below depth."),
+        ("cor:homogeneous-maximal-cm-cutoff", "Homogeneous maximal ideals → one localization", "Every proper homogeneous ideal lies in the augmentation ideal, so it is the only localization in the graded maximal ideal test."),
+        ("cor:cm-lc", "Local test → Cohen–Macaulayness of the face ring", "The graded local test transfers the augmentation-local criterion to the entire face ring."),
         ("thm:lc-link", "Graded Čech pieces → link cohomology", "Compute localized monomials, contract positive degrees, and identify the remaining complexes with augmented link cochains."),
         ("thm:reisner", "Purity and vanishing → the criterion", "Prove purity from linkwise vanishing, match the dimension bounds, and deduce both implications."),
     ]
@@ -527,6 +666,11 @@ NODE_CODE = {
     "lem:cech-nonpositive-indices": ["cech-nonpositive-indices"],
     "lem:augmented-cochain-complex": ["simplicial-cochain-modules",
         "simplicial-differential", "simplicial-boundaries"],
+    "lem:cochain-finite-dim": ["simplicial-cochain-modules"],
+    "lem:augmented-chain-complex": ["simplicial-chain-model"],
+    "lem:dual-vanishing": ["simplicial-chain-model", "simplicial-differential"],
+    "lem:dual-isomorphism": ["dual-homology", "simplicial-duality"],
+    "lem:dual": ["simplicial-integer-duality", "simplicial-actual-dimension-cutoffs"],
     "lem:augmented-basis-insertion": ["simplicial-basis-insertion"],
     "lem:augmented-cohomology-minus-one": ["simplicial-homology-endpoints"],
     "lem:augmented-cochains": ["simplicial-integer-reindexing",
@@ -535,8 +679,44 @@ NODE_CODE = {
         "cech-link-compatibility", "cech-link-compatibility-proof"],
     "lem:cech-link-cohomology-comparison": ["cech-link-shifted-complex",
         "cech-link-complex-iso", "cech-link-homology"],
+    "cor:cech-uniform-link": ["cech-uniform-link"],
+    "cor:cech-uniform-link-homology": ["cech-link-homology"],
+    "lem:link-calculus": ["link-calculus"],
+    "cor:cech-purity": ["cech-purity"],
+    "cor:cech-purity-homology": ["cech-purity-homology"],
+    "thm:reisner": ["reisner-criterion"],
     "lem:localization-kernel": ["localization-objects", "localization-kernel",
                                 "localization-nonzero", "localization-maps"],
+    "def:local-cohomology": ["local-cohomology-definition"],
+    "lem:depth-ext-stage-vanishing": ["local-cohomology-stage"],
+    "lem:depth-ext-stage-nontrivial": ["local-cohomology-stage-nontrivial"],
+    "lem:lc-vanishes-below-depth": ["local-cohomology-vanishing"],
+    "thm:depth-cutoff": ["local-depth-cutoff"],
+    "lem:augmentation-depth-bound": ["augmentation-depth-bound"],
+    "cor:augmentation-local-cm": ["augmentation-local-cm"],
+    "def:cm": ["algebraic-cm"],
+    "lem:face-ring-graded-maximal": ["graded-maximal"],
+    "cor:homogeneous-maximal-cm-cutoff": ["homogeneous-maximal-cutoff"],
+    "cor:global-cm-implies-vanishing": ["global-cm-vanishing"],
+    "lem:principal-localization-torsion": ["principal-localization-torsion"],
+    "lem:ext-zero-quotient-hom": ["ext-zero-quotient-hom"],
+    "lem:quotient-hom-annihilator": ["quotient-hom-annihilator"],
+    "lem:ext-zero-naturality": ["ext-zero-naturality"],
+    "lem:ext-zero-torsion-transition": ["ext-zero-torsion-transition"],
+    "thm:principal-degree-zero-localization": ["principal-degree-zero-localization"],
+    "lem:ext-zero-power-torsion-sup": ["ext-zero-power-torsion-sup"],
+    "lem:finite-generator-power-torsion": ["finite-generator-power-torsion"],
+    "thm:finite-generator-degree-zero-localization": ["finite-generator-degree-zero-localization"],
+    "lem:cech-degree-zero-kernel": ["cech-degree-zero-kernel"],
+    "thm:ext-zero-cech-cycles": ["finite-generator-degree-zero-localization",
+        "cech-degree-zero-kernel", "ext-zero-cech-cycles"],
+    "thm:ext-zero-cech-cohomology": ["ext-zero-cech-cohomology"],
+    "lem:generator-power-ideals": ["generator-power-ideals"],
+    "thm:generator-power-ext-colimit": ["generator-power-ext-colimit"],
+    "lem:localized-ext-scalar": ["localized-ext-scalar"],
+    "thm:localized-ext-rows": ["localized-ext-rows"],
+    "thm:cech-acyclic-terms": ["cech-acyclic-terms"],
+    "thm:cech-ext-complex": ["cech-ext-complex"],
 }
 
 
@@ -554,6 +734,7 @@ def blueprint_content(nodes, linked):
     current_section = None
     current_article = None
     encountered = set()
+    emitted_source_anchors = set()
     for element in content.children:
         if isinstance(element, str) and not element.strip():
             continue
@@ -578,9 +759,23 @@ def blueprint_content(nodes, linked):
             ) if metadata['deps'] else 'base definitions') + '</div>'
             current_article = {'metadata': metadata, 'parts': [heading, '<div class="statement">' + render(statement) + '</div>', deps]}
             if metadata['lean']:
-                links = ''.join(f'<li><a class="source-link" href="index.html#{source_anchor(name)}">{escape(name)}</a></li>' for name in metadata['lean'])
+                source_target = '#'
+                links = ''.join(f'<li><a class="source-link" href="{source_target}{source_anchor(name)}">{escape(name)}</a></li>' for name in metadata['lean'])
+                # Source links must land on the declaration even when this
+                # node only displays selected source excerpts.
+                declarations = [resolve_declaration(name, ROOT) for name in metadata['lean']]
+                anchors = ''.join(
+                    f'<span id="{declaration.site_anchor}"></span>'
+                    for declaration in declarations
+                    if (declaration.source.key, declaration.line) not in emitted_source_anchors
+                )
+                emitted_source_anchors.update(
+                    (declaration.source.key, declaration.line) for declaration in declarations
+                )
                 code = ''.join(code_for(key) for key in NODE_CODE[metadata['label']])
-                current_article['parts'].append('<details><summary>Checked Lean declarations and source</summary><ul>' + links + '</ul>' + code + '</details>')
+                summary = ('Checked Lean declarations and source' if metadata['status'] == 'checked'
+                           else 'Lean statement (proof pending)')
+                current_article['parts'].append('<details><summary>' + summary + '</summary><div class="source-anchors" hidden>' + anchors + '</div><ul>' + links + '</ul>' + code + '</details>')
             current_section['body'].append(current_article)
             current_section['has_nodes'] = True
         else:
@@ -646,7 +841,8 @@ def main():
                   + run(['lake', 'env', 'lean', 'Checks/Axioms.lean'])
                   + run(['lake', 'env', 'lean', 'Checks/LocalizationKernelAudit.lean'])
                   + run(['lake', 'env', 'lean', 'Checks/Cech.lean'])
-                  + run(['lake', 'env', 'lean', 'Checks/SimplicialCochain.lean']))
+                  + run(['lake', 'env', 'lean', 'Checks/SimplicialCochain.lean'])
+                  + run(['lake', 'env', 'lean', 'Checks/LinkCalculus.lean']))
     if 'sorryAx' in validation:
         raise RuntimeError('Axiom inspection contains a proof placeholder')
     allowed_axioms = {'propext', 'Classical.choice', 'Quot.sound'}
@@ -679,10 +875,11 @@ def main():
     (OUT / 'blueprint.html').write_text(page('The blueprint', content, blueprint_toc, 'blueprint'))
     (OUT / 'validation.txt').write_text(validation)
     (OUT / 'source').mkdir(exist_ok=True)
-    for source in [*(ROOT / item.relative_path for item in SOURCE_FILES), ROOT / 'Checks/Axioms.lean', ROOT / 'Checks/LocalizationKernelAudit.lean', ROOT / 'Checks/Cech.lean', ROOT / 'Checks/SimplicialCochain.lean', ROOT / 'AUDIT.md', ROOT / 'STATUS.md', ROOT / 'lake-manifest.json', ROOT / 'lakefile.lean', ROOT / 'lean-toolchain']:
+    for source in [*(ROOT / item.relative_path for item in SOURCE_FILES), ROOT / 'Checks/Axioms.lean', ROOT / 'Checks/LocalizationKernelAudit.lean', ROOT / 'Checks/Cech.lean', ROOT / 'Checks/SimplicialCochain.lean', ROOT / 'Checks/LinkCalculus.lean', ROOT / 'AUDIT.md', ROOT / 'STATUS.md', ROOT / 'lake-manifest.json', ROOT / 'lakefile.lean', ROOT / 'lean-toolchain']:
         destination_name = {
             ROOT / 'Checks/Cech.lean': 'Checks-Cech.lean',
             ROOT / 'Checks/SimplicialCochain.lean': 'Checks-SimplicialCochain.lean',
+            ROOT / 'Checks/LinkCalculus.lean': 'Checks-LinkCalculus.lean',
         }.get(source, source.name)
         shutil.copyfile(source, OUT / 'source' / destination_name)
     shutil.copyfile(ROOT / 'blueprint/print/print.pdf', OUT / 'blueprint.pdf')

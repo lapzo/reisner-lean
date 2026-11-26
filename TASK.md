@@ -1,111 +1,44 @@
-# Current task: package the shifted Cech/link cohomology comparison
+# Current formalization task
 
-The signed termwise comparison between a nonpositive fine-degree Cech
-subcomplex and augmented cochains of its link is checked, including inverse
-formulas and differential compatibility. Positive-coordinate contraction
-and the nonface-negative-support zero case are checked. The next dependency
-for the local-cohomology link formula is to package these maps as an actual
-shifted cochain-complex isomorphism and transport actual homology. This is
-not the Cech/local-cohomology comparison or the full theorem thm:lc-link.
+## Reisner's criterion statement
 
-Read AGENTS.md, STATUS.md, AUDIT.md, the blueprint, Lean source/checks, and
-pinned mathlib. Preserve checked results, APIs, empty-face/ghost conventions,
-and pins. Work locally. No commits, publication, sorry/admit, or new axioms.
+The full statement in `Reisner/ReisnerCriterion.lean` compiles. For a finite
+ambient vertex type and any field, `Reisner.Complex.reisner_criterion` states
+that algebraic Cohen–Macaulayness of the face ring is equivalent to reduced
+homology vanishing below each face link's own dimension. It includes the
+empty face and ghost vertices. This milestone covers the statement. Its
+proof remains open, with one intentional `sorry` in this declaration.
 
-## Mathematical target
+## Current checked milestone
 
-Let V be finite and linearly ordered, K : Complex V, R a commutative ring,
-a : V →₀ ℤ with a ≤ 0, N := negativeSupport a, and hN : N ∈ K.faces.
-Set L := K.link N hN and m := N.card. The checked source complex is
-K.cechComplexDegree R a. Define an actual natural-indexed shifted link
-complex D in ModuleCat R by
+The project now has a checked canonical evaluation isomorphism between augmented simplicial cohomology and the linear dual of augmented simplicial homology in every integer reduced degree. It reindexes the natural face-cardinality theorem, including degree zero (reduced degree -1), and uses the zero extensions below -1. Chain and cochain terms and homology have checked upper bounds at both the ambient vertex count and actual maximal face cardinality. The generic short-complex theorem and simplicial specializations are in `Reisner/DualHomology.lean` and `Reisner/SimplicialDuality.lean`.
 
-- D.X q = 0 when q < m;
-- D.X (m+r) = ModuleCat.of R (L.SimplicialCochain R r);
-- its differential is zero below m and the existing simplicial
-  differential at r from m+r to m+(r+1).
+The actual Cech complex has also been compared with shifted link cohomology, and its uniform vanishing cutoff is characterized as purity together with integer reduced link homology vanishing below each link dimension. The cohomology form remains available over nontrivial commutative coefficient rings; homology duality uses field coefficients. This checked Cech statement is not yet the algebraic Reisner criterion.
 
-Prove D is a cochain complex. Construct an actual cochain-complex
-isomorphism K.cechComplexDegree R a ≅ D. Below m, use the already checked
-zero theorem for Cech degree modules. At q=m+r, use the checked
-cechNonpositiveLinkEquiv and its differential-compatibility theorem.
-Prove the induced actual homology-object equivalence in every degree q.
-For q=m+r identify the result with the link's actual reduced cohomology
-object at integer degree (r:ℤ)-1 using the checked integer reindexing of
-augmented cochains. State the q<m zero case separately; do not use truncated
-subtraction there. Keep r=0 and the empty link face, so degree -1 remains.
+The positive-degree bridge now has checked stage normalization in `Reisner/Cech/ExtComparison.lean`: for every cohomological degree `q`, the face-ring local-cohomology module is canonically isomorphic to the colimit of `Ext^q(A / (x_v^n), A)`. This uses the project's derived-category Ext model and applies over every commutative coefficient ring, including the zero ring and an empty vertex set. It is not yet a comparison with positive-degree Cech cohomology.
 
-This result is over arbitrary commutative R, including the zero ring and
-characteristic two. Do not claim the local-cohomology comparison,
-higher-degree vanishing below link dimension, or full thm:lc-link.
-The existing nonface-N and positive-coordinate zero results remain intact.
+The nonempty Čech rows now also have checked acyclicity: for every nonempty `F`, exponent `n`, and cohomological degree `q`, `Ext^q_A(A/m^n, A_{x_F}) = 0`, and the evaluated Ext-colimit local cohomology of `A_{x_F}` vanishes. This includes ghost/nonface localizations, which may be zero rings. No comparison of the whole Čech complex with local cohomology has yet been proved.
 
-## Builder: API route and blueprint source
+The Ext target functor and its local-cohomology colimit are checked additive and preserve finite products. Consequently, for every positive Čech degree, exponent `n`, and Ext degree `q`, both `Ext^q_A(A/m^n, C^p)` and the project Ext-colimit local cohomology of `C^p` vanish. This is stagewise acyclicity input for the full comparison; the augmented Čech complex has not yet been shown to compute the Ext-colimit.
 
-Builder owns blueprint/src/content.tex.
+The actual Čech complex is now also available over the face ring: its differential is built from face-ring algebra maps, proved equal to the existing coefficient-ring differential, and its square-zero identity is inherited from the checked complex. For each fixed augmentation-power stage and Ext degree, termwise application of the derived Ext functor gives a complex with zero terms and homology in all positive Čech degrees. For the cofinal generator-power stages, the fixed complexes are now assembled into a coherent diagram; its degree-zero term colimit is the existing local-cohomology Ext colimit, and the colimit complex has zero terms and homology in positive Čech degrees. This still does not identify a double-complex totalization or original Čech cohomology with the colimit.
 
-1. Define a custom ComplexShape.Embedding (up ℕ) (up ℕ) by r ↦ m+r,
-   with injectivity by cancellation and relation preservation by
-   m+(r+1)=(m+r)+1. Use HomologicalComplex.extend on the checked link
-   complex to obtain D. This supplies the genuine cutoff complex directly,
-   with extendXIso for terms, extend_d_eq for the unchanged differential,
-   isZero_extend_X below m, and extendHomologyIso at m+r.
-   Package the component maps using HomologicalComplex.Hom.isoOfComponents;
-   use homologyMapIso for the induced actual homology isomorphism.
-   Compose with the checked link integer-reindexing homology isomorphism
-   in the inverse direction. A small prototype of this route is compiled
-   in /tmp/reisner-link-cutoff-api.lean; no project Lean is implemented yet.
-2. Add a distinct node, e.g. lem:cech-link-cohomology-comparison, depending
-   on lem:cech-link-coordinate-comparison, lem:cech-nonpositive-indices,
-   and the checked augmented cochain/reindexing nodes. State D, the complex
-   isomorphism, q<m vanishing, and q=m+r homology identification exactly.
-3. Give Formalizer exact types, source anchors, cutoff arithmetic, and
-   edge-case expectations. Do not mark claims checked before compilation.
-   Do not edit Lean/checks/docs/site/pins in this stage.
+Its degree-zero Čech cochain module is checked face-ring-linearly equivalent to `A`, and the degree-zero object after fixed-stage Ext is identified with `Ext^q_A(A/m^n,A)`. The next step remains the genuine comparison between these fixed-stage complexes and the Ext-colimit model; the termwise Ext image alone does not commute with cohomology.
 
-## Formalizer: implementation and validation
+More precisely, the fixed-stage Ext-applied Čech complex has degree-zero homology canonically isomorphic to `Ext^q_A(A/m^n,A)`, while all positive-degree homology vanishes. This is a statement about homology after applying the single functor `Ext^q`; it does not identify `Ext^q` of Čech cohomology and must not be used as the desired hypercohomology comparison.
 
-Formalizer owns Lean and checks, not blueprint source. Reuse
-cechComplexDegree, cechNonpositiveLinkEquiv, its differential theorem, and
-simplicialCochainComplexInt. Do not create new link differentials or change
-signs.
+## Open positive-degree comparison
 
-Acceptance:
+The blueprint's double-complex/totalization or acyclic-resolution argument comparing positive-degree Čech cohomology with the generator-power Ext-colimit remains open. The coherent diagram of generator-power Ext-applied Čech complexes, natural identification of its degree-zero term colimit, and vanishing of positive terms and homology of its colimit complex are now checked. This diagram still applies each fixed `Ext^q` to the Čech terms before taking the colimit; it does not compute the original Čech cohomology. Keep the derived-category Ext model throughout; no bridge to Mathlib's older left-derived Ext has been proved. Do not assume that the generator-power Koszul complexes resolve `A / (x_v^n)`: variables can be zero divisors. If a Koszul route is chosen over general coefficient rings, establish the needed weak-proregularity or restrict the eventual comparison to the blueprint's stated Noetherian case. Preserve the empty complex, ghost vertices, and degree -1 conventions. The separate graph-connectivity comparison remains unformalized and must not be assumed.
 
-- D has the exact zero and shifted terms and the specified differentials;
-- D satisfies the cochain-complex law;
-- the component equivalences form an actual cochain-complex isomorphism,
-  not merely a family of termwise maps;
-- actual homology is identified for q<m and q=m+r, with the link reduced
-  degree r-1 made explicit through the existing integer reindexing;
-- focused checks cover N=∅, nonempty face N, empty link, q<m, q=m, r=0,
-  and arbitrary coefficients including the zero ring;
-- run lake build, lake env lean Checks/Axioms.lean, Checks/Cech.lean, and
-  Checks/SimplicialCochain.lean; inspect axioms for D, the complex
-  isomorphism, and homology result; scan for sorry/admit/custom axioms.
+## Open dependencies of the blueprint proof
 
-Do not edit pins, existing checked statements, or blueprint source. Report
-exact declarations, proof route, validation, and gaps. If the manual cutoff
-does not match the checked term maps, report the blocker; do not add
-hypotheses or drop the empty-face case.
+1. The positive-degree comparison between the face ring's actual Čech cohomology and its Ext-colimit local cohomology remains open.
+2. The global converse transferring the augmentation-local test to algebraic Cohen–Macaulayness of the face ring remains open.
+3. The converse also uses purity deduced from vanishing below each link's own dimension. Its graph-connectivity argument remains in the blueprint.
 
-## Builder finalization and Weber
+## Working rules
 
-After successful Lean handoff, Builder links and marks only compiled shifted
-complex and homology statements. Keep full thm:lc-link, found:cech's local
-cohomology comparison, def:homology, lem:dual, and the full criterion future
-unless their entire statements are proved.
-
-Weber then regenerates local blueprint PDF/HTML, declarations and graph;
-runs leanblueprint checkdecls, lake build, axiom/check files,
-python3 site/build.py, and python3 scripts/check_site.py; and updates
-STATUS.md, AUDIT.md, and README with verified results only. No reports or
-publication.
-
-## Scope estimate
-
-Target 35-45 minutes. The termwise maps, sign correction, cutoff zero terms,
-cochain complexes, and integer reindexing already exist. New work is one
-custom natural-index embedding and its zero extension, packaging component
-maps with pinned homological-complex APIs, and transporting actual homology.
-Do not expand into local cohomology.
+- Consult the blueprint before changing mathematical statements, and mark a node checked only after Lean compilation succeeds.
+- Reuse the pinned mathlib APIs and existing project definitions. Completed proofs must contain no `sorry`, `admit`, or new axioms. The sole placeholder exception is the requested statement `Reisner.Complex.reisner_criterion`.
+- After each milestone, run `lake build`, inspect axioms of the main new theorem, and run the site and blueprint checks if their inputs change. Do not deploy the site.
